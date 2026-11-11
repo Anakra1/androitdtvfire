@@ -23,6 +23,14 @@ The [setup guide](outputs/CBR-Kodi-Build-README.md) covers both installs. The wi
 
 You can install the direct add-on ZIP instead of the repository, then install the wizard and skin from their separate ZIPs in the same folder.
 
+### Fire TV source install
+
+After GitHub Pages is enabled for this repository, add this as a Kodi File Manager source:
+
+`https://anakra1.github.io/CBR-Kodi-Project/downloads/Fire-TV-Android/`
+
+Name it `CBR Fire TV`, then choose **Add-ons → Install from zip file → CBR Fire TV → CBR-Fire-TV-Android-Repository-0.1.1.zip**. The folder's `index.html` lists the ZIPs in a format Kodi can browse.
+
 ## Android / Fire TV note
 
 The Android add-on downloads the matching official TorrServer MatriX.150 binary on first torrent playback and checks its SHA-256. That download is about 61 MB. Some newer Android builds block Kodi from launching binaries stored in add-on data; those devices need a companion service app for torrent playback. The current package does not include that helper, and it has not been tested on Fire TV hardware. Kodi-native HTTP/HLS playback and the catalogue UI remain available.
