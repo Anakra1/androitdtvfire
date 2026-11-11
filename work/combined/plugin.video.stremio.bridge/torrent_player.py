@@ -8,25 +8,7 @@ import xbmc
 import xbmcgui
 import xbmcvfs
 
-from engine import (ANDROID_COMPANION_PACKAGE, ANDROID_COMPANION_PORT, Client,
-                    prepare_torrent, read_json, write_json)
-
-
-def launch_android_companion():
-    if os.name == 'nt':
-        return
-    client = Client('http://127.0.0.1:{}'.format(ANDROID_COMPANION_PORT))
-    if client.alive():
-        return
-    try:
-        # This is called from Kodi's foreground playback selection, not its
-        # background add-on service. Fire OS can reject background activity starts.
-        xbmc.executebuiltin(
-            'StartAndroidActivity({},android.intent.action.VIEW,,cbr://start)'.format(
-                ANDROID_COMPANION_PACKAGE), True)
-    except Exception as error:
-        raise RuntimeError(
-            'Fire TV could not open CBR Kodi Companion. Check that it is installed and enabled.') from error
+from engine import Client, prepare_torrent, read_json, write_json
 
 
 def torrent_magnet(stream):
@@ -52,7 +34,6 @@ def prepare_item(addon, stream, meta):
     session_path = os.path.join(root, 'engine-session.json')
     client, torrent_hash = None, None
     try:
-        launch_android_companion()
         stamp = time.time()
         write_json(os.path.join(root, 'engine-request.json'), {'time': stamp})
         deadline = time.monotonic() + 300

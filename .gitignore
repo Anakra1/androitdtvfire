@@ -7,3 +7,13 @@ userdata/
 addon_data/
 *.log
 *.console
+/work/native-engine/
+/work/toolchains/
+/work/test-android-native/
+/work/emulator-avds/
+/work/combined/script.module.cbr.engine/resources/lib/
+/work/combined/repository.crb*/packages/
+/outputs/cbr-test-seed.exe
+/outputs/*-stage/
+/outputs/verified-live-*
+/outputs/published-addons.xml

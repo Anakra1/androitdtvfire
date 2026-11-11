@@ -1,4 +1,4 @@
-"""Windows engine and localhost client with an Android companion handoff."""
+"""Windows engine and Android shared engine supplied by a Kodi dependency."""
 import hashlib
 import json
 import os
@@ -11,8 +11,6 @@ from urllib.parse import quote, urlencode
 from urllib.request import ProxyHandler, Request, build_opener
 
 ENGINE_SHA256 = '3a96b97a24d86a90c0712a6ec47d4ed52edc7eabac1bce6a0d9bbc8fd30de5bb'
-ANDROID_COMPANION_PACKAGE = 'com.crimsonbloodrequiem.companion'
-ANDROID_COMPANION_PORT = 8766
 OPENER = build_opener(ProxyHandler({}))  # Local playback must not use an HTTP proxy.
 
 
@@ -145,17 +143,11 @@ class Engine:
             arch = _android_arch()
             if not arch:
                 raise RuntimeError('The built-in torrent player supports Windows and Android devices.')
-            self.client = Client('http://127.0.0.1:{}'.format(ANDROID_COMPANION_PORT))
-            if not self.client.alive():
-                deadline = time.monotonic() + 90
-                while not self.client.alive():
-                    if progress:
-                        progress(0, 'Connecting to CBR torrent player…')
-                    if time.monotonic() > deadline:
-                        raise RuntimeError(
-                            'Fire TV did not start the CBR torrent player. Android blocked the launch; '
-                            'check that CBR Kodi Companion is installed and enabled.')
-                    time.sleep(0.25)
+            try:
+                from cbrengine import start
+            except ImportError as error:
+                raise RuntimeError('CBR Playback Engine is missing. Install CBR from its Kodi repository to include the playback dependency.') from error
+            self.client = Client(start(self.data_path))
         os.makedirs(self.data_path, exist_ok=True)
         if os.name == 'nt':
             with socket.socket() as listener:
@@ -192,13 +184,8 @@ class Engine:
 
     def stop(self):
         if os.name != 'nt':
-            try:
-                import xbmc
-                xbmc.executebuiltin(
-                    'StartAndroidActivity({},android.intent.action.VIEW,,cbr://stop)'.format(
-                        ANDROID_COMPANION_PACKAGE))
-            except Exception:
-                pass
+            # Idle torrent cleanup happens in service.py. Keep the shared
+            # library resident, with no active torrent, until Kodi exits.
             self.client = None
             return
         if self.process and self.process.poll() is None:

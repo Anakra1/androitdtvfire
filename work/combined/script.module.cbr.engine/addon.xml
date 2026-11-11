@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<addon id="script.module.cbr.engine" name="CBR Playback Engine" version="0.1.0" provider-name="CBR Project">
+  <requires><import addon="xbmc.python" version="3.0.1"/></requires>
+  <extension point="xbmc.python.module" library="lib"/>
+  <extension point="xbmc.addon.metadata">
+    <summary lang="en_GB">Integrated torrent buffering for Crimson Blood Requiem</summary>
+    <description lang="en_GB">Loads the bundled TorrServer shared engine inside Kodi on Android. Installed and updated automatically as a CBR dependency.</description>
+    <platform>all</platform>
+    <license>GPL-3.0-or-later</license>
+    <source>https://github.com/Anakra1/androitdtvfire</source>
+  </extension>
+</addon>

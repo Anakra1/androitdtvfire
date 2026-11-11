@@ -1,59 +1,29 @@
 # Crimson Blood Requiem for Kodi
 
-CBR is a Kodi add-on with movie and TV catalogues, search, Live TV categories, multiple Stremio-compatible manifest sources, a built-in torrent player, a crimson space skin, and an optional setup wizard.
+CBR provides movie and TV catalogues, posters, separate searches, Live TV categories, multiple Stremio-compatible manifests, and integrated torrent buffering. The optional skin and wizard provide the crimson space interface.
 
-## Download packages
+## Fire TV and Android installation
 
-Use the repository ZIP for your Kodi platform. It installs the CBR repository; from there install the video add-on, skin and setup wizard.
+1. In Kodi File Manager, add `https://anakra1.github.io/androitdtvfire/` as a source named CBR.
+2. Select **Add-ons → Install from zip file → CBR → repository.cbr.zip**.
+3. Select **Install from repository → CBR Android Add-on Repository → Video add-ons → Crimson Blood Requiem**.
+4. Accept Kodi’s dependency list, including **CBR Playback Engine**. Kodi installs the playback engine with the video add-on.
+5. Open CBR and select a movie or episode and a source. On upgrades from older CBR versions, restart Kodi once so its old service unloads.
 
-| Platform | Kodi repository installer | Direct add-on installer |
-| --- | --- | --- |
-| Windows x64 | [`CBR-Windows-Repository-0.1.7.zip`](downloads/Windows/CBR-Windows-Repository-0.1.7.zip) | [`plugin.video.stremio.bridge-0.5.5.zip`](downloads/Windows/plugin.video.stremio.bridge-0.5.5.zip) |
-| Fire TV / Android TV | [`CBR-Fire-TV-Android-Repository-0.1.5.zip`](downloads/Fire-TV-Android/CBR-Fire-TV-Android-Repository-0.1.5.zip) | [`plugin.video.stremio.bridge-0.5.6-android.zip`](downloads/Fire-TV-Android/plugin.video.stremio.bridge-0.5.6-android.zip) |
+Current Android versions: repository **0.1.6**, video add-on **0.6.0**, playback engine **0.1.0**. All playback installation and updates use this one Kodi repository.
 
-Fire TV torrent playback also needs the separate [CBR Kodi Companion APK](downloads/Fire-TV-Android/CBR-Kodi-Companion-0.2.0.apk). Install that Android app once; add-on 0.5.6 requests its foreground launch directly from the source-selection action. The APK must be sideloaded on Fire TV and cannot be installed by Kodi's add-on repository.
+Install **Crimson Blood Requiem Skin** and **CBR Setup Wizard** from the same repository for the optional interface, then run the wizard. The video add-on also works with Kodi’s normal skin.
 
-The [setup guide](outputs/CBR-Kodi-Build-README.md) covers both installs. The wizard and skin ZIPs are also in each platform's download folder.
+The existing Windows packages are in [downloads/Windows](downloads/Windows).
 
-## Install on Kodi
+## Sources
 
-1. Copy the platform repository ZIP to the Kodi device.
-2. In Kodi, select **Add-ons → Install from zip file** and choose the repository ZIP.
-3. Open **Install from repository** and select **CBR Add-on Repository** on Windows or **CBR Android Add-on Repository** on Fire TV/Android.
-4. Install **Crimson Blood Requiem**, **CBR Setup Wizard**, and **Crimson Blood Requiem Skin**.
-5. Launch the wizard and choose **Apply CBR space interface**.
+Open **Sources and player settings → Manage sources / add manifest URL** to add, rename, disable or remove providers. Private configured manifests belong in device settings and are not included in distributed installers. Public defaults supply catalogues and stream results; availability depends on the provider and peers.
 
-You can install the direct add-on ZIP instead of the repository, then install the wizard and skin from their separate ZIPs in the same folder.
+## Implementation and build
 
-### Fire TV source install
+Android playback uses a shared engine library loaded inside Kodi through the CBR Playback Engine module. The engine buffers torrents in memory and provides a seekable HTTP stream on loopback for Kodi’s player. Libraries are included in the Kodi dependency and verified before loading. The loader respects the bitness of Kodi’s process.
 
-Add this as a Kodi File Manager source:
+The source is in `work/combined`. Build native libraries with `build_native_engine.ps1` using Go and Android NDK, then run `build_combined.py` and `build_crb_setup.py`. The Android repository uses its own HTTPS metadata and packages under `android/`, avoiding the former shared localhost repository service.
 
-`https://anakra1.github.io/androitdtvfire/`
-
-Name it `CBR Fire TV`, then choose **Add-ons → Install from zip file → CBR Fire TV → CBR-Fire-TV-Android-Repository-0.1.5.zip**. The root `index.html` lists the repository ZIP in a format Kodi can browse.
-
-## Android / Fire TV note
-
-CBR Kodi Companion 0.2.0 packages the pinned TorrServer MatriX.150 engines for ARMv7 and ARM64 in the APK. Android installs the engine in its native library directory; the companion verifies its SHA-256 before starting it. It runs TorrServer as an Android foreground service on `127.0.0.1:8766`; the Kodi add-on launches it when needed and uses Kodi's normal player. Install the companion APK once before playing torrent sources. Kodi-native HTTP/HLS playback and the catalogue UI remain available without it.
-
-The project supports Android ARM64, ARMv7, x86_64 and x86. Most Fire TV devices use ARM64.
-
-## Provider settings and privacy
-
-This repository uses public defaults and does not contain the personalized MediaFusion URL or any account tokens. Add any private or device-specific manifest from **Sources and player settings → Manage sources / add manifest URL** on each Kodi device. Keep personalized URLs out of public commits.
-
-## Source and packaging
-
-- `work/combined/plugin.video.stremio.bridge` — Kodi add-on source.
-- `work/combined/skin.crimsonbloodrequiem` — CBR Kodi skin.
-- `work/combined/script.crb.wizard` — interface setup and restore wizard.
-- `work/combined/build_combined.py` and `build_crb_setup.py` — package builders.
-- `downloads/` — ready-to-install platform packages.
-- `source/TorrServer-MatriX.150-source.zip` — corresponding TorrServer source distribution.
-
-To rebuild the packages on Windows, install Python 3 and run `build_combined.py`, then `build_crb_setup.py` from `work/combined`. The builds create the plugin, repository, skin and wizard ZIPs in `outputs/`.
-
-The Kodi integration is GPL-3.0-or-later and includes earlier MIT-licensed components with their notices. TorrServer is GPL-3.0; its license and matching source are included. Provider manifests supply listings and streams; CBR does not include media files.
-
-Android repository 0.1.5 uses its own HTTPS feed under android/ rather than the shared localhost port. Install repo.zip, then update the CBR video add-on to 0.5.6. video.zip also installs that version directly. Install cbr.apk separately to update the companion to 0.2.0. A physical Fire TV playback check is still required.
+The integration and TorrServer-derived engine are GPL-3.0-or-later. Earlier MIT notices are preserved. Matching upstream source is included at `source/TorrServer-MatriX.150-source.zip`; CBR’s C ABI wrapper and native build script are included in the repository.

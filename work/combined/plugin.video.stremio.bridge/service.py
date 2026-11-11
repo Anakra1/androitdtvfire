@@ -66,6 +66,12 @@ def main():
     finally:
         if engine:
             engine.stop()
+        if os.name != 'nt':
+            try:
+                from cbrengine import shutdown
+                shutdown()
+            except Exception as error:
+                xbmc.log('CBR playback shutdown: {}'.format(error), xbmc.LOGWARNING)
         write_json(endpoint_path, {})
         write_json(session_path, {})
 

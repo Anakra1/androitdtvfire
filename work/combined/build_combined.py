@@ -12,7 +12,7 @@ outputs = here.parent.parent / 'outputs' if here.parent.name == 'work' else here
 outputs.mkdir(exist_ok=True)
 readme = outputs / 'Crimson-Blood-Requiem-README.md' if here.parent.name == 'work' else here / 'README.md'
 version = ET.parse(source / 'addon.xml').getroot().attrib['version']
-assert version == '0.5.6'
+assert version == '0.6.0'
 assert 'plugin.video.stremio.bridge' in (source / 'service.py').read_text(encoding='utf-8-sig')
 for path in source.rglob('*.py'):
     py_compile.compile(str(path), doraise=True)
@@ -25,7 +25,7 @@ for path in (source / 'resources/defaults').glob('*.json'):
         assert all(key in data for key in ('id', 'name', 'version'))
 binary = source / 'resources/bin/windows-x64/TorrServer.exe'
 assert hashlib.sha256(binary.read_bytes()).hexdigest() == '3a96b97a24d86a90c0712a6ec47d4ed52edc7eabac1bce6a0d9bbc8fd30de5bb'
-(source / 'README.md').write_text(readme.read_text(encoding='utf-8-sig'), encoding='utf-8')
+readme.write_text((source / 'README.md').read_text(encoding='utf-8-sig'), encoding='utf-8')
 files = [path for path in source.rglob('*') if path.is_file() and '__pycache__' not in path.parts]
 installer = outputs / ('plugin.video.stremio.bridge-' + version + '.zip')
 with ZipFile(installer, 'w', ZIP_DEFLATED) as archive:
@@ -48,7 +48,18 @@ with ZipFile(bundle, 'w', ZIP_DEFLATED) as archive:
             archive.write(path, name)
     for path in here.glob('test_*.py'):
         archive.write(path, path.name)
+    for path in (here / 'tests').rglob('*'):
+        if path.is_file():
+            archive.write(path, path.relative_to(here).as_posix())
     archive.write(here / 'build_combined.py', 'build_combined.py')
+    archive.write(here / 'build_crb_setup.py', 'build_crb_setup.py')
+    archive.write(here / 'build_native_engine.ps1', 'build_native_engine.ps1')
+    for path in (here / 'script.module.cbr.engine').rglob('*'):
+        if path.is_file() and '__pycache__' not in path.parts and not ('resources' in path.parts and 'lib' in path.parts):
+            archive.write(path, path.relative_to(here).as_posix())
+    upstream = here.parent.parent / 'source/TorrServer-MatriX.150-source.zip'
+    if upstream.is_file():
+        archive.write(upstream, 'source/TorrServer-MatriX.150-source.zip')
     archive.write(readme, 'README.md')
 for path in (installer, bundle):
     with ZipFile(path) as archive:
