@@ -8,8 +8,10 @@ Use the repository ZIP for your Kodi platform. It installs the CBR repository; f
 
 | Platform | Kodi repository installer | Direct add-on installer |
 | --- | --- | --- |
-| Windows x64 | [`CBR-Windows-Repository-0.1.6.zip`](downloads/Windows/CBR-Windows-Repository-0.1.6.zip) | [`plugin.video.stremio.bridge-0.5.4.zip`](downloads/Windows/plugin.video.stremio.bridge-0.5.4.zip) |
-| Fire TV / Android TV | [`CBR-Fire-TV-Android-Repository-0.1.2.zip`](downloads/Fire-TV-Android/CBR-Fire-TV-Android-Repository-0.1.2.zip) | [`plugin.video.stremio.bridge-0.5.4-android.zip`](downloads/Fire-TV-Android/plugin.video.stremio.bridge-0.5.4-android.zip) |
+| Windows x64 | [`CBR-Windows-Repository-0.1.7.zip`](downloads/Windows/CBR-Windows-Repository-0.1.7.zip) | [`plugin.video.stremio.bridge-0.5.5.zip`](downloads/Windows/plugin.video.stremio.bridge-0.5.5.zip) |
+| Fire TV / Android TV | [`CBR-Fire-TV-Android-Repository-0.1.3.zip`](downloads/Fire-TV-Android/CBR-Fire-TV-Android-Repository-0.1.3.zip) | [`plugin.video.stremio.bridge-0.5.5-android.zip`](downloads/Fire-TV-Android/plugin.video.stremio.bridge-0.5.5-android.zip) |
+
+Fire TV torrent playback also needs the separate [CBR Kodi Companion APK](downloads/Fire-TV-Android/CBR-Kodi-Companion-0.1.0.apk). Install that Android app once; the Kodi add-on starts its foreground service automatically when a torrent source is selected. The APK must be sideloaded on Fire TV and cannot be installed by Kodi's add-on repository.
 
 The [setup guide](outputs/CBR-Kodi-Build-README.md) covers both installs. The wizard and skin ZIPs are also in each platform's download folder.
 
@@ -29,11 +31,11 @@ Add this as a Kodi File Manager source:
 
 `https://anakra1.github.io/androitdtvfire/`
 
-Name it `CBR Fire TV`, then choose **Add-ons → Install from zip file → CBR Fire TV → CBR-Fire-TV-Android-Repository-0.1.2.zip**. The root `index.html` lists the repository ZIP in a format Kodi can browse.
+Name it `CBR Fire TV`, then choose **Add-ons → Install from zip file → CBR Fire TV → CBR-Fire-TV-Android-Repository-0.1.3.zip**. The root `index.html` lists the repository ZIP in a format Kodi can browse.
 
 ## Android / Fire TV note
 
-The Android add-on downloads the matching official TorrServer MatriX.150 binary on first torrent playback and checks its SHA-256. That download is about 61 MB. Some newer Android builds block Kodi from launching binaries stored in add-on data; those devices need a companion service app for torrent playback. The current package does not include that helper, and it has not been tested on Fire TV hardware. Kodi-native HTTP/HLS playback and the catalogue UI remain available.
+The separate CBR Kodi Companion app downloads the matching official TorrServer MatriX.150 binary on first torrent playback and checks its SHA-256. It runs TorrServer as an Android foreground service on `127.0.0.1:8766`; the Kodi add-on launches it when needed and uses Kodi's normal player. Install the companion APK once before playing torrent sources. Kodi-native HTTP/HLS playback and the catalogue UI remain available without it.
 
 The project supports Android ARM64, ARMv7, x86_64 and x86. Most Fire TV devices use ARM64.
 

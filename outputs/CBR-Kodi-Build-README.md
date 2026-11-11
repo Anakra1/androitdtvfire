@@ -4,20 +4,20 @@ CBR has a Windows package and a separate Android TV/Fire TV package. Both includ
 
 ## Windows
 
-1. In Kodi, choose **Add-ons → Install from zip file** and select `CBR-Windows-Repository-0.1.5.zip`.
+1. In Kodi, choose **Add-ons → Install from zip file** and select `CBR-Windows-Repository-0.1.7.zip`.
 2. Open **Install from repository → CBR Add-on Repository → Video add-ons** and install **Crimson Blood Requiem**.
 3. Install **CBR Setup Wizard** and **Crimson Blood Requiem Skin** from the same repository.
 4. Launch the wizard and choose **Apply CBR space interface**.
 
 ## Fire TV and Android TV boxes
 
-1. Copy `CBR-Fire-TV-Android-Repository-0.1.1.zip` to the device or a USB drive. Use Kodi's **Add-ons → Install from zip file** to install it.
+1. Install the updated CBR Android repository ZIP from the Kodi source, or use **Add-ons → Install from zip file** and choose `CBR-Fire-TV-Android-Repository-0.1.3.zip`.
 2. Open **Install from repository → CBR Android Add-on Repository** and install **Crimson Blood Requiem**, **CBR Setup Wizard**, and **Crimson Blood Requiem Skin**.
 3. Launch the wizard and choose **Apply CBR space interface**.
-4. The first time you choose a torrent source, CBR downloads the matching Android torrent engine (about 61 MB) and verifies it. Allow that first setup to finish before retrying playback.
+4. Install `CBR-Kodi-Companion-0.1.0.apk` separately on Fire TV. The first time you choose a torrent source, the companion downloads the matching Android torrent engine (about 61 MB) and verifies it. Allow that first setup to finish before retrying playback.
 
-The Android package supports ARM64, ARMv7, x86_64 and x86 Kodi devices. Fire TV and most current Android boxes use ARM64. The engine is stored in Kodi's add-on data and reused on later plays. The device needs internet access for the first engine download. Some newer Android versions prevent Kodi from launching a downloaded native executable; CBR reports this clearly, but those devices need an Android companion service app for torrent playback. This package does not include that helper yet, and playback has not been tested on Fire TV hardware.
+The companion supports ARM64, ARMv7, x86_64 and x86 Android devices. Fire TV and most current Android boxes use ARM64. The engine is stored in the companion app's private data and reused on later plays. The device needs internet access for the first engine download. The companion runs the torrent engine in its own foreground service because some Android versions prevent Kodi from launching a downloaded native executable.
 
 The packages are made for Kodi 21 or newer. Installing the repository does not replace Kodi; the optional wizard applies the CBR skin and can restore your previous interface later. Provider URLs and settings remain on the device.
 
-Kodi must be allowed to install add-ons from zip files. This setup does not install a separate Android app or require sideloading an APK.
+Kodi must be allowed to install add-ons from zip files. The companion is a separate Android APK and must be installed once through a Fire TV APK installer or ADB; Kodi's add-on repository cannot install it.

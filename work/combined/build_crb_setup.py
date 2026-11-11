@@ -11,8 +11,8 @@ OUTPUTS = ROOT.parent.parent / 'outputs'
 OUTPUTS.mkdir(exist_ok=True)
 SKIN = ROOT / 'skin.crimsonbloodrequiem'
 WIZARD = ROOT / 'script.crb.wizard'
-VIDEO_ZIP = OUTPUTS / 'plugin.video.stremio.bridge-0.5.4.zip'
-ANDROID_VIDEO_ZIP = OUTPUTS / 'plugin.video.stremio.bridge-0.5.4-android.zip'
+VIDEO_ZIP = OUTPUTS / 'plugin.video.stremio.bridge-0.5.5.zip'
+ANDROID_VIDEO_ZIP = OUTPUTS / 'plugin.video.stremio.bridge-0.5.5-android.zip'
 
 if not VIDEO_ZIP.is_file():
     raise SystemExit('Missing the current CBR video add-on installer.')
@@ -138,12 +138,12 @@ def create_repository(repo_id, title, version, video_zip, summary, description):
 
 
 windows_repo = create_repository(
-    'repository.crb', 'CBR Add-on Repository', '0.1.6', VIDEO_ZIP,
+    'repository.crb', 'CBR Add-on Repository', '0.1.7', VIDEO_ZIP,
     "CBR's local Windows setup repository",
     'Provides the CBR skin, setup wizard and Windows video add-on package.',
 )
 android_repo = create_repository(
-    'repository.crb.android', 'CBR Android Add-on Repository', '0.1.2', ANDROID_VIDEO_ZIP,
+    'repository.crb.android', 'CBR Android Add-on Repository', '0.1.3', ANDROID_VIDEO_ZIP,
     "CBR's local Android TV and Fire TV setup repository",
     'Provides the CBR skin, setup wizard and Android-compatible video add-on package. The torrent engine is downloaded for the device CPU on first playback.',
 )

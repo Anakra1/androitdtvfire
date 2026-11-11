@@ -1,4 +1,4 @@
-"""Bundled Windows torrent engine and its localhost HTTP client."""
+"""Windows engine and localhost client with an Android companion handoff."""
 import hashlib
 import json
 import os
@@ -8,16 +8,11 @@ import subprocess
 import sys
 import time
 from urllib.parse import quote, urlencode
-from urllib.request import ProxyHandler, Request, build_opener, urlopen
+from urllib.request import ProxyHandler, Request, build_opener
 
 ENGINE_SHA256 = '3a96b97a24d86a90c0712a6ec47d4ed52edc7eabac1bce6a0d9bbc8fd30de5bb'
-TORRSERVER_VERSION = 'MatriX.150'
-ANDROID_ENGINES = {
-    'arm64': '760f18c6837c7fc1c440726a14e7534e3baca914b780fbc3ec28a38b6158aaf0',
-    'arm7': '852e15b8d4739ac94ce0e046bba5c7a929b2ad75f980849cef10c668971ee764',
-    'amd64': 'b0ffd094e22e09b41e171bc0f06f865bcd8da9e089501e58d65b5dbe79249d54',
-    '386': '66d89512f8b8153d90635c9baa03fd543b0a80bc76883d25741ad9e1b778054b',
-}
+ANDROID_COMPANION_PACKAGE = 'com.crimsonbloodrequiem.companion'
+ANDROID_COMPANION_PORT = 8766
 OPENER = build_opener(ProxyHandler({}))  # Local playback must not use an HTTP proxy.
 
 
@@ -47,45 +42,6 @@ def _android_arch():
     if machine in ('i386', 'i486', 'i586', 'i686', 'x86'):
         return '386'
     raise RuntimeError('This Android device architecture ({}) is not supported.'.format(machine or 'unknown'))
-
-
-def _ensure_android_engine(path, arch, progress=None):
-    expected = ANDROID_ENGINES[arch]
-    if os.path.isfile(path) and _sha256(path) == expected:
-        os.chmod(path, 0o700)
-        return path
-    os.makedirs(os.path.dirname(path), exist_ok=True)
-    temporary = path + '.download'
-    url = 'https://github.com/YouROK/TorrServer/releases/download/{}/TorrServer-android-{}'.format(
-        TORRSERVER_VERSION, arch)
-    try:
-        with urlopen(url, timeout=30) as response, open(temporary, 'wb') as output:
-            total = int(response.headers.get('Content-Length', 0) or 0)
-            received = 0
-            while True:
-                block = response.read(1024 * 1024)
-                if not block:
-                    break
-                output.write(block)
-                received += len(block)
-                if progress:
-                    percent = min(99, int(received * 100 / total)) if total else 0
-                    progress(percent, 'Downloading Android torrent player: {:.1f} / {:.1f} MB'.format(
-                        received / 1048576, total / 1048576) if total else
-                        'Downloading Android torrent player: {:.1f} MB'.format(received / 1048576))
-        if _sha256(temporary) != expected:
-            raise RuntimeError('The downloaded Android torrent player failed its integrity check.')
-        os.chmod(temporary, 0o700)
-        os.replace(temporary, path)
-        if progress:
-            progress(100, 'Android torrent player ready.')
-        return path
-    except Exception:
-        try:
-            os.remove(temporary)
-        except OSError:
-            pass
-        raise
 
 
 def write_json(path, value):
@@ -189,49 +145,69 @@ class Engine:
             arch = _android_arch()
             if not arch:
                 raise RuntimeError('The built-in torrent player supports Windows and Android devices.')
-            binary = _ensure_android_engine(os.path.join(self.data_path, 'engine-bin', 'TorrServer'), arch, progress)
+            self.client = Client('http://127.0.0.1:{}'.format(ANDROID_COMPANION_PORT))
+            if not self.client.alive():
+                try:
+                    import xbmc
+                    xbmc.executebuiltin(
+                        'StartAndroidActivity({},android.intent.action.VIEW,,cbr://start)'.format(
+                            ANDROID_COMPANION_PACKAGE))
+                except Exception as error:
+                    raise RuntimeError(
+                        'Install CBR Kodi Companion on this Fire TV, open it once, then retry playback.') from error
+                deadline = time.monotonic() + 90
+                while not self.client.alive():
+                    if progress:
+                        progress(0, 'Starting CBR Kodi Companion…')
+                    if time.monotonic() > deadline:
+                        raise RuntimeError(
+                            'CBR Kodi Companion did not start. Open the companion app on Fire TV and retry.')
+                    time.sleep(0.25)
         os.makedirs(self.data_path, exist_ok=True)
-        with socket.socket() as listener:
-            listener.bind(('127.0.0.1', 0))
-            port = listener.getsockname()[1]
-        self.client = Client('http://127.0.0.1:{}'.format(port))
-        args = [binary, '--ip', '127.0.0.1', '--port', str(port), '--path', self.data_path,
-                '--logpath', self.diagnostic_path or os.devnull, '--weblogpath', os.devnull]
-        if self.diagnostic_path:
-            self.console = open(self.diagnostic_path + '.console', 'wb')
-        process_options = {'cwd': self.data_path, 'stdin': subprocess.DEVNULL,
-                           'stdout': self.console or subprocess.DEVNULL,
-                           'stderr': self.console or subprocess.DEVNULL}
         if os.name == 'nt':
-            process_options['creationflags'] = subprocess.CREATE_NO_WINDOW
-        else:
-            process_options['start_new_session'] = True
-        try:
-            self.process = subprocess.Popen(args, **process_options)
-        except OSError as error:
-            if os.name != 'nt':
-                raise RuntimeError('Kodi downloaded the Android torrent engine, but Android blocked it from starting. '
-                                   'This device needs the CBR companion service app for torrent playback.') from error
-            raise
-        try:
+            with socket.socket() as listener:
+                listener.bind(('127.0.0.1', 0))
+                port = listener.getsockname()[1]
+            self.client = Client('http://127.0.0.1:{}'.format(port))
+            args = [binary, '--ip', '127.0.0.1', '--port', str(port), '--path', self.data_path,
+                    '--logpath', self.diagnostic_path or os.devnull, '--weblogpath', os.devnull]
+            if self.diagnostic_path:
+                self.console = open(self.diagnostic_path + '.console', 'wb')
+            process_options = {'cwd': self.data_path, 'stdin': subprocess.DEVNULL,
+                               'stdout': self.console or subprocess.DEVNULL,
+                               'stderr': self.console or subprocess.DEVNULL,
+                               'creationflags': subprocess.CREATE_NO_WINDOW}
+            try:
+                self.process = subprocess.Popen(args, **process_options)
+            except OSError:
+                raise
             deadline = time.monotonic() + 15
             while not self.client.alive():
                 if self.process.poll() is not None or time.monotonic() > deadline:
+                    self.stop()
                     raise RuntimeError('The torrent engine could not start.')
                 time.sleep(0.1)
-            settings = self.client.call('/settings', {'action': 'get'})
-            settings.update({'CacheSize': self.cache_mb * 1024 * 1024, 'PreloadCache': 10,
-                             'ReaderReadAHead': 95, 'UseDisk': False, 'DisableUpload': True,
-                             'DisableUPNP': True, 'EnableDLNA': False, 'EnableBonjour': False,
-                             'EnableLPD': False, 'EnableRutorSearch': False, 'EnableTorznabSearch': False,
-                             'TorrentDisconnectTimeout': 60, 'RemoveCacheOnDrop': True, 'RetrackersMode': 0})
-            self.client.call('/settings', {'action': 'set', 'sets': settings}, timeout=30)
-            return self.client
-        except Exception:
-            self.stop()
-            raise
+
+        settings = self.client.call('/settings', {'action': 'get'})
+        settings.update({'CacheSize': self.cache_mb * 1024 * 1024, 'PreloadCache': 10,
+                         'ReaderReadAHead': 95, 'UseDisk': False, 'DisableUpload': True,
+                         'DisableUPNP': True, 'EnableDLNA': False, 'EnableBonjour': False,
+                         'EnableLPD': False, 'EnableRutorSearch': False, 'EnableTorznabSearch': False,
+                         'TorrentDisconnectTimeout': 60, 'RemoveCacheOnDrop': True, 'RetrackersMode': 0})
+        self.client.call('/settings', {'action': 'set', 'sets': settings}, timeout=30)
+        return self.client
 
     def stop(self):
+        if os.name != 'nt':
+            try:
+                import xbmc
+                xbmc.executebuiltin(
+                    'StartAndroidActivity({},android.intent.action.VIEW,,cbr://stop)'.format(
+                        ANDROID_COMPANION_PACKAGE))
+            except Exception:
+                pass
+            self.client = None
+            return
         if self.process and self.process.poll() is None:
             self.process.terminate()
             try:

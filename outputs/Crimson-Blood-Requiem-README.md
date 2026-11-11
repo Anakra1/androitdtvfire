@@ -1,4 +1,4 @@
-# Crimson Blood Requiem (CBR) 0.5.4 — Windows, Android TV and Fire TV
+# Crimson Blood Requiem (CBR) 0.5.5 — Windows, Android TV and Fire TV
 
 **One Kodi add-on includes movies, TV series, a torrent player and Live TV split into TV Channels, Internet TV and Live Sports.** No Elementum, separate Stream Bridge installation, or manual script copying is required.
 
@@ -8,10 +8,12 @@ These packages use public provider defaults and contain no personalized MediaFus
 
 ## Install
 
-1. On Windows, use **Add-ons → Install from zip file** and choose `plugin.video.stremio.bridge-0.5.4.zip`. On Android TV or Fire TV, install `CBR-Fire-TV-Android-Repository-0.1.1.zip`, then install Crimson Blood Requiem, the skin and the setup wizard from **Install from repository → CBR Android Add-on Repository**.
+1. On Windows, use **Add-ons → Install from zip file** and choose `plugin.video.stremio.bridge-0.5.5.zip`. On Android TV or Fire TV, install `CBR-Fire-TV-Android-Repository-0.1.3.zip`, then install Crimson Blood Requiem, the skin and the setup wizard from **Install from repository → CBR Android Add-on Repository**.
 2. Restart Kodi once to start the new background player service.
 3. Open **Video add-ons → Crimson Blood Requiem** (the crimson **CBR** thumbnail).
 4. Choose a movie or TV episode and a source, or open **Live TV** and select a category, catalogue, channel/event and source.
+
+For torrent playback on Fire TV/Android TV, install `CBR-Kodi-Companion-0.1.0.apk` separately. Kodi's add-on repository cannot install an Android APK; sideload the companion once, then CBR launches its service automatically when you select a torrent stream.
 
 On a fresh profile, **Cinemeta** supplies movie/TV listings and posters, and **Torrentio** supplies stream results. They are enabled automatically on first launch; no account or default-URL entry is needed. Manifests describe sources and catalogues; the package does not contain movies or guarantee that every listed title has a working source. Playback depends on available peers, providers, network and Kodi codec support.
 
@@ -50,7 +52,7 @@ Live sources change and may be offline or restricted by their provider. Provider
 
 ## Torrent player
 
-The bundled Windows x64 TorrServer engine starts automatically when needed. On Android, the add-on downloads the official Android build matching the device CPU (ARM64, ARMv7, x86_64 or x86) the first time you play a torrent, verifies its pinned SHA-256, and keeps it in Kodi's private add-on data folder. That one-time download is about 61 MB and requires internet access. Both versions download torrent pieces into a memory cache and serve a seekable HTTP video stream to Kodi over `127.0.0.1`. No download-folder selection is needed. Kodi handles video decoding and playback controls.
+The bundled Windows x64 TorrServer engine starts automatically when needed. On Android, install the separate CBR Kodi Companion APK once. It downloads the official Android build matching the device CPU (ARM64, ARMv7, x86_64 or x86) the first time you play a torrent, verifies its pinned SHA-256, and keeps it in the companion app's private data folder. That one-time download is about 61 MB and requires internet access. Both versions download torrent pieces into a memory cache and serve a seekable HTTP video stream to Kodi over `127.0.0.1`. No download-folder selection is needed. Kodi handles video decoding and playback controls.
 
 **Sources and player settings → Built-in player settings** controls the memory cache: 64, 128 (default), 256 or 512 MB. Restart Kodi after changing it. Engine and Kodi memory usage is higher than the cache alone.
 
@@ -62,7 +64,7 @@ Cancelling preparation or stopping playback removes the active torrent. Abandone
 
 Version 0.3.1 fixes TV playback for ongoing series such as Nocturne: Cinemeta's `hasScheduledVideos` flag no longer bypasses season/episode selection. An empty embedded stream list also falls back to configured providers instead of displaying no sources. Nocturne's first-episode request returned 74 torrent results during diagnosis; availability can change.
 
-The Android package includes the same CBR listings, manifest setup, crimson skin and setup wizard. Its first torrent playback downloads the matching official TorrServer MatriX.150 Android executable for the device ABI; download progress is shown inside Kodi. Some newer Android/Fire TV builds block Kodi from launching native executables stored in add-on data. On those devices CBR reports that an Android companion service app is needed; this package does not include that helper yet. Non-torrent HTTP/HLS sources continue to use Kodi's native player.
+The Android package includes the same CBR listings, manifest setup, crimson skin and setup wizard. Torrent playback uses the separate CBR Kodi Companion app, which downloads and verifies the matching official TorrServer MatriX.150 Android executable for the device ABI, then runs it in an Android foreground service. The add-on launches the companion through `cbr://start` and connects to its loopback stream endpoint. Install the companion APK separately; non-torrent HTTP/HLS sources continue to use Kodi's native player.
 
 Tests cover fresh-profile defaults, migration, multiple enabled sources, poster browsing, TV navigation, library exports, HTTP playback/subtitles, the torrent resolver, cancellation, repeated playback requests and service cleanup. A real-engine test downloads a generated local torrent from a local BitTorrent seed, verifies buffering and byte-correct HTTP range seeking, and checks cancellation/shutdown. The public default endpoints were also checked: Cinemeta returned 50 poster listings and Torrentio returned 14 torrent results for the openly licensed Big Buck Bunny test film. These checks do not establish playback of every source or Kodi codec compatibility.
 
@@ -70,7 +72,7 @@ From the source archive, run `python -m unittest discover -s . -p 'test_*.py' -v
 
 ## Source and license
 
-The new integration is GPL-3.0-or-later and includes earlier MIT-licensed Movies components, with notices preserved. TorrServer MatriX.150 retains its GPL-3.0 license. Windows includes its engine binary in the add-on ZIP; Android fetches the matching official binary and checks its pinned SHA-256 before launch.
+The new integration is GPL-3.0-or-later and includes earlier MIT-licensed Movies components, with notices preserved. TorrServer MatriX.150 retains its GPL-3.0 license. Windows includes its engine binary in the add-on ZIP; the Android companion fetches the matching official binary and checks its pinned SHA-256 before launch.
 
 `Crimson-Blood-Requiem-source.zip` contains our source, public defaults, build script and tests. `TorrServer-MatriX.150-source.zip` contains matching upstream engine source and build information. Keep both with the binary when redistributing it.
 
