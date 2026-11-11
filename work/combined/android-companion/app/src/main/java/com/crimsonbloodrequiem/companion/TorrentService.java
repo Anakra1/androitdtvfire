@@ -80,8 +80,11 @@ public final class TorrentService extends Service {
     private void launchEngine() throws Exception {
         File data = new File(getFilesDir(), "torrent-engine");
         if (!data.exists() && !data.mkdirs()) throw new IllegalStateException("Cannot create engine folder.");
-        File binary = new File(data, "TorrServer");
-        ensureEngineBinary(binary);
+        File binary = new File(getApplicationInfo().nativeLibraryDir, "libtorrserver.so");
+        String expected = HASHES.get(archName());
+        if (!binary.isFile() || expected == null || !expected.equals(sha256(binary))) {
+            throw new IllegalStateException("Packaged engine is missing or damaged. Reinstall CBR Companion 0.2.0.");
+        }
         if (engine != null && engine.isAlive() && isReady()) return;
 
         if (portBusy()) {
@@ -133,42 +136,6 @@ public final class TorrentService extends Service {
             return false;
         } finally {
             if (connection != null) connection.disconnect();
-        }
-    }
-
-    private void ensureEngineBinary(File binary) throws Exception {
-        String arch = archName();
-        String expected = HASHES.get(arch);
-        if (expected == null) throw new IllegalStateException("Unsupported device architecture: " + arch);
-        if (binary.isFile() && expected.equals(sha256(binary))) {
-            android.system.Os.chmod(binary.getAbsolutePath(), 0700);
-            return;
-        }
-
-        String url = "https://github.com/YouROK/TorrServer/releases/download/" + RELEASE
-                + "/TorrServer-android-" + arch;
-        File temporary = new File(binary.getParentFile(), "TorrServer.download");
-        setStatus("Downloading torrent engine for " + arch + "…");
-        HttpURLConnection connection = null;
-        try {
-            connection = connection(url, "GET", 30_000);
-            if (connection.getResponseCode() != 200) throw new IllegalStateException("Engine download failed.");
-            try (InputStream input = new BufferedInputStream(connection.getInputStream());
-                 FileOutputStream file = new FileOutputStream(temporary);
-                 BufferedOutputStream output = new BufferedOutputStream(file)) {
-                byte[] buffer = new byte[64 * 1024];
-                int count;
-                while ((count = input.read(buffer)) != -1) {
-                    if (stopping) throw new InterruptedException("Service stopped.");
-                    output.write(buffer, 0, count);
-                }
-            }
-            if (!expected.equals(sha256(temporary))) throw new IllegalStateException("Engine checksum verification failed.");
-            if (!temporary.renameTo(binary)) throw new IllegalStateException("Cannot install the verified engine.");
-            android.system.Os.chmod(binary.getAbsolutePath(), 0700);
-        } finally {
-            if (connection != null) connection.disconnect();
-            if (temporary.exists()) temporary.delete();
         }
     }
 

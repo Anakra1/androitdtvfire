@@ -111,6 +111,10 @@ def create_repository(repo_id, title, version, video_zip, summary, description):
 </addon>
 '''.format(repo_id=repo_id, title=title, version=version, summary=summary, description=description)
     (repository / 'addon.xml').write_text(repo_manifest, encoding='utf-8')
+    if repo_id == 'repository.crb.android':
+        repo_manifest = repo_manifest.replace('http://127.0.0.1:8765/', 'https://anakra1.github.io/androitdtvfire/android/')
+        repo_manifest = repo_manifest.replace('  <extension point="xbmc.service" library="service.py" start="startup"/>\n', '')
+        (repository / 'addon.xml').write_text(repo_manifest, encoding='utf-8')
     resources = repository / 'resources'
     resources.mkdir()
     shutil.copy2(SKIN / 'resources' / 'icon.png', resources / 'icon.png')
@@ -128,11 +132,20 @@ def create_repository(repo_id, title, version, video_zip, summary, description):
     ET.parse(repository / 'addon.xml')
     ET.parse(repository / 'addons.xml')
 
+    if repo_id == 'repository.crb.android':
+        published = ROOT.parent.parent / 'android'
+        published.mkdir(exist_ok=True)
+        shutil.copytree(packages, published / 'packages', dirs_exist_ok=True)
+        for name in ('addons.xml', 'addons.xml.md5'):
+            shutil.copy2(repository / name, published / name)
+
     package_name = 'CBR-Windows-Repository-{}.zip'.format(version) if repo_id == 'repository.crb' else 'CBR-Fire-TV-Android-Repository-{}.zip'.format(version)
     destination = OUTPUTS / package_name
     with ZipFile(destination, 'w', ZIP_DEFLATED, compresslevel=7) as archive:
         for path in repository.rglob('*'):
             if path.is_file():
+                if repo_id == 'repository.crb.android' and (path.name in ('service.py', 'addons.xml', 'addons.xml.md5') or 'packages' in path.relative_to(repository).parts):
+                    continue
                 archive.write(path, (Path(repo_id) / path.relative_to(repository)).as_posix())
     return destination
 
@@ -143,9 +156,9 @@ windows_repo = create_repository(
     'Provides the CBR skin, setup wizard and Windows video add-on package.',
 )
 android_repo = create_repository(
-    'repository.crb.android', 'CBR Android Add-on Repository', '0.1.4', ANDROID_VIDEO_ZIP,
-    "CBR's local Android TV and Fire TV setup repository",
-    'Provides the CBR skin, setup wizard and Android-compatible video add-on package. The torrent engine is downloaded for the device CPU on first playback.',
+    'repository.crb.android', 'CBR Android Add-on Repository', '0.1.5', ANDROID_VIDEO_ZIP,
+    "CBR's Android TV and Fire TV repository",
+    'Provides the CBR skin, setup wizard and Android video add-on through a dedicated HTTPS feed. Torrent playback requires CBR Companion 0.2.0.',
 )
 
 for path in (skin_zip, wizard_zip, windows_repo, android_repo, ANDROID_VIDEO_ZIP):

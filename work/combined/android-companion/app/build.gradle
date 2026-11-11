@@ -10,12 +10,62 @@ android {
         applicationId 'com.crimsonbloodrequiem.companion'
         minSdk 23
         targetSdk 33
-        versionCode 1
-        versionName '0.1.0'
+        versionCode 2
+        versionName '0.2.0'
+        ndk { abiFilters 'armeabi-v7a', 'arm64-v8a' }
     }
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
+    sourceSets.main.jniLibs.srcDir(layout.buildDirectory.dir('generated/engine-libs'))
+    packagingOptions {
+        jniLibs {
+            useLegacyPackaging = true
+            keepDebugSymbols += '**/libtorrserver.so'
+        }
+    }
 }
+
+// Fetch and verify engines at build time. Android installs these files in its
+// read-only native library directory; never execute a download from app data.
+def engineArtifacts = [
+    'arm64-v8a': ['arm64', '760f18c6837c7fc1c440726a14e7534e3baca914b780fbc3ec28a38b6158aaf0'],
+    'armeabi-v7a': ['arm7', '852e15b8d4739ac94ce0e046bba5c7a929b2ad75f980849cef10c668971ee764'],
+    'x86_64': ['amd64', 'b0ffd094e22e09b41e171bc0f06f865bcd8da9e089501e58d65b5dbe79249d54'],
+    'x86': ['386', '66d89512f8b8153d90635c9baa03fd543b0a80bc76883d25741ad9e1b778054b']
+]
+tasks.register('prepareTorrentEngines') {
+    inputs.property('engineArtifacts', engineArtifacts)
+    outputs.dir(layout.buildDirectory.dir('generated/engine-libs'))
+    doLast {
+        engineArtifacts.each { abi, artifact ->
+            def output = layout.buildDirectory.file("generated/engine-libs/${abi}/libtorrserver.so").get().asFile
+            output.parentFile.mkdirs()
+            def digest = { file ->
+                def sha = java.security.MessageDigest.getInstance('SHA-256')
+                file.withInputStream { input ->
+                    byte[] buffer = new byte[65536]
+                    int count
+                    while ((count = input.read(buffer)) != -1) sha.update(buffer, 0, count)
+                }
+                sha.digest().encodeHex().toString()
+            }
+            if (!output.exists() || digest(output) != artifact[1]) {
+                def pending = new File(output.parentFile, 'engine.download')
+                try {
+                    new URL("https://github.com/YouROK/TorrServer/releases/download/MatriX.150/TorrServer-android-${artifact[0]}").withInputStream { input ->
+                        pending.withOutputStream { stream -> stream << input }
+                    }
+                    if (digest(pending) != artifact[1]) throw new GradleException("Engine checksum failed for ${abi}")
+                    java.nio.file.Files.move(pending.toPath(), output.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING)
+                } finally {
+                    pending.delete()
+                }
+            }
+        }
+    }
+}
+tasks.named('preBuild').configure { dependsOn('prepareTorrentEngines') }

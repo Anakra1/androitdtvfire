@@ -1,19 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<addon id="repository.crb.android" name="CBR Android Add-on Repository" version="0.1.4" provider-name="CBR Project">
+<addon id="repository.crb.android" name="CBR Android Add-on Repository" version="0.1.5" provider-name="CBR Project">
   <requires><import addon="xbmc.python" version="3.0.0"/></requires>
   <extension point="xbmc.addon.repository">
     <dir minversion="21.0.0">
-      <info>http://127.0.0.1:8765/addons.xml</info>
-      <checksum>http://127.0.0.1:8765/addons.xml.md5</checksum>
-      <datadir zip="true">http://127.0.0.1:8765/packages/</datadir>
+      <info>https://anakra1.github.io/androitdtvfire/android/addons.xml</info>
+      <checksum>https://anakra1.github.io/androitdtvfire/android/addons.xml.md5</checksum>
+      <datadir zip="true">https://anakra1.github.io/androitdtvfire/android/packages/</datadir>
     </dir>
   </extension>
-  <extension point="xbmc.service" library="service.py" start="startup"/>
   <extension point="xbmc.addon.metadata">
     <platform>all</platform>
     <license>GPL-3.0-or-later</license>
     <summary lang="en_GB">CBR's local Android TV and Fire TV setup repository</summary>
-    <description lang="en_GB">Provides the CBR skin, setup wizard and Android-compatible video add-on package. The torrent engine is downloaded for the device CPU on first playback.</description>
+    <description lang="en_GB">Provides the CBR skin, setup wizard and Android-compatible video add-on package. Torrent playback requires CBR Companion 0.2.0.</description>
     <assets><icon>resources/icon.png</icon><fanart>resources/fanart.jpg</fanart></assets>
   </extension>
 </addon>
