@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<addon id="repository.crb.android" name="CBR Android Add-on Repository" version="0.1.1" provider-name="CBR Project">
+<addon id="repository.crb.android" name="CBR Android Add-on Repository" version="0.1.2" provider-name="CBR Project">
   <requires><import addon="xbmc.python" version="3.0.0"/></requires>
   <extension point="xbmc.addon.repository">
     <dir minversion="21.0.0">

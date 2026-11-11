@@ -82,7 +82,12 @@ def create_repository(repo_id, title, version, video_zip, summary, description):
     ):
         directory = packages / addon_id
         directory.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(package, directory / package.name)
+        # Kodi resolves repository package URLs from the add-on ID and version.
+        # Keep the platform-specific download name outside the repository, and
+        # publish every repo package under Kodi's canonical <id>-<version>.zip.
+        addon_source = SKIN if addon_id == 'skin.crimsonbloodrequiem' else WIZARD if addon_id == 'script.crb.wizard' else ROOT / 'plugin.video.stremio.bridge'
+        addon_version = addon_xml(addon_source).attrib['version']
+        shutil.copy2(package, directory / '{}-{}.zip'.format(addon_id, addon_version))
 
     (repository / 'service.py').write_text(SERVICE, encoding='utf-8')
     repo_manifest = '''<?xml version="1.0" encoding="UTF-8"?>
@@ -133,12 +138,12 @@ def create_repository(repo_id, title, version, video_zip, summary, description):
 
 
 windows_repo = create_repository(
-    'repository.crb', 'CBR Add-on Repository', '0.1.5', VIDEO_ZIP,
+    'repository.crb', 'CBR Add-on Repository', '0.1.6', VIDEO_ZIP,
     "CBR's local Windows setup repository",
     'Provides the CBR skin, setup wizard and Windows video add-on package.',
 )
 android_repo = create_repository(
-    'repository.crb.android', 'CBR Android Add-on Repository', '0.1.1', ANDROID_VIDEO_ZIP,
+    'repository.crb.android', 'CBR Android Add-on Repository', '0.1.2', ANDROID_VIDEO_ZIP,
     "CBR's local Android TV and Fire TV setup repository",
     'Provides the CBR skin, setup wizard and Android-compatible video add-on package. The torrent engine is downloaded for the device CPU on first playback.',
 )

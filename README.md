@@ -8,8 +8,8 @@ Use the repository ZIP for your Kodi platform. It installs the CBR repository; f
 
 | Platform | Kodi repository installer | Direct add-on installer |
 | --- | --- | --- |
-| Windows x64 | [`CBR-Windows-Repository-0.1.5.zip`](downloads/Windows/CBR-Windows-Repository-0.1.5.zip) | [`plugin.video.stremio.bridge-0.5.4.zip`](downloads/Windows/plugin.video.stremio.bridge-0.5.4.zip) |
-| Fire TV / Android TV | [`CBR-Fire-TV-Android-Repository-0.1.1.zip`](downloads/Fire-TV-Android/CBR-Fire-TV-Android-Repository-0.1.1.zip) | [`plugin.video.stremio.bridge-0.5.4-android.zip`](downloads/Fire-TV-Android/plugin.video.stremio.bridge-0.5.4-android.zip) |
+| Windows x64 | [`CBR-Windows-Repository-0.1.6.zip`](downloads/Windows/CBR-Windows-Repository-0.1.6.zip) | [`plugin.video.stremio.bridge-0.5.4.zip`](downloads/Windows/plugin.video.stremio.bridge-0.5.4.zip) |
+| Fire TV / Android TV | [`CBR-Fire-TV-Android-Repository-0.1.2.zip`](downloads/Fire-TV-Android/CBR-Fire-TV-Android-Repository-0.1.2.zip) | [`plugin.video.stremio.bridge-0.5.4-android.zip`](downloads/Fire-TV-Android/plugin.video.stremio.bridge-0.5.4-android.zip) |
 
 The [setup guide](outputs/CBR-Kodi-Build-README.md) covers both installs. The wizard and skin ZIPs are also in each platform's download folder.
 
@@ -29,7 +29,7 @@ Add this as a Kodi File Manager source:
 
 `https://anakra1.github.io/androitdtvfire/`
 
-Name it `CBR Fire TV`, then choose **Add-ons → Install from zip file → CBR Fire TV → CBR-Fire-TV-Android-Repository-0.1.1.zip**. The root `index.html` lists the repository ZIP in a format Kodi can browse.
+Name it `CBR Fire TV`, then choose **Add-ons → Install from zip file → CBR Fire TV → CBR-Fire-TV-Android-Repository-0.1.2.zip**. The root `index.html` lists the repository ZIP in a format Kodi can browse.
 
 ## Android / Fire TV note
 
