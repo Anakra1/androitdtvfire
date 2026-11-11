@@ -147,21 +147,14 @@ class Engine:
                 raise RuntimeError('The built-in torrent player supports Windows and Android devices.')
             self.client = Client('http://127.0.0.1:{}'.format(ANDROID_COMPANION_PORT))
             if not self.client.alive():
-                try:
-                    import xbmc
-                    xbmc.executebuiltin(
-                        'StartAndroidActivity({},android.intent.action.VIEW,,cbr://start)'.format(
-                            ANDROID_COMPANION_PACKAGE))
-                except Exception as error:
-                    raise RuntimeError(
-                        'Install CBR Kodi Companion on this Fire TV, open it once, then retry playback.') from error
                 deadline = time.monotonic() + 90
                 while not self.client.alive():
                     if progress:
-                        progress(0, 'Starting CBR Kodi Companion…')
+                        progress(0, 'Connecting to CBR torrent player…')
                     if time.monotonic() > deadline:
                         raise RuntimeError(
-                            'CBR Kodi Companion did not start. Open the companion app on Fire TV and retry.')
+                            'Fire TV did not start the CBR torrent player. Android blocked the launch; '
+                            'check that CBR Kodi Companion is installed and enabled.')
                     time.sleep(0.25)
         os.makedirs(self.data_path, exist_ok=True)
         if os.name == 'nt':

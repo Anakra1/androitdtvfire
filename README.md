@@ -9,9 +9,9 @@ Use the repository ZIP for your Kodi platform. It installs the CBR repository; f
 | Platform | Kodi repository installer | Direct add-on installer |
 | --- | --- | --- |
 | Windows x64 | [`CBR-Windows-Repository-0.1.7.zip`](downloads/Windows/CBR-Windows-Repository-0.1.7.zip) | [`plugin.video.stremio.bridge-0.5.5.zip`](downloads/Windows/plugin.video.stremio.bridge-0.5.5.zip) |
-| Fire TV / Android TV | [`CBR-Fire-TV-Android-Repository-0.1.3.zip`](downloads/Fire-TV-Android/CBR-Fire-TV-Android-Repository-0.1.3.zip) | [`plugin.video.stremio.bridge-0.5.5-android.zip`](downloads/Fire-TV-Android/plugin.video.stremio.bridge-0.5.5-android.zip) |
+| Fire TV / Android TV | [`CBR-Fire-TV-Android-Repository-0.1.4.zip`](downloads/Fire-TV-Android/CBR-Fire-TV-Android-Repository-0.1.4.zip) | [`plugin.video.stremio.bridge-0.5.6-android.zip`](downloads/Fire-TV-Android/plugin.video.stremio.bridge-0.5.6-android.zip) |
 
-Fire TV torrent playback also needs the separate [CBR Kodi Companion APK](downloads/Fire-TV-Android/CBR-Kodi-Companion-0.1.0.apk). Install that Android app once; the Kodi add-on starts its foreground service automatically when a torrent source is selected. The APK must be sideloaded on Fire TV and cannot be installed by Kodi's add-on repository.
+Fire TV torrent playback also needs the separate [CBR Kodi Companion APK](downloads/Fire-TV-Android/CBR-Kodi-Companion-0.1.0.apk). Install that Android app once; add-on 0.5.6 requests its foreground launch directly from the source-selection action. The APK must be sideloaded on Fire TV and cannot be installed by Kodi's add-on repository.
 
 The [setup guide](outputs/CBR-Kodi-Build-README.md) covers both installs. The wizard and skin ZIPs are also in each platform's download folder.
 
@@ -31,7 +31,7 @@ Add this as a Kodi File Manager source:
 
 `https://anakra1.github.io/androitdtvfire/`
 
-Name it `CBR Fire TV`, then choose **Add-ons → Install from zip file → CBR Fire TV → CBR-Fire-TV-Android-Repository-0.1.3.zip**. The root `index.html` lists the repository ZIP in a format Kodi can browse.
+Name it `CBR Fire TV`, then choose **Add-ons → Install from zip file → CBR Fire TV → CBR-Fire-TV-Android-Repository-0.1.4.zip**. The root `index.html` lists the repository ZIP in a format Kodi can browse.
 
 ## Android / Fire TV note
 

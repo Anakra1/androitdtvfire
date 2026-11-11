@@ -11,10 +11,10 @@ CBR has a Windows package and a separate Android TV/Fire TV package. Both includ
 
 ## Fire TV and Android TV boxes
 
-1. Install the updated CBR Android repository ZIP from the Kodi source, or use **Add-ons → Install from zip file** and choose `CBR-Fire-TV-Android-Repository-0.1.3.zip`.
+1. Install the updated CBR Android repository ZIP from the Kodi source, or use **Add-ons → Install from zip file** and choose `CBR-Fire-TV-Android-Repository-0.1.4.zip`.
 2. Open **Install from repository → CBR Android Add-on Repository** and install **Crimson Blood Requiem**, **CBR Setup Wizard**, and **Crimson Blood Requiem Skin**.
 3. Launch the wizard and choose **Apply CBR space interface**.
-4. Install `CBR-Kodi-Companion-0.1.0.apk` separately on Fire TV. The first time you choose a torrent source, the companion downloads the matching Android torrent engine (about 61 MB) and verifies it. Allow that first setup to finish before retrying playback.
+4. Install `CBR-Kodi-Companion-0.1.0.apk` separately on Fire TV. When you choose a torrent source, CBR launches the companion from Kodi's foreground playback action; the first start downloads the matching Android torrent engine (about 61 MB) and verifies it.
 
 The companion supports ARM64, ARMv7, x86_64 and x86 Android devices. Fire TV and most current Android boxes use ARM64. The engine is stored in the companion app's private data and reused on later plays. The device needs internet access for the first engine download. The companion runs the torrent engine in its own foreground service because some Android versions prevent Kodi from launching a downloaded native executable.
 
