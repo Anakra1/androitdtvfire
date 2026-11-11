@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings>
+  <category label="Built-in player">
+    <setting id="cache_mb" type="select" label="Torrent memory cache (MB; restart Kodi to apply)" values="64|128|256|512" default="128" />
+  </category>
+</settings>

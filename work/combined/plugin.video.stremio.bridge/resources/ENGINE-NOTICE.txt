@@ -1,0 +1,19 @@
+Crimson Blood Requiem 0.5.1 bundles the unmodified TorrServer MatriX.150 Windows x64 engine.
+Project: https://github.com/YouROK/TorrServer
+Release: https://github.com/YouROK/TorrServer/releases/tag/MatriX.150
+Binary: TorrServer-windows-amd64.exe, renamed TorrServer.exe
+SHA256: 3a96b97a24d86a90c0712a6ec47d4ed52edc7eabac1bce6a0d9bbc8fd30de5bb
+Copyright: YouROK and TorrServer contributors; see matching source distribution.
+License: GNU GPL version 3, included in TorrServer-LICENSE.txt.
+
+Matching engine source is delivered beside this ZIP as TorrServer-MatriX.150-source.zip,
+including upstream build instructions and dependency manifests. Crimson-Blood-Requiem-source.zip
+contains integration source, build script and tests. Integration source is also present
+inside the installed add-on. The new integration is GPL-3.0-or-later; the prior Movies
+interface and library components retain the MIT notice in MIT-LICENSE.txt.
+
+Public Cinemeta and Torrentio manifest snapshots provide default configuration, not
+media files. No account tokens are included. No relationship with or endorsement by
+Stremio, Kodi, Cinemeta, Torrentio or TorrServer is implied.
+
+

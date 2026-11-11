@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="plugin.video.stremio.bridge" name="Crimson Blood Requiem" version="0.5.3" provider-name="Community">
+  <requires><import addon="xbmc.python" version="3.0.1"/></requires>
+  <extension point="xbmc.python.pluginsource" library="addon.py"><provides>video</provides></extension>
+  <extension point="xbmc.service" library="service.py" start="startup"/>
+  <extension point="xbmc.addon.metadata">
+    <summary lang="en_GB">CRB movies, series, live TV and built-in Windows/Android torrent player</summary>
+    <description lang="en_GB">Crimson Blood Requiem for Windows, Android TV and Fire TV: movies, TV episodes, torrent buffering, TV Channels, Internet TV and Live Sports. Android downloads the pinned, checksum-verified torrent engine on first torrent playback.</description>
+    <platform>all</platform><license>GPL-3.0-or-later; includes MIT-licensed components</license>
+    <assets><icon>resources/art/crb-icon.png</icon><fanart>resources/art/crb-fanart.jpg</fanart></assets>
+  </extension>
+</addon>

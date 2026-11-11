@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='utf-8'?>
+<addons><addon id="skin.crimsonbloodrequiem" version="0.1.0" name="Crimson Blood Requiem" provider-name="CRB Project">
+  <requires>
+    <import addon="xbmc.gui" version="5.17.0" />
+    <import addon="plugin.video.stremio.bridge" version="0.5.3" />
+  </requires>
+  <extension point="xbmc.gui.skin" debugging="false">
+    <res width="1920" height="1440" aspect="4:3" default="false" folder="xml" />
+    <res width="1920" height="1280" aspect="3:2" default="false" folder="xml" />
+    <res width="1920" height="1200" aspect="16:10" default="false" folder="xml" />
+    <res width="2040" height="1080" aspect="17:9" default="false" folder="xml" />
+    <res width="1920" height="1080" aspect="16:9" default="true" folder="xml" />
+    <res width="2560" height="1080" aspect="21:9" default="false" folder="xml" />
+    <res width="2338" height="1080" aspect="19.5:9" default="false" folder="xml" />
+    <res width="2160" height="1080" aspect="18:9" default="false" folder="xml" />
+  </extension>
+  <extension point="xbmc.addon.metadata">
+    <platform>all</platform>
+    <license>GPL-2.0-or-later; CC BY-SA 4.0 where applicable</license>
+    <assets>
+      <icon>resources/icon.png</icon>
+      <fanart>resources/fanart.jpg</fanart>
+    </assets>
+    <summary lang="en_GB">A crimson space-command skin for Kodi, built for CRB.</summary>
+    <description lang="en_GB">Crimson Blood Requiem brings a dark space-fleet backdrop, deep red accents, and direct home-screen access to CRB movies, TV series, Live TV and search. Based on Kodi Estuary and designed to keep Kodi library, settings and other add-ons available.</description>
+    <disclaimer lang="en_GB">An independent community skin. Kodi and Estuary are trademarks and software of their respective owners.</disclaimer>
+  </extension>
+</addon><addon id="script.crb.wizard" name="CRB Setup Wizard" version="0.1.0" provider-name="CRB Project">
+  <requires>
+    <import addon="xbmc.python" version="3.0.1" />
+    <import addon="skin.crimsonbloodrequiem" version="0.1.0" />
+    <import addon="plugin.video.stremio.bridge" version="0.5.3" />
+  </requires>
+  <extension point="xbmc.python.script" library="default.py" />
+  <extension point="xbmc.addon.metadata">
+    <platform>all</platform>
+    <license>GPL-3.0-or-later</license>
+    <summary lang="en_GB">Install or restore the Crimson Blood Requiem Kodi interface</summary>
+    <description lang="en_GB">Applies the CRB space skin while preserving your Kodi library, profile and other add-ons. Stores the previous skin so you can restore it.</description>
+    <assets>
+      <icon>resources/icon.png</icon>
+      <fanart>resources/fanart.jpg</fanart>
+    </assets>
+  </extension>
+</addon><addon id="plugin.video.stremio.bridge" name="Crimson Blood Requiem" version="0.5.3" provider-name="Community">
+  <requires><import addon="xbmc.python" version="3.0.1" /></requires>
+  <extension point="xbmc.python.pluginsource" library="addon.py"><provides>video</provides></extension>
+  <extension point="xbmc.service" library="service.py" start="startup" />
+  <extension point="xbmc.addon.metadata">
+    <summary lang="en_GB">CRB movies, series, live TV and built-in Windows/Android torrent player</summary>
+    <description lang="en_GB">Crimson Blood Requiem for Windows, Android TV and Fire TV: movies, TV episodes, torrent buffering, TV Channels, Internet TV and Live Sports. Android downloads the pinned, checksum-verified torrent engine on first torrent playback.</description>
+    <platform>all</platform><license>GPL-3.0-or-later; includes MIT-licensed components</license>
+    <assets><icon>resources/art/crb-icon.png</icon><fanart>resources/art/crb-fanart.jpg</fanart></assets>
+  </extension>
+</addon></addons>

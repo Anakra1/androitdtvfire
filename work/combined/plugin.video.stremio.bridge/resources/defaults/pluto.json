@@ -1,0 +1,31 @@
+{
+  "id": "org.plutotv",
+  "version": "1.0.0",
+  "name": "Pluto TV",
+  "description": "Live Pluto TV channels with catalog and search support",
+  "resources": [
+    "catalog",
+    "meta",
+    "stream"
+  ],
+  "types": [
+    "tv"
+  ],
+  "catalogs": [
+    {
+      "type": "tv",
+      "id": "pluto",
+      "name": "Pluto TV",
+      "extra": [
+        {
+          "name": "search"
+        }
+      ]
+    },
+    {
+      "type": "tv",
+      "id": "pluto_popular",
+      "name": "Pluto TV Popular Channels"
+    }
+  ]
+}

@@ -1,0 +1,149 @@
+"""Build Windows and Android CRB Kodi repositories, skin and setup wizard."""
+from pathlib import Path
+from zipfile import ZIP_DEFLATED, ZipFile
+import hashlib
+import shutil
+import xml.etree.ElementTree as ET
+
+
+ROOT = Path(__file__).parent
+OUTPUTS = ROOT.parent.parent / 'outputs'
+OUTPUTS.mkdir(exist_ok=True)
+SKIN = ROOT / 'skin.crimsonbloodrequiem'
+WIZARD = ROOT / 'script.crb.wizard'
+VIDEO_ZIP = OUTPUTS / 'plugin.video.stremio.bridge-0.5.3.zip'
+ANDROID_VIDEO_ZIP = OUTPUTS / 'plugin.video.stremio.bridge-0.5.3-android.zip'
+
+if not VIDEO_ZIP.is_file():
+    raise SystemExit('Missing the current CRB video add-on installer.')
+
+
+def addon_xml(source):
+    return ET.parse(source / 'addon.xml').getroot()
+
+
+def create_addon_zip(source, destination):
+    addon_id = addon_xml(source).attrib['id']
+    with ZipFile(destination, 'w', ZIP_DEFLATED, compresslevel=7) as archive:
+        for path in source.rglob('*'):
+            if not path.is_file() or '__pycache__' in path.parts:
+                continue
+            archive.write(path, (Path(addon_id) / path.relative_to(source)).as_posix())
+
+
+skin_zip = OUTPUTS / 'skin.crimsonbloodrequiem-0.1.0.zip'
+wizard_zip = OUTPUTS / 'script.crb.wizard-0.1.0.zip'
+create_addon_zip(SKIN, skin_zip)
+create_addon_zip(WIZARD, wizard_zip)
+
+# Android installs only the engine for its own ABI at first torrent playback.
+# Keep the Windows package bundled, while omitting its unused EXE from Android.
+with ZipFile(VIDEO_ZIP) as source, ZipFile(ANDROID_VIDEO_ZIP, 'w', ZIP_DEFLATED, compresslevel=7) as target:
+    for item in source.infolist():
+        if item.filename.endswith('/resources/bin/windows-x64/TorrServer.exe'):
+            continue
+        target.writestr(item, source.read(item.filename))
+
+SERVICE = '''import functools
+from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
+from threading import Thread
+
+import xbmc
+import xbmcaddon
+
+
+PORT = 8765
+addon_path = xbmcaddon.Addon().getAddonInfo("path")
+handler = functools.partial(SimpleHTTPRequestHandler, directory=addon_path)
+server = ThreadingHTTPServer(("127.0.0.1", PORT), handler)
+thread = Thread(target=server.serve_forever, daemon=True)
+thread.start()
+monitor = xbmc.Monitor()
+try:
+    while not monitor.abortRequested():
+        if monitor.waitForAbort(1):
+            break
+finally:
+    server.shutdown()
+    server.server_close()
+'''
+
+
+def create_repository(repo_id, title, version, video_zip, summary, description):
+    repository = ROOT / repo_id
+    if repository.exists():
+        shutil.rmtree(repository)
+    packages = repository / 'packages'
+    packages.mkdir(parents=True)
+    for addon_id, package in (
+        ('skin.crimsonbloodrequiem', skin_zip),
+        ('script.crb.wizard', wizard_zip),
+        ('plugin.video.stremio.bridge', video_zip),
+    ):
+        directory = packages / addon_id
+        directory.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(package, directory / package.name)
+
+    (repository / 'service.py').write_text(SERVICE, encoding='utf-8')
+    repo_manifest = '''<?xml version="1.0" encoding="UTF-8"?>
+<addon id="{repo_id}" name="{title}" version="{version}" provider-name="CRB Project">
+  <requires><import addon="xbmc.python" version="3.0.0"/></requires>
+  <extension point="xbmc.addon.repository">
+    <dir minversion="21.0.0">
+      <info>http://127.0.0.1:8765/addons.xml</info>
+      <checksum>http://127.0.0.1:8765/addons.xml.md5</checksum>
+      <datadir zip="true">http://127.0.0.1:8765/packages/</datadir>
+    </dir>
+  </extension>
+  <extension point="xbmc.service" library="service.py" start="startup"/>
+  <extension point="xbmc.addon.metadata">
+    <platform>all</platform>
+    <license>GPL-3.0-or-later</license>
+    <summary lang="en_GB">{summary}</summary>
+    <description lang="en_GB">{description}</description>
+    <assets><icon>resources/icon.png</icon><fanart>resources/fanart.jpg</fanart></assets>
+  </extension>
+</addon>
+'''.format(repo_id=repo_id, title=title, version=version, summary=summary, description=description)
+    (repository / 'addon.xml').write_text(repo_manifest, encoding='utf-8')
+    resources = repository / 'resources'
+    resources.mkdir()
+    shutil.copy2(SKIN / 'resources' / 'icon.png', resources / 'icon.png')
+    shutil.copy2(SKIN / 'resources' / 'fanart.jpg', resources / 'fanart.jpg')
+
+    addon_roots = [addon_xml(SKIN), addon_xml(WIZARD)]
+    with ZipFile(video_zip) as archive:
+        manifest = next(name for name in archive.namelist() if name.endswith('/addon.xml'))
+        addon_roots.append(ET.fromstring(archive.read(manifest)))
+    metadata_root = ET.Element('addons')
+    metadata_root.extend(addon_roots)
+    metadata = ET.tostring(metadata_root, encoding='utf-8', xml_declaration=True)
+    (repository / 'addons.xml').write_bytes(metadata)
+    (repository / 'addons.xml.md5').write_text(hashlib.md5(metadata).hexdigest(), encoding='ascii')
+    ET.parse(repository / 'addon.xml')
+    ET.parse(repository / 'addons.xml')
+
+    destination = OUTPUTS / '{}-{}.zip'.format(repo_id, version)
+    with ZipFile(destination, 'w', ZIP_DEFLATED, compresslevel=7) as archive:
+        for path in repository.rglob('*'):
+            if path.is_file():
+                archive.write(path, (Path(repo_id) / path.relative_to(repository)).as_posix())
+    return destination
+
+
+windows_repo = create_repository(
+    'repository.crb', 'CRB Add-on Repository', '0.1.4', VIDEO_ZIP,
+    "CRB's local Windows setup repository",
+    'Provides the CRB skin, setup wizard and Windows video add-on package.',
+)
+android_repo = create_repository(
+    'repository.crb.android', 'CRB Android Add-on Repository', '0.1.0', ANDROID_VIDEO_ZIP,
+    "CRB's local Android TV and Fire TV setup repository",
+    'Provides the CRB skin, setup wizard and Android-compatible video add-on package. The torrent engine is downloaded for the device CPU on first playback.',
+)
+
+for path in (skin_zip, wizard_zip, windows_repo, android_repo, ANDROID_VIDEO_ZIP):
+    with ZipFile(path) as archive:
+        assert archive.testzip() is None
+    print('{}: {:,} bytes'.format(path.name, path.stat().st_size))
+print('Built Windows and Android Kodi repositories, CRB skin, setup wizard and platform-specific add-on packages.')

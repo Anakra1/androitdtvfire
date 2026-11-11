@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<addon id="script.crb.wizard" name="CRB Setup Wizard" version="0.1.0" provider-name="CRB Project">
+  <requires>
+    <import addon="xbmc.python" version="3.0.1" />
+    <import addon="skin.crimsonbloodrequiem" version="0.1.0" />
+    <import addon="plugin.video.stremio.bridge" version="0.5.3" />
+  </requires>
+  <extension point="xbmc.python.script" library="default.py" />
+  <extension point="xbmc.addon.metadata">
+    <platform>all</platform>
+    <license>GPL-3.0-or-later</license>
+    <summary lang="en_GB">Install or restore the Crimson Blood Requiem Kodi interface</summary>
+    <description lang="en_GB">Applies the CRB space skin while preserving your Kodi library, profile and other add-ons. Stores the previous skin so you can restore it.</description>
+    <assets>
+      <icon>resources/icon.png</icon>
+      <fanart>resources/fanart.jpg</fanart>
+    </assets>
+  </extension>
+</addon>
