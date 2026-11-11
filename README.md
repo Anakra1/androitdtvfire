@@ -25,11 +25,11 @@ You can install the direct add-on ZIP instead of the repository, then install th
 
 ### Fire TV source install
 
-After GitHub Pages is enabled for this repository, add this as a Kodi File Manager source:
+Add this as a Kodi File Manager source:
 
-`https://anakra1.github.io/CBR-Kodi-Project/downloads/Fire-TV-Android/`
+`https://anakra1.github.io/androitdtvfire/`
 
-Name it `CBR Fire TV`, then choose **Add-ons → Install from zip file → CBR Fire TV → CBR-Fire-TV-Android-Repository-0.1.1.zip**. The folder's `index.html` lists the ZIPs in a format Kodi can browse.
+Name it `CBR Fire TV`, then choose **Add-ons → Install from zip file → CBR Fire TV → CBR-Fire-TV-Android-Repository-0.1.1.zip**. The root `index.html` lists the repository ZIP in a format Kodi can browse.
 
 ## Android / Fire TV note
 
