@@ -23,7 +23,7 @@ class RepositoryInstallTests(unittest.TestCase):
     def test_repository_installs_video_and_embedded_engine_from_one_feed(self):
         with ZipFile(PROJECT / 'repository.cbr.zip') as repository:
             manifest = ET.fromstring(repository.read('repository.crb.android/addon.xml'))
-        self.assertEqual(manifest.attrib['version'], '0.1.6')
+        self.assertEqual(manifest.attrib['version'], '0.1.7')
         self.assertFalse(manifest.findall("extension[@point='xbmc.service']"))
         directory = manifest.find("extension[@point='xbmc.addon.repository']/dir")
         self.assertEqual(directory.findtext('info'), 'https://anakra1.github.io/androitdtvfire/android/addons.xml')
@@ -32,7 +32,7 @@ class RepositoryInstallTests(unittest.TestCase):
                          (PROJECT / 'android/addons.xml.md5').read_text().strip())
         addons = {item.attrib['id']: item for item in ET.parse(feed).getroot()}
         video = addons['plugin.video.stremio.bridge']
-        self.assertEqual(video.attrib['version'], '0.6.0')
+        self.assertEqual(video.attrib['version'], '0.6.1')
         requirements = {item.attrib['addon']: item.attrib.get('version') for item in video.find('requires')}
         self.assertEqual(requirements['script.module.cbr.engine'], '0.1.0')
         for addon_id, item in addons.items():

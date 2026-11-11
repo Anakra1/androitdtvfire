@@ -96,6 +96,7 @@ def home():
 
 
 def tools():
+    item('Source setup (phone / PC)', 'web_setup', artwork='settings')
     item('Search movies', 'search', media_type='movie', artwork='search')
     item('Search TV series', 'search', media_type='series', artwork='search')
     item('Search Live TV', 'search', live_only='true', artwork='search')
@@ -121,6 +122,7 @@ def movie_home():
     item('Search Live TV', 'search', live_only='true', artwork='search')
     item('Live TV', 'live', artwork='live')
     item('My Kodi Movies library', 'library', artwork='library')
+    item('Source setup (phone / PC)', 'web_setup', artwork='settings')
     item('Sources and player settings', 'tools', artwork='settings')
     candidates = [(e, c) for e, c in movie_catalogs() if not any(x.get('isRequired') for x in c.get('extra', []))]
     candidates.sort(key=lambda pair: (pair[0]['manifest'].get('id') != 'com.linvo.cinemeta',
@@ -147,6 +149,7 @@ def movie_home():
 
 
 def manage():
+    item('Source setup (phone / PC)', 'web_setup', artwork='settings')
     item('Add another source / manifest URL', 'add')
     item('Import manifest URLs from a text file', 'import')
     item('Add Cinemeta (official movie and series catalogue)', 'cinemeta')
@@ -172,6 +175,7 @@ def add_provider(live_group=None):
 
 
 def live_home():
+    item('Source setup (phone / PC)', 'web_setup', artwork='settings')
     for group, name in GROUPS:
         item(name, 'live_catalogues', group=group, artwork='live')
     finish()
@@ -183,6 +187,7 @@ def live_catalogues(group):
         item('{} / {}'.format(entry['label'], catalog.get('name', catalog['id'])), 'catalog',
              provider=entry['key'], catalog=STORE.put(catalog), artwork='catalogues')
     item('Add another {} source'.format(GROUP_NAMES[group]), 'add', group=group, artwork='settings')
+    item('Source setup (phone / PC)', 'web_setup', artwork='settings')
     item('Manage sources', 'manage', artwork='settings')
     if not matches:
         notify('Add a manifest source to this category to load channels or events.')
@@ -212,6 +217,44 @@ def import_providers():
         except Exception:
             failed += 1
     DIALOG.ok('Import complete', '{} connected; {} failed. Maximum 100 URLs per import.'.format(success, failed))
+
+
+def web_setup():
+    import secrets
+    import time
+    from engine import read_json, write_json
+    root = xbmcvfs.translatePath(ADDON.getAddonInfo('profile'))
+    request_path = os.path.join(root, 'web-setup-request.json')
+    endpoint_path = os.path.join(root, 'web-setup-endpoint.json')
+    nonce = secrets.token_hex(16)
+    monitor = xbmc.Monitor()
+    write_json(request_path, {'nonce': nonce, 'time': time.time()})
+    progress = xbmcgui.DialogProgress()
+    progress.create(BRAND, 'Opening source setup for your phone or PC…')
+    deadline, endpoint = time.monotonic() + 12, {}
+    try:
+        while time.monotonic() < deadline and not monitor.abortRequested():
+            if progress.iscanceled():
+                return home()
+            endpoint = read_json(endpoint_path)
+            if endpoint.get('nonce') == nonce:
+                break
+            monitor.waitForAbort(0.2)
+        progress.close()
+        if endpoint.get('nonce') != nonce:
+            DIALOG.ok(BRAND, 'The CBR setup service did not answer. Restart Kodi and open Source setup again.')
+        elif endpoint.get('error'):
+            DIALOG.ok(BRAND, endpoint['error'])
+        else:
+            DIALOG.ok('CBR source setup',
+                      'On a phone or PC connected to the same home network, open:\n[B]{}[/B]\n\n'
+                      'Pairing code: [B]{}[/B]\n\n'
+                      'Leave this screen open while you add or edit sources. Setup closes after ten minutes. '
+                      'Select OK when finished.'.format(endpoint['url'], endpoint['code']))
+    finally:
+        progress.close()
+        write_json(request_path, {'nonce': nonce, 'stop': True})
+    home()
 
 
 def provider_menu(key):
@@ -629,6 +672,8 @@ def main():
             library_setup()
         elif action == 'manage':
             manage()
+        elif action == 'web_setup':
+            web_setup()
         elif action == 'defaults':
             ensure_defaults(STORE, ADDON.getAddonInfo('path'), force=True)
             manage()

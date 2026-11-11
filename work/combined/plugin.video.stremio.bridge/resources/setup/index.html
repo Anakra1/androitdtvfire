@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CBR Source Setup</title><link rel="stylesheet" href="/style.css"><script src="/setup.js" defer></script></head>
+<body><main>
+<header><span class="badge">CBR</span><div><p class="eyebrow">CRIMSON BLOOD REQUIEM</p><h1>Source setup</h1></div></header>
+<p>Paste manifest links here to save them directly to CBR on your TV.</p>
+<p id="status" role="status" aria-live="polite"></p>
+<section id="pair-panel"><h2>Connect to your TV</h2><form id="pair-form"><label for="code">Pairing code shown in Kodi</label><input id="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" required><button>Connect</button></form><p class="muted">Keep the source setup screen open in Kodi. This connection lasts ten minutes.</p></section>
+<div id="workspace" hidden>
+<section><div class="row"><h2>Your sources</h2><button id="refresh" type="button" class="secondary">Refresh catalogues</button></div><p class="muted">Choose Edit to replace an expired manifest without entering it on the TV remote.</p><div id="sources"></div></section>
+<section><h2 id="editor-title">Add a source</h2><form id="source-form">
+<input type="hidden" id="source-key">
+<label for="label">Source name</label><input id="label" placeholder="For example, Sports Streams" maxlength="100" required>
+<label for="url">Full manifest URL</label><textarea id="url" rows="3" placeholder="https://provider.example/your-configuration/manifest.json" spellcheck="false" autocapitalize="off" required></textarea>
+<label for="group">Live TV category</label><select id="group"><option value="">Automatic / movies and series</option><option value="tv">TV Channels</option><option value="internet">Internet TV</option><option value="sports">Live Sports</option></select>
+<label class="check"><input id="enabled" type="checkbox" checked> Enabled in CBR</label>
+<div class="row"><button id="save">Add source</button><button id="cancel" type="button" class="secondary" hidden>Cancel edit</button></div>
+</form></section>
+<p class="muted">After saving, return to CBR’s home menu and reopen the catalogue. Changes are stored on your Kodi device.</p>
+</div>
+</main></body></html>

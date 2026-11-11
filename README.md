@@ -10,11 +10,19 @@ CBR provides movie and TV catalogues, posters, separate searches, Live TV catego
 4. Accept Kodi’s dependency list, including **CBR Playback Engine**. Kodi installs the playback engine with the video add-on.
 5. Open CBR and select a movie or episode and a source. On upgrades from older CBR versions, restart Kodi once so its old service unloads.
 
-Current Android versions: repository **0.1.6**, video add-on **0.6.0**, playback engine **0.1.0**. All playback installation and updates use this one Kodi repository.
+Current Android versions: repository **0.1.7**, video add-on **0.6.1**, playback engine **0.1.0**. All playback installation and updates use this one Kodi repository.
 
 Install **Crimson Blood Requiem Skin** and **CBR Setup Wizard** from the same repository for the optional interface, then run the wizard. The video add-on also works with Kodi’s normal skin.
 
 The existing Windows packages are in [downloads/Windows](downloads/Windows).
+
+## Add or update manifests from a phone or PC
+
+In CBR choose **Source setup (phone / PC)**. This button is also in **Live TV** and **Manage sources**. Kodi shows a local web address and a six-digit pairing code. Keep that screen open.
+
+On a phone or computer connected to the same home network, open the displayed address in its browser and enter the code. Choose **Edit** next to the source you want to update, paste its full configured manifest URL, and save. You can add different providers, select their Live TV categories, enable/disable entries, remove old sources, and refresh enabled source catalogues. When finished, select OK on the Kodi screen and reopen the catalogue.
+
+Kodi hosts this page only while source setup is active, for up to ten minutes. Provider configurations remain on the Kodi device. Pairing is required before a browser can read or change them. No website hosting account is needed for this local setup mode. Guest Wi-Fi isolation or a VPN that blocks local-network access can prevent a phone or PC from reaching the device.
 
 ## Sources
 

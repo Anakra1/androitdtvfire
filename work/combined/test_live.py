@@ -90,7 +90,9 @@ class LiveRouteTests(unittest.TestCase):
 
     def test_live_home_has_requested_categories(self):
         self.app.live_home()
-        self.assertEqual([args[2].label for args, _ in self.items], ['TV Channels', 'Internet TV', 'Live Sports'])
+        self.assertEqual([args[2].label for args, _ in self.items],
+                         ['Source setup (phone / PC)', 'TV Channels', 'Internet TV', 'Live Sports'])
+        self.assertIn('action=web_setup', self.items[0][0][1])
 
     def test_sports_catalogue_to_live_stream_preserves_custom_type_and_skips_schedule(self):
         manifest = {'id': 'fixture.sports', 'name': 'Sports', 'version': '1', 'types': ['sport'],
