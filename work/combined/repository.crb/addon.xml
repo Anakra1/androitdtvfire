@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<addon id="repository.crb" name="CRB Add-on Repository" version="0.1.4" provider-name="CRB Project">
+<addon id="repository.crb" name="CBR Add-on Repository" version="0.1.5" provider-name="CBR Project">
   <requires><import addon="xbmc.python" version="3.0.0"/></requires>
   <extension point="xbmc.addon.repository">
     <dir minversion="21.0.0">
@@ -12,8 +12,8 @@
   <extension point="xbmc.addon.metadata">
     <platform>all</platform>
     <license>GPL-3.0-or-later</license>
-    <summary lang="en_GB">CRB's local Windows setup repository</summary>
-    <description lang="en_GB">Provides the CRB skin, setup wizard and Windows video add-on package.</description>
+    <summary lang="en_GB">CBR's local Windows setup repository</summary>
+    <description lang="en_GB">Provides the CBR skin, setup wizard and Windows video add-on package.</description>
     <assets><icon>resources/icon.png</icon><fanart>resources/fanart.jpg</fanart></assets>
   </extension>
 </addon>

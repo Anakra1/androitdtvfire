@@ -1,4 +1,4 @@
-"""CRB setup wizard: applies and restores the optional Kodi skin."""
+"""CBR setup wizard: applies and restores the optional Kodi skin."""
 import json
 import os
 
@@ -60,7 +60,7 @@ def apply_skin():
     try:
         xbmcaddon.Addon(SKIN_ID)
     except Exception:
-        DIALOG.ok(BRAND, 'The CRB skin is not installed yet. Install CRB Setup Wizard from the CRB repository, then try again.')
+        DIALOG.ok(BRAND, 'The CBR skin is not installed yet. Install CBR Setup Wizard from the CBR repository, then try again.')
         return
     previous = current_skin()
     if previous != SKIN_ID:
@@ -69,14 +69,14 @@ def apply_skin():
                     'Your Kodi libraries, add-ons and provider settings stay in place. '
                     'You can restore the previous skin from this wizard.'):
         set_skin(SKIN_ID)
-        DIALOG.notification(BRAND, 'CRB interface applied', xbmcgui.NOTIFICATION_INFO, 5000)
+        DIALOG.notification(BRAND, 'CBR interface applied', xbmcgui.NOTIFICATION_INFO, 5000)
 
 
 def restore_skin():
     target = read_previous()
     if target == SKIN_ID:
         target = 'skin.estuary'
-    if DIALOG.yesno(BRAND, 'Restore the previous Kodi interface?\n\nThe CRB add-on and its settings will stay installed.'):
+    if DIALOG.yesno(BRAND, 'Restore the previous Kodi interface?\n\nThe CBR add-on and its settings will stay installed.'):
         set_skin(target)
         DIALOG.notification(BRAND, 'Previous interface restored', xbmcgui.NOTIFICATION_INFO, 5000)
 
@@ -86,8 +86,8 @@ def open_crb():
 
 
 def main():
-    options = ['Apply CRB space interface', 'Restore previous Kodi interface', 'Open Crimson Blood Requiem', 'Close']
-    choice = DIALOG.select('CRB Setup Wizard', options)
+    options = ['Apply CBR space interface', 'Restore previous Kodi interface', 'Open Crimson Blood Requiem', 'Close']
+    choice = DIALOG.select('CBR Setup Wizard', options)
     if choice == 0:
         apply_skin()
     elif choice == 1:

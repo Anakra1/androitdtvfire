@@ -11,6 +11,6 @@ You can find the license details here: <https://www.gnu.org/licenses/gpl-2.0>.
 
 
 Crimson Blood Requiem modifications
-The CRB-specific artwork and modifications are licensed GPL-2.0-or-later.
+The CBR-specific artwork and modifications are licensed GPL-2.0-or-later.
 Estuary code remains GPL-2.0; Estuary artwork remains CC BY-SA 4.0.
 Estuary by phil65 and Kodi contributors; source: https://github.com/xbmc/skin.estuary/

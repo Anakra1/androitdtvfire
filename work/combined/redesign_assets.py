@@ -27,7 +27,7 @@ def make_card(base, title, subtitle, symbol):
     card.alpha_composite(Image.new('RGBA', card.size, (13, 3, 8, 190)))
     draw = ImageDraw.Draw(card)
     draw.rounded_rectangle((19, 20, 381, 580), radius=22, outline=(118, 25, 43, 230), width=2)
-    draw.text((40, 43), 'CRB', font=font(27, True), fill=(244, 222, 224, 255))
+    draw.text((40, 43), 'CBR', font=font(27, True), fill=(244, 222, 224, 255))
     draw.text((40, 79), 'CRIMSON BLOOD REQUIEM', font=font(12, True), fill=(221, 60, 79, 255))
     draw.line((40, 109, 360, 109), fill=(111, 26, 39, 230), width=2)
     cx, cy = 200, 268
@@ -86,13 +86,13 @@ source = Image.open(SOURCE).convert('RGB')
 fanart = fit_cover(source, (1920, 1080), (0.5, 0.5))
 fanart.save(ART / 'crb-fanart.jpg', quality=93, optimize=True)
 
-# Readable CRB thumbnail: use the ship-and-nebula region under a dark red veil.
+# Readable CBR thumbnail: use the ship-and-nebula region under a dark red veil.
 icon = fit_cover(source, (512, 512), (0.9, 0.5)).convert('RGBA')
 icon.alpha_composite(Image.new('RGBA', icon.size, (26, 2, 9, 138)))
 draw = ImageDraw.Draw(icon)
 draw.rounded_rectangle((18, 18, 494, 494), radius=42, outline=(174, 33, 52, 255), width=5)
 draw.line((96, 132, 416, 132), fill=(210, 41, 61, 220), width=3)
-draw.text((256, 231), 'CRB', anchor='mm', font=font(142, True), fill=(252, 235, 236, 255), stroke_width=2, stroke_fill=(63, 7, 17, 255))
+draw.text((256, 231), 'CBR', anchor='mm', font=font(142, True), fill=(252, 235, 236, 255), stroke_width=2, stroke_fill=(63, 7, 17, 255))
 draw.text((256, 307), 'CRIMSON BLOOD REQUIEM', anchor='mm', font=font(23, True), fill=(239, 83, 99, 255))
 draw.line((96, 356, 416, 356), fill=(210, 41, 61, 220), width=3)
 icon.convert('RGB').save(ART / 'crb-icon.png', optimize=True)
@@ -107,4 +107,4 @@ make_card(base, 'LIVE TV', 'Channels and live sports', 'live').save(ART / 'crb-l
 make_card(base, 'COLLECTIONS', 'Browse movies and genres', 'catalogues').save(ART / 'crb-catalogues.png', optimize=True)
 make_card(base, 'SETTINGS', 'Sources and playback', 'settings').save(ART / 'crb-settings.png', optimize=True)
 make_card(base, 'MY MOVIES', 'Your Kodi library', 'film').save(ART / 'crb-library.png', optimize=True)
-print('Created CRB icon, fanart and matching crimson category and search cards.')
+print('Created CBR icon, fanart and matching crimson category and search cards.')

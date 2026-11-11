@@ -1,4 +1,4 @@
-"""Build Windows and Android CRB Kodi repositories, skin and setup wizard."""
+"""Build Windows and Android CBR Kodi repositories, skin and setup wizard."""
 from pathlib import Path
 from zipfile import ZIP_DEFLATED, ZipFile
 import hashlib
@@ -11,11 +11,11 @@ OUTPUTS = ROOT.parent.parent / 'outputs'
 OUTPUTS.mkdir(exist_ok=True)
 SKIN = ROOT / 'skin.crimsonbloodrequiem'
 WIZARD = ROOT / 'script.crb.wizard'
-VIDEO_ZIP = OUTPUTS / 'plugin.video.stremio.bridge-0.5.3.zip'
-ANDROID_VIDEO_ZIP = OUTPUTS / 'plugin.video.stremio.bridge-0.5.3-android.zip'
+VIDEO_ZIP = OUTPUTS / 'plugin.video.stremio.bridge-0.5.4.zip'
+ANDROID_VIDEO_ZIP = OUTPUTS / 'plugin.video.stremio.bridge-0.5.4-android.zip'
 
 if not VIDEO_ZIP.is_file():
-    raise SystemExit('Missing the current CRB video add-on installer.')
+    raise SystemExit('Missing the current CBR video add-on installer.')
 
 
 def addon_xml(source):
@@ -31,8 +31,8 @@ def create_addon_zip(source, destination):
             archive.write(path, (Path(addon_id) / path.relative_to(source)).as_posix())
 
 
-skin_zip = OUTPUTS / 'skin.crimsonbloodrequiem-0.1.0.zip'
-wizard_zip = OUTPUTS / 'script.crb.wizard-0.1.0.zip'
+skin_zip = OUTPUTS / 'CBR-Space-Skin-0.1.1.zip'
+wizard_zip = OUTPUTS / 'CBR-Setup-Wizard-0.1.1.zip'
 create_addon_zip(SKIN, skin_zip)
 create_addon_zip(WIZARD, wizard_zip)
 
@@ -86,7 +86,7 @@ def create_repository(repo_id, title, version, video_zip, summary, description):
 
     (repository / 'service.py').write_text(SERVICE, encoding='utf-8')
     repo_manifest = '''<?xml version="1.0" encoding="UTF-8"?>
-<addon id="{repo_id}" name="{title}" version="{version}" provider-name="CRB Project">
+<addon id="{repo_id}" name="{title}" version="{version}" provider-name="CBR Project">
   <requires><import addon="xbmc.python" version="3.0.0"/></requires>
   <extension point="xbmc.addon.repository">
     <dir minversion="21.0.0">
@@ -123,7 +123,8 @@ def create_repository(repo_id, title, version, video_zip, summary, description):
     ET.parse(repository / 'addon.xml')
     ET.parse(repository / 'addons.xml')
 
-    destination = OUTPUTS / '{}-{}.zip'.format(repo_id, version)
+    package_name = 'CBR-Windows-Repository-{}.zip'.format(version) if repo_id == 'repository.crb' else 'CBR-Fire-TV-Android-Repository-{}.zip'.format(version)
+    destination = OUTPUTS / package_name
     with ZipFile(destination, 'w', ZIP_DEFLATED, compresslevel=7) as archive:
         for path in repository.rglob('*'):
             if path.is_file():
@@ -132,18 +133,18 @@ def create_repository(repo_id, title, version, video_zip, summary, description):
 
 
 windows_repo = create_repository(
-    'repository.crb', 'CRB Add-on Repository', '0.1.4', VIDEO_ZIP,
-    "CRB's local Windows setup repository",
-    'Provides the CRB skin, setup wizard and Windows video add-on package.',
+    'repository.crb', 'CBR Add-on Repository', '0.1.5', VIDEO_ZIP,
+    "CBR's local Windows setup repository",
+    'Provides the CBR skin, setup wizard and Windows video add-on package.',
 )
 android_repo = create_repository(
-    'repository.crb.android', 'CRB Android Add-on Repository', '0.1.0', ANDROID_VIDEO_ZIP,
-    "CRB's local Android TV and Fire TV setup repository",
-    'Provides the CRB skin, setup wizard and Android-compatible video add-on package. The torrent engine is downloaded for the device CPU on first playback.',
+    'repository.crb.android', 'CBR Android Add-on Repository', '0.1.1', ANDROID_VIDEO_ZIP,
+    "CBR's local Android TV and Fire TV setup repository",
+    'Provides the CBR skin, setup wizard and Android-compatible video add-on package. The torrent engine is downloaded for the device CPU on first playback.',
 )
 
 for path in (skin_zip, wizard_zip, windows_repo, android_repo, ANDROID_VIDEO_ZIP):
     with ZipFile(path) as archive:
         assert archive.testzip() is None
     print('{}: {:,} bytes'.format(path.name, path.stat().st_size))
-print('Built Windows and Android Kodi repositories, CRB skin, setup wizard and platform-specific add-on packages.')
+print('Built Windows and Android Kodi repositories, CBR skin, setup wizard and platform-specific add-on packages.')

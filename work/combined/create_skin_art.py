@@ -58,4 +58,4 @@ def wizard(draw, c):
 for n, fn in [('search', search), ('movies', movie), ('series', series), ('live', live), ('wizard', wizard)]:
     save_icon(n, fn)
 
-print('Generated CRB skin art and menu icons.')
+print('Generated CBR skin art and menu icons.')

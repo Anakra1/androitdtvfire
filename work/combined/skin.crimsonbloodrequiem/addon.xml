@@ -1,8 +1,8 @@
 <?xml version='1.0' encoding='utf-8'?>
-<addon id="skin.crimsonbloodrequiem" version="0.1.0" name="Crimson Blood Requiem" provider-name="CRB Project">
+<addon id="skin.crimsonbloodrequiem" version="0.1.1" name="Crimson Blood Requiem" provider-name="CBR Project">
   <requires>
     <import addon="xbmc.gui" version="5.17.0" />
-    <import addon="plugin.video.stremio.bridge" version="0.5.3" />
+    <import addon="plugin.video.stremio.bridge" version="0.5.4" />
   </requires>
   <extension point="xbmc.gui.skin" debugging="false">
     <res width="1920" height="1440" aspect="4:3" default="false" folder="xml" />
@@ -21,8 +21,8 @@
       <icon>resources/icon.png</icon>
       <fanart>resources/fanart.jpg</fanart>
     </assets>
-    <summary lang="en_GB">A crimson space-command skin for Kodi, built for CRB.</summary>
-    <description lang="en_GB">Crimson Blood Requiem brings a dark space-fleet backdrop, deep red accents, and direct home-screen access to CRB movies, TV series, Live TV and search. Based on Kodi Estuary and designed to keep Kodi library, settings and other add-ons available.</description>
+    <summary lang="en_GB">A crimson space-command skin for Kodi, built for CBR.</summary>
+    <description lang="en_GB">Crimson Blood Requiem brings a dark space-fleet backdrop, deep red accents, and direct home-screen access to CBR movies, TV series, Live TV and search. Based on Kodi Estuary and designed to keep Kodi library, settings and other add-ons available.</description>
     <disclaimer lang="en_GB">An independent community skin. Kodi and Estuary are trademarks and software of their respective owners.</disclaimer>
   </extension>
 </addon>

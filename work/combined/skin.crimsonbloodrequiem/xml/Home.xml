@@ -934,15 +934,15 @@
 					</itemlayout>
 					<content>
 					<item>
-						<label>CRB Movies</label>
-						<label2>CRB movie catalogues and collections</label2>
+						<label>CBR Movies</label>
+						<label2>CBR movie catalogues and collections</label2>
 						<onclick>ActivateWindow(Videos,plugin://plugin.video.stremio.bridge/,return)</onclick>
 						<property name="menu_id">$NUMBER[9000]</property>
 						<thumb>crb-movies.png</thumb>
 						<property name="id">crb_0</property>
 					</item>
 					<item>
-						<label>CRB TV Series</label>
+						<label>CBR TV Series</label>
 						<label2>Browse series, seasons and episodes</label2>
 						<onclick>ActivateWindow(Videos,plugin://plugin.video.stremio.bridge/?action=catalogues&amp;media_type=series,return)</onclick>
 						<property name="menu_id">$NUMBER[9000]</property>
@@ -950,7 +950,7 @@
 						<property name="id">crb_1</property>
 					</item>
 					<item>
-						<label>CRB Live TV</label>
+						<label>CBR Live TV</label>
 						<label2>TV channels, internet TV and live sports</label2>
 						<onclick>ActivateWindow(Videos,plugin://plugin.video.stremio.bridge/?action=live,return)</onclick>
 						<property name="menu_id">$NUMBER[9000]</property>
@@ -982,8 +982,8 @@
 						<property name="id">crb_5</property>
 					</item>
 					<item>
-						<label>CRB Setup Wizard</label>
-						<label2>Change the CRB interface or restore Kodi</label2>
+						<label>CBR Setup Wizard</label>
+						<label2>Change the CBR interface or restore Kodi</label2>
 						<onclick>RunAddon(script.crb.wizard)</onclick>
 						<property name="menu_id">$NUMBER[9000]</property>
 						<thumb>crb-wizard.png</thumb>

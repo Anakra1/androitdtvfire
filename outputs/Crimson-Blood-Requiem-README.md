@@ -1,16 +1,16 @@
-# Crimson Blood Requiem (CRB) 0.5.3 — Windows, Android TV and Fire TV
+# Crimson Blood Requiem (CBR) 0.5.4 — Windows, Android TV and Fire TV
 
 **One Kodi add-on includes movies, TV series, a torrent player and Live TV split into TV Channels, Internet TV and Live Sports.** No Elementum, separate Stream Bridge installation, or manual script copying is required.
 
-CRB uses a crimson and dark-red palette, a CRB add-on thumbnail, matching menu artwork and original deep-space fleet fanart. Kodi skins control the navigation highlight colours.
+CBR uses a crimson and dark-red palette, a CBR add-on thumbnail, matching menu artwork and original deep-space fleet fanart. Kodi skins control the navigation highlight colours.
 
-This installer includes the personalised MediaFusion and Sports Streams manifest configurations supplied for this task. Keep the installer private. The source-code archive replaces those personalised URLs with account-free setup URLs.
+These packages use public provider defaults and contain no personalized MediaFusion URL or account tokens. Add any private manifest URL in Kodi's source settings on each device.
 
 ## Install
 
-1. On Windows, use **Add-ons → Install from zip file** and choose `plugin.video.stremio.bridge-0.5.3.zip`. On Android TV or Fire TV, install `repository.crb.android-0.1.0.zip`, then install Crimson Blood Requiem, the skin and the setup wizard from **Install from repository → CRB Android Add-on Repository**.
+1. On Windows, use **Add-ons → Install from zip file** and choose `plugin.video.stremio.bridge-0.5.4.zip`. On Android TV or Fire TV, install `CBR-Fire-TV-Android-Repository-0.1.1.zip`, then install Crimson Blood Requiem, the skin and the setup wizard from **Install from repository → CBR Android Add-on Repository**.
 2. Restart Kodi once to start the new background player service.
-3. Open **Video add-ons → Crimson Blood Requiem** (the crimson **CRB** thumbnail).
+3. Open **Video add-ons → Crimson Blood Requiem** (the crimson **CBR** thumbnail).
 4. Choose a movie or TV episode and a source, or open **Live TV** and select a category, catalogue, channel/event and source.
 
 On a fresh profile, **Cinemeta** supplies movie/TV listings and posters, and **Torrentio** supplies stream results. They are enabled automatically on first launch; no account or default-URL entry is needed. Manifests describe sources and catalogues; the package does not contain movies or guarantee that every listed title has a working source. Playback depends on available peers, providers, network and Kodi codec support.
@@ -62,7 +62,7 @@ Cancelling preparation or stopping playback removes the active torrent. Abandone
 
 Version 0.3.1 fixes TV playback for ongoing series such as Nocturne: Cinemeta's `hasScheduledVideos` flag no longer bypasses season/episode selection. An empty embedded stream list also falls back to configured providers instead of displaying no sources. Nocturne's first-episode request returned 74 torrent results during diagnosis; availability can change.
 
-The Android package includes the same CRB listings, manifest setup, crimson skin and setup wizard. Its first torrent playback downloads the matching official TorrServer MatriX.150 Android executable for the device ABI; download progress is shown inside Kodi. Some newer Android/Fire TV builds block Kodi from launching native executables stored in add-on data. On those devices CRB reports that an Android companion service app is needed; this package does not include that helper yet. Non-torrent HTTP/HLS sources continue to use Kodi's native player.
+The Android package includes the same CBR listings, manifest setup, crimson skin and setup wizard. Its first torrent playback downloads the matching official TorrServer MatriX.150 Android executable for the device ABI; download progress is shown inside Kodi. Some newer Android/Fire TV builds block Kodi from launching native executables stored in add-on data. On those devices CBR reports that an Android companion service app is needed; this package does not include that helper yet. Non-torrent HTTP/HLS sources continue to use Kodi's native player.
 
 Tests cover fresh-profile defaults, migration, multiple enabled sources, poster browsing, TV navigation, library exports, HTTP playback/subtitles, the torrent resolver, cancellation, repeated playback requests and service cleanup. A real-engine test downloads a generated local torrent from a local BitTorrent seed, verifies buffering and byte-correct HTTP range seeking, and checks cancellation/shutdown. The public default endpoints were also checked: Cinemeta returned 50 poster listings and Torrentio returned 14 torrent results for the openly licensed Big Buck Bunny test film. These checks do not establish playback of every source or Kodi codec compatibility.
 

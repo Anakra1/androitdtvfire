@@ -211,7 +211,7 @@ class Engine:
         except OSError as error:
             if os.name != 'nt':
                 raise RuntimeError('Kodi downloaded the Android torrent engine, but Android blocked it from starting. '
-                                   'This device needs the CRB companion service app for torrent playback.') from error
+                                   'This device needs the CBR companion service app for torrent playback.') from error
             raise
         try:
             deadline = time.monotonic() + 15
