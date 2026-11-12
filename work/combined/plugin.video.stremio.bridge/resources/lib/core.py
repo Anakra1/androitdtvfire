@@ -25,22 +25,23 @@ def normalize_url(value):
     parts = urlsplit(value)
     if parts.scheme not in ('http', 'https') or not parts.hostname:
         raise ValueError('Enter an HTTP(S) or stremio:// manifest URL.')
-    if parts.username or parts.password or parts.query or parts.fragment:
-        raise ValueError('Use the full manifest URL without a query or fragment.')
+    if parts.username or parts.password or parts.fragment:
+        raise ValueError('Use the full manifest URL without credentials or a fragment.')
     path = parts.path.rstrip('/')
     if path.endswith('/configure'):
         raise ValueError('This is a configuration page. Copy the Share addon manifest URL instead.')
     if not path.endswith('/manifest.json'):
         path += '/manifest.json'
-    return urlunsplit((parts.scheme, parts.netloc, path, '', ''))
+    return urlunsplit((parts.scheme, parts.netloc, path, parts.query, ''))
 
 
 def resource_url(manifest_url, resource, media_type, item_id, extras=None):
-    base = normalize_url(manifest_url)[:-len('/manifest.json')]
+    parts = urlsplit(normalize_url(manifest_url))
+    base_path = parts.path[:-len('/manifest.json')]
     path = '/'.join(quote(str(x), safe='') for x in (resource, media_type, item_id))
     if extras:
         path += '/' + urlencode(extras, quote_via=quote)
-    return base + '/' + path + '.json'
+    return urlunsplit((parts.scheme, parts.netloc, base_path + '/' + path + '.json', parts.query, ''))
 
 
 def fetch_json(url, timeout=20):

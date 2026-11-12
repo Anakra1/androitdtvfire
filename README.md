@@ -10,7 +10,7 @@ CBR provides movie and TV catalogues, posters, separate searches, Live TV catego
 4. Accept Kodi’s dependency list, including **CBR Playback Engine**. Kodi installs the playback engine with the video add-on.
 5. Open CBR and select a movie or episode and a source. On upgrades from older CBR versions, restart Kodi once so its old service unloads.
 
-Current Android versions: repository **0.1.7**, video add-on **0.6.1**, playback engine **0.1.0**. All playback installation and updates use this one Kodi repository.
+Current Android versions: repository **0.1.7**, video add-on **0.6.2**, playback engine **0.1.0**. All playback installation and updates use this one Kodi repository.
 
 Install **Crimson Blood Requiem Skin** and **CBR Setup Wizard** from the same repository for the optional interface, then run the wizard. The video add-on also works with Kodi’s normal skin.
 

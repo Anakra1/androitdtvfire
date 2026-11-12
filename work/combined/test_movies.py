@@ -78,9 +78,22 @@ class ProtocolTests(ServerFixture):
     def test_manifest_url_normalization_and_rejection(self):
         self.assertEqual(core.normalize_url('stremio://example.org/token/manifest.json'), 'https://example.org/token/manifest.json')
         self.assertEqual(core.normalize_url('https://example.org/token'), 'https://example.org/token/manifest.json')
-        for value in ['file:///etc/passwd', 'https://example.org/configure', 'https://u:p@example.org/manifest.json', 'https://example.org/manifest.json?token=x']:
+        for value in ['file:///etc/passwd', 'https://example.org/configure', 'https://u:p@example.org/manifest.json', 'https://example.org/manifest.json#token=x']:
             with self.assertRaises(ValueError):
                 core.normalize_url(value)
+
+    def test_query_config_survives_store_and_resource_requests(self):
+        url = 'https://example.org/manifest.json?genres=News%2CTop+News&token=a%2Bb'
+        with tempfile.TemporaryDirectory() as directory:
+            store = core.Store(directory)
+            seen = []
+            entry = store.add(url, fetch=lambda requested: seen.append(requested) or MANIFEST)
+            self.assertEqual(seen, [url])
+            self.assertEqual(entry['url'], url)
+            self.assertEqual(core.resource_url(entry['url'], 'catalog', 'tv', 'news', {'skip': 100}),
+                             'https://example.org/catalog/tv/news/skip=100.json?genres=News%2CTop+News&token=a%2Bb')
+            self.assertEqual(core.resource_url(entry['url'], 'stream', 'tv', 'ABC.us'),
+                             'https://example.org/stream/tv/ABC.us.json?genres=News%2CTop+News&token=a%2Bb')
 
     def test_resource_url_preserves_configuration_and_escapes_ids(self):
         url = core.resource_url(self.url, 'stream', 'series', 'tt1:1:2/a', {'filename': 'x&y + z', 'videoSize': 10})
