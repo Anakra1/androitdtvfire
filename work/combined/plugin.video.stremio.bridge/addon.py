@@ -13,7 +13,7 @@ import xbmcvfs
 from resources.lib.core import (DEFAULT_URL, PRESETS, Store, aggregate, fetch_json,
                                 playback_url, resource_url, stream_kind)
 from resources.lib.library import MovieLibrary
-from resources.lib.live_player import LiveAutoplay
+from resources.lib.live_player import LiveAutoplay, probe_stream
 from resources.lib.defaults import ensure_defaults
 from resources.lib.live import (GROUPS, GROUP_NAMES, LiveCatalogueCache, LiveLibrary, browse_title, catalogue_group,
                                 entry_catalogs, grouped_catalogues, search_only)
@@ -659,7 +659,7 @@ def show_streams(media_type, item_id, meta, inline=None, channel=None, autoplay=
             streams.extend((entry['label'], s) for s in data.get('streams', []) if isinstance(s, dict))
     if autoplay and channel:
         bookmark = LIVE_LIBRARY.channel(channel)
-        path = LIVE_AUTOPLAY.begin(meta, bookmark, [stream for _, stream in streams])
+        path = LIVE_AUTOPLAY.begin(meta, bookmark, [stream for _, stream in streams], probe=probe_stream)
         if path:
             li = xbmcgui.ListItem(path=path)
             li.getVideoInfoTag().setTitle(meta.get('name', 'Live TV'))

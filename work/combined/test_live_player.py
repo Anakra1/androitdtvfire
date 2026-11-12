@@ -1,16 +1,37 @@
 import sys
 import tempfile
 import unittest
+import threading
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 ROOT = Path(__file__).parent / 'plugin.video.stremio.bridge'
 sys.path.insert(0, str(ROOT))
 from resources.lib.core import Store
-from resources.lib.live_player import LiveAutoplay
+from resources.lib.live_player import LiveAutoplay, probe_stream
 
 
 class LiveAutoplayTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        class Handler(BaseHTTPRequestHandler):
+            def log_message(self, *args):
+                pass
+            def do_GET(self):
+                self.send_response(403 if self.path.startswith('/blocked') else 200)
+                self.end_headers()
+        cls.server = ThreadingHTTPServer(('127.0.0.1', 0), Handler)
+        cls.thread = threading.Thread(target=cls.server.serve_forever, daemon=True)
+        cls.thread.start()
+        cls.base = 'http://127.0.0.1:' + str(cls.server.server_port)
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.server.shutdown()
+        cls.server.server_close()
+        cls.thread.join()
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
@@ -23,6 +44,22 @@ class LiveAutoplayTests(unittest.TestCase):
     def begin(self):
         return self.autoplay.begin(self.channel['meta'], self.channel, [
             {'url': 'https://example.org/first.m3u8'}, {'url': 'https://example.org/second.m3u8'}])
+
+    def test_two_blocked_http_links_do_not_prevent_the_third_link_from_playing(self):
+        streams = [{'url': self.base + path} for path in ('/blocked1', '/blocked2', '/good3', '/good4')]
+        selected = self.autoplay.begin(self.channel['meta'], self.channel, streams, probe=probe_stream)
+        self.assertEqual(selected, self.base + '/good3')
+        self.assertEqual(self.store.read(self.autoplay.path)['targets'],
+                         [self.base + '/good3', self.base + '/good4'])
+
+    def test_probe_timeout_retains_unknown_options_after_verified_links(self):
+        streams = [{'url': 'https://example.org/' + str(i)} for i in range(3)]
+        states = {'https://example.org/0': None, 'https://example.org/1': True, 'https://example.org/2': False}
+        selected = self.autoplay.begin(self.channel['meta'], self.channel, streams,
+                                       probe=lambda stream: states[stream['url']])
+        self.assertEqual(selected, 'https://example.org/1')
+        self.assertEqual(self.store.read(self.autoplay.path)['targets'],
+                         ['https://example.org/1', 'https://example.org/0'])
 
     def poll(self):
         self.autoplay.poll(self.player, self.item, self.notify)

@@ -17,11 +17,11 @@ class RepositoryInstallTests(unittest.TestCase):
         # no DOTALL flag, so each entry is also valid without multiline matching.
         pattern = re.compile(r'<a href="([^"]*)"[^>]*>\s*(.*?)\s*</a>(.+?)(?=<a|</tr|$)', re.I)
         entries = [link for link, name, _ in pattern.findall(html) if link.rstrip('/') == name.strip().rstrip('/')]
-        self.assertEqual(entries, ['repository.cbr.zip', 'cbr071.zip'])
+        self.assertEqual(entries, ['repository.cbr.zip', 'cbr072.zip'])
         for entry in entries:
             self.assertTrue((PROJECT / entry).is_file())
-        self.assertEqual((PROJECT / 'cbr071.zip').read_bytes(),
-                         (PROJECT / 'android/packages/plugin.video.stremio.bridge/plugin.video.stremio.bridge-0.7.1.zip').read_bytes())
+        self.assertEqual((PROJECT / 'cbr072.zip').read_bytes(),
+                         (PROJECT / 'android/packages/plugin.video.stremio.bridge/plugin.video.stremio.bridge-0.7.2.zip').read_bytes())
 
     def test_repository_installs_video_and_embedded_engine_from_one_feed(self):
         with ZipFile(PROJECT / 'repository.cbr.zip') as repository:
@@ -35,7 +35,7 @@ class RepositoryInstallTests(unittest.TestCase):
                          (PROJECT / 'android/addons.xml.md5').read_text().strip())
         addons = {item.attrib['id']: item for item in ET.parse(feed).getroot()}
         video = addons['plugin.video.stremio.bridge']
-        self.assertEqual(video.attrib['version'], '0.7.1')
+        self.assertEqual(video.attrib['version'], '0.7.2')
         requirements = {item.attrib['addon']: item.attrib.get('version') for item in video.find('requires')}
         self.assertEqual(requirements['script.module.cbr.engine'], '0.1.0')
         for addon_id, item in addons.items():

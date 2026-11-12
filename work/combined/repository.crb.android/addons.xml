@@ -52,7 +52,7 @@
     <license>GPL-3.0-or-later</license>
     <source>https://github.com/Anakra1/androitdtvfire</source>
   </extension>
-</addon><addon id="plugin.video.stremio.bridge" name="Crimson Blood Requiem" version="0.7.1" provider-name="Community">
+</addon><addon id="plugin.video.stremio.bridge" name="Crimson Blood Requiem" version="0.7.2" provider-name="Community">
   <requires><import addon="xbmc.python" version="3.0.1" /><import addon="script.module.cbr.engine" version="0.1.0" /></requires>
   <extension point="xbmc.python.pluginsource" library="addon.py"><provides>video</provides></extension>
   <extension point="xbmc.service" library="service.py" start="startup" />
