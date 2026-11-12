@@ -13,8 +13,9 @@ import xbmcvfs
 from resources.lib.core import (DEFAULT_URL, PRESETS, Store, aggregate, fetch_json,
                                 playback_url, resource_url, stream_kind)
 from resources.lib.library import MovieLibrary
+from resources.lib.live_player import LiveAutoplay
 from resources.lib.defaults import ensure_defaults
-from resources.lib.live import (GROUPS, GROUP_NAMES, LiveLibrary, browse_title, catalogue_group,
+from resources.lib.live import (GROUPS, GROUP_NAMES, LiveCatalogueCache, LiveLibrary, browse_title, catalogue_group,
                                 entry_catalogs, grouped_catalogues, search_only)
 
 ADDON = xbmcaddon.Addon()
@@ -24,6 +25,8 @@ DIALOG = xbmcgui.Dialog()
 STORE = Store(xbmcvfs.translatePath(ADDON.getAddonInfo('profile')))
 LIBRARY = MovieLibrary(STORE)
 LIVE_LIBRARY = LiveLibrary(STORE)
+LIVE_CATALOGUES = LiveCatalogueCache(STORE)
+LIVE_AUTOPLAY = LiveAutoplay(STORE)
 ART = os.path.join(ADDON.getAddonInfo('path'), 'resources', 'art')
 BRAND = 'Crimson Blood Requiem'
 
@@ -69,7 +72,11 @@ def item(label, action, folder=True, meta=None, artwork=None, channel=None, **kw
     if channel:
         bookmark = LIVE_LIBRARY.channel(channel)
         label = 'Remove from CBR favourites' if LIVE_LIBRARY.is_favourite(bookmark) else 'Add to CBR favourites'
-        li.addContextMenuItems([(label, 'RunPlugin({})'.format(route('live_favourite', key=STORE.put(bookmark))))])
+        arguments = {'key': kwargs['key']}
+        if 'index' in kwargs:
+            arguments['index'] = kwargs['index']
+        li.addContextMenuItems([(label, 'RunPlugin({})'.format(route('live_favourite', **arguments)))])
+        li.addContextMenuItems([('Choose stream manually', 'Container.Update({})'.format(route('meta', **arguments)))])
     li.setArt(art)
     if not folder:
         li.setProperty('IsPlayable', 'true')
@@ -242,10 +249,11 @@ def live_saved(collection):
     if collection not in ('favourites', 'recent'):
         raise ValueError('Unknown channel collection.')
     entries = LIVE_LIBRARY.entries(collection)
+    LIVE_LIBRARY.begin_listing()
     for channel in entries:
         saved = LIVE_LIBRARY.resolve(channel)
         if saved:
-            item(channel['meta'].get('name', 'Channel'), 'meta', key=STORE.put(saved),
+            item(channel['meta'].get('name', 'Channel'), 'live_play', folder=False, key=STORE.put(saved),
                  meta=channel['meta'], channel=saved)
         else:
             item(channel['meta'].get('name', 'Channel') + ' — source disabled or removed',
@@ -378,6 +386,7 @@ def catalogues(media_type=None):
 
 
 def add_metas(metas, provider, media_type, seen=None, live_group=None):
+    records = []
     for meta in metas:
         if not isinstance(meta, dict) or not meta.get('id'):
             continue
@@ -391,11 +400,21 @@ def add_metas(metas, provider, media_type, seen=None, live_group=None):
         saved = {'meta': meta, 'provider': provider}
         if live_group:
             saved.update(live_group=live_group, resource_type=media_type)
-        key = STORE.put(saved)
-        item(meta.get('name', meta['id']), 'meta', meta=meta, key=key, channel=saved if live_group else None)
+        if live_group:
+            records.append(saved)
+        else:
+            key = STORE.put(saved)
+            item(meta.get('name', meta['id']), 'meta', meta=meta, key=key)
+    if records:
+        LIVE_LIBRARY.begin_listing()
+        key = STORE.put(records)
+        for index, saved in enumerate(records):
+            meta = saved['meta']
+            item(meta.get('name', meta['id']), 'live_play', folder=False,
+                 meta=meta, key=key, index=index, channel=saved)
 
 
-def catalog_page(provider, catalog, extras=None):
+def catalog_page(provider, catalog, extras=None, offset=0, refresh=False):
     entry = STORE.provider(provider)
     cat = STORE.get(catalog)
     live_group = catalogue_group(entry, cat)
@@ -423,17 +442,26 @@ def catalog_page(provider, catalog, extras=None):
                 finish()
                 return
             extras[name] = value
-    data = request(resource_url(entry['url'], 'catalog', cat['type'], cat['id'], extras))
+    url = resource_url(entry['url'], 'catalog', cat['type'], cat['id'], extras)
+    data = (LIVE_CATALOGUES.get(url, request, lifetime=60 if live_group == 'sports' else 300, refresh=refresh)
+            if live_group else request(url))
     metas = data.get('metas', [])
-    live_group = catalogue_group(entry, cat)
-    add_metas(metas, provider, cat['type'], live_group=live_group)
+    offset = max(0, int(offset)) if live_group else 0
+    displayed = metas[offset:offset + 100] if live_group else metas
+    add_metas(displayed, provider, cat['type'], live_group=live_group)
     if cat['type'] == 'movie' and metas:
         item('Add this page to Kodi Movies library', 'export_page',
              key=STORE.put([dict(m, type='movie') for m in metas if isinstance(m, dict) and m.get('type', 'movie') == 'movie']),
              artwork='library')
-    if metas and any(x.get('name') == 'skip' for x in cat.get('extra', [])):
-        extras['skip'] = int(extras.get('skip', 0)) + len(metas)
-        item('Next page', 'catalog', provider=provider, catalog=catalog, extras=json.dumps(extras))
+    if live_group and offset + len(displayed) < len(metas):
+        item('Next page', 'catalog', provider=provider, catalog=catalog,
+             extras=json.dumps(extras), offset=offset + 100, artwork='live')
+    elif metas and any(x.get('name') == 'skip' for x in cat.get('extra', [])):
+        next_extras = dict(extras, skip=int(extras.get('skip', 0)) + len(metas))
+        item('Next page', 'catalog', provider=provider, catalog=catalog, extras=json.dumps(next_extras))
+    if live_group:
+        item('Refresh channels', 'catalog', provider=provider, catalog=catalog, extras=json.dumps(extras),
+             refresh='true', offset=offset, artwork='settings')
     if not metas:
         notify('No results in this catalogue')
     finish('movies' if cat['type'] == 'movie' else 'videos')
@@ -558,13 +586,27 @@ def library_play(movie):
     play(key)
 
 
-def metadata(key):
+def cached_item(key, index=None):
     saved = STORE.get(key)
+    if index is not None:
+        index = int(index)
+        if not isinstance(saved, list) or not 0 <= index < len(saved):
+            raise ValueError('This channel list has changed. Reopen its catalogue.')
+        saved = saved[index]
+    return saved
+
+
+def metadata(key, index=None, autoplay=False):
+    saved = cached_item(key, index)
     preview = saved['meta']
     providers = sorted(STORE.providers(), key=lambda x: x['key'] != saved['provider'])
     resource_type = saved.get('resource_type', preview['type'])
     origin = STORE.provider(saved['provider'])
     live_group = saved.get('live_group') or catalogue_group(origin, {'type': resource_type})
+    if live_group:
+        providers = [origin]
+        if not autoplay:
+            LIVE_AUTOPLAY.clear()
     results = aggregate(providers, 'meta', resource_type, preview['id'])
     meta = next((data['meta'] for _, data, _ in results if isinstance(data.get('meta'), dict) and data['meta']), preview)
     meta = dict(preview, **meta)
@@ -581,7 +623,8 @@ def metadata(key):
         finish('seasons')
     else:
         video_id = hints.get('defaultVideoId') or meta['id']
-        show_streams(resource_type, video_id, meta, meta.get('streams'), channel=saved if live_group else None)
+        show_streams(resource_type, video_id, meta, meta.get('streams'), channel=saved if live_group else None,
+                     autoplay=autoplay)
 
 
 def episodes(key):
@@ -602,15 +645,31 @@ def episodes(key):
     finish('episodes')
 
 
-def show_streams(media_type, item_id, meta, inline=None, channel=None):
+def show_streams(media_type, item_id, meta, inline=None, channel=None, autoplay=False):
     streams = []
     if inline:
         streams = [('Embedded source', s) for s in inline]
     else:
-        results = aggregate(STORE.providers(), 'stream', media_type, item_id)
+        providers = STORE.providers()
+        if channel and channel.get('provider'):
+            providers = [entry for entry in providers if entry['key'] == channel['provider']]
+        results = aggregate(providers, 'stream', media_type, item_id)
         failures(results)
         for entry, data, _ in results:
             streams.extend((entry['label'], s) for s in data.get('streams', []) if isinstance(s, dict))
+    if autoplay and channel:
+        bookmark = LIVE_LIBRARY.channel(channel)
+        path = LIVE_AUTOPLAY.begin(meta, bookmark, [stream for _, stream in streams])
+        if path:
+            li = xbmcgui.ListItem(path=path)
+            li.getVideoInfoTag().setTitle(meta.get('name', 'Live TV'))
+            li.setArt({'thumb': meta.get('logo') or meta.get('poster', '')})
+            LIVE_LIBRARY.pending(bookmark, path)
+            xbmcplugin.setResolvedUrl(HANDLE, True, li)
+        else:
+            notify('No compatible automatic link. Long-press the channel and choose a stream manually.')
+            xbmcplugin.setResolvedUrl(HANDLE, False, xbmcgui.ListItem())
+        return
     for source, stream in streams:
         kind = stream_kind(stream)
         title = stream.get('description') or stream.get('title') or stream.get('name') or kind
@@ -633,6 +692,7 @@ def show_streams(media_type, item_id, meta, inline=None, channel=None):
 
 
 def play(key):
+    LIVE_AUTOPLAY.clear()
     saved = STORE.get(key)
     stream = saved['stream']
     kind = stream_kind(stream)
@@ -725,7 +785,9 @@ def main():
         elif action == 'live_saved':
             live_saved(params['collection'])
         elif action == 'live_favourite':
-            added = LIVE_LIBRARY.toggle(STORE.get(params['key']))
+            saved = cached_item(params['key'], params.get('index'))
+            channel = saved if saved.get('provider_id') else LIVE_LIBRARY.channel(saved)
+            added = LIVE_LIBRARY.toggle(channel)
             notify('Added to CBR favourites' if added else 'Removed from CBR favourites')
             xbmc.executebuiltin('Container.Refresh')
         elif action == 'live_unavailable':
@@ -784,11 +846,14 @@ def main():
         elif action == 'catalogues':
             catalogues(params.get('media_type'))
         elif action == 'catalog':
-            catalog_page(params['provider'], params['catalog'], json.loads(params.get('extras', '{}')))
+            catalog_page(params['provider'], params['catalog'], json.loads(params.get('extras', '{}')),
+                         params.get('offset', 0), params.get('refresh') == 'true')
         elif action == 'search':
             search(params.get('media_type'), params.get('live_only') == 'true', params.get('provider'))
         elif action == 'meta':
-            metadata(params['key'])
+            metadata(params['key'], params.get('index'))
+        elif action == 'live_play':
+            metadata(params['key'], params.get('index'), autoplay=True)
         elif action == 'episodes':
             episodes(params['key'])
         elif action == 'streams':
@@ -806,7 +871,7 @@ def main():
         # Only controlled, user-safe messages; never log raw URLs or response bodies.
         text = str(error) if isinstance(error, (ValueError, RuntimeError)) else 'Unable to complete this action. Refresh the provider manifest or reopen the catalogue.'
         DIALOG.ok(BRAND, text)
-        if action in ('play', 'library_play'):
+        if action in ('play', 'library_play', 'live_play'):
             xbmcplugin.setResolvedUrl(HANDLE, False, xbmcgui.ListItem())
         elif HANDLE >= 0:
             xbmcplugin.endOfDirectory(HANDLE, succeeded=False, cacheToDisc=False)

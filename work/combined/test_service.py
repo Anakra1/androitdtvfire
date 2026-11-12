@@ -11,13 +11,19 @@ sys.path.insert(0, str(ROOT))
 
 class ServiceTests(unittest.TestCase):
     def load(self, profile):
-        mocks = {key: MagicMock() for key in ('xbmc', 'xbmcaddon', 'xbmcvfs')}
+        mocks = {key: MagicMock() for key in ('xbmc', 'xbmcaddon', 'xbmcgui', 'xbmcvfs')}
+        player = MagicMock()
+        class FakePlayer:
+            def __getattr__(self, name):
+                return getattr(player, name)
+        mocks['xbmc'].Player = FakePlayer
         mocks['xbmcvfs'].translatePath.return_value = profile
         mocks['xbmcaddon'].Addon.return_value.getSetting.return_value = '128'
         with patch.dict(sys.modules, mocks):
             spec = importlib.util.spec_from_file_location('bridge_service', ROOT / 'service.py')
             module = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(module)
+        mocks['player'] = player
         return module, mocks
 
     def test_playback_stop_and_kodi_shutdown_cleanup(self):
@@ -25,7 +31,7 @@ class ServiceTests(unittest.TestCase):
             module, mocks = self.load(profile)
             monitor = mocks['xbmc'].Monitor.return_value
             monitor.abortRequested.side_effect = [False, False, False, False, True]
-            player = mocks['xbmc'].Player.return_value
+            player = mocks['player']
             player.isPlaying.side_effect = [False, True, False, False]
             player.getPlayingFile.return_value = 'http://127.0.0.1:9000/stream/video.mp4'
             state = {'engine-request.json': {'time': 1}, 'engine-session.json': {'hash': 'a' * 40}}
@@ -57,7 +63,7 @@ class ServiceTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as profile:
             module, mocks = self.load(profile)
             mocks['xbmc'].Monitor.return_value.abortRequested.side_effect = [False, False, True]
-            mocks['xbmc'].Player.return_value.isPlaying.return_value = False
+            mocks['player'].isPlaying.return_value = False
             times = iter([1, 2])
             def read(path):
                 return {'time': next(times)} if Path(path).name == 'engine-request.json' else {}

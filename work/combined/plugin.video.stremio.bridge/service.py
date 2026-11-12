@@ -4,12 +4,39 @@ import time
 
 import xbmc
 import xbmcaddon
+import xbmcgui
 import xbmcvfs
 
 from engine import Engine, read_json, write_json
 from resources.lib.setup_web import SetupController
 from resources.lib.core import Store
 from resources.lib.live import LiveLibrary
+from resources.lib.live_player import LiveAutoplay
+
+
+class PlaybackPlayer(xbmc.Player):
+    def __init__(self, autoplay):
+        super().__init__()
+        self.autoplay = autoplay
+
+    def onAVStarted(self):
+        self.autoplay.signal('started')
+
+    def onPlayBackError(self):
+        self.autoplay.signal('error')
+
+    def onPlayBackEnded(self):
+        self.autoplay.signal('ended')
+
+    def onPlayBackStopped(self):
+        self.autoplay.signal('stopped')
+
+
+def live_item(path, title, meta):
+    item = xbmcgui.ListItem(path=path)
+    item.getVideoInfoTag().setTitle(title)
+    item.setArt({'thumb': meta.get('logo') or meta.get('poster', '')})
+    return item
 
 
 def main():
@@ -19,7 +46,9 @@ def main():
     endpoint_path = os.path.join(root, 'engine-endpoint.json')
     request_path = os.path.join(root, 'engine-request.json')
     session_path = os.path.join(root, 'engine-session.json')
-    monitor, player = xbmc.Monitor(), xbmc.Player()
+    autoplay = LiveAutoplay(Store(root))
+    autoplay.clear()
+    monitor, player = xbmc.Monitor(), PlaybackPlayer(autoplay)
     setup = SetupController(root, addon.getAddonInfo('path'), xbmc.getIPAddress)
     live_library = LiveLibrary(Store(root))
     engine, last_request, touched, current_hash, started = None, 0, 0, '', False
@@ -27,6 +56,8 @@ def main():
     try:
         while not monitor.abortRequested():
             setup.poll()
+            autoplay.poll(player, live_item, lambda message: xbmcgui.Dialog().notification(
+                'Crimson Blood Requiem', message, xbmcgui.NOTIFICATION_INFO, 4000))
             live_library.poll(player)
             request = read_json(request_path).get('time', 0)
             if request > last_request:
@@ -71,6 +102,7 @@ def main():
                     write_json(endpoint_path, {})
             monitor.waitForAbort(0.5)
     finally:
+        autoplay.clear()
         setup.close()
         if engine:
             engine.stop()

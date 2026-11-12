@@ -9,7 +9,7 @@ ROOT = Path(__file__).parent / 'plugin.video.stremio.bridge'
 sys.path.insert(0, str(ROOT))
 from resources.lib.core import Store, aggregate, stream_kind, playback_url
 from resources.lib.defaults import ensure_defaults, ensure_live_defaults
-from resources.lib.live import LiveLibrary, catalogue_group, entry_catalogs, grouped_catalogues
+from resources.lib.live import LiveCatalogueCache, LiveLibrary, catalogue_group, entry_catalogs, grouped_catalogues
 import test_movies as fixtures
 
 
@@ -88,6 +88,79 @@ class LiveRouteTests(unittest.TestCase):
     record_rpc = fixtures.KodiRouteTests.record_rpc
     follow = fixtures.KodiRouteTests.follow
 
+    def test_large_channel_list_reuses_cache_and_writes_one_batch_per_page(self):
+        manifest = dict(fixtures.MANIFEST, types=['tv'])
+        entry = self.app.STORE.add(self.url, fetch=lambda url: manifest)
+        cat = self.app.STORE.put({'id': 'uk', 'type': 'tv', 'name': 'UK'})
+        metas = [{'id': 'channel:' + str(i), 'name': 'Channel ' + str(i), 'type': 'tv'} for i in range(547)]
+        with patch.object(self.app, 'request', return_value={'metas': metas}) as request, \
+             patch.object(self.app.STORE, 'write', wraps=self.app.STORE.write) as write, \
+             patch.object(self.app.STORE, 'providers', wraps=self.app.STORE.providers) as providers:
+            self.app.catalog_page(entry['key'], cat)
+            self.assertEqual(len(self.items), 102)  # 100 channels, next, refresh
+            self.assertEqual(write.call_count, 2)  # one listing cache and one channel batch
+            self.assertLessEqual(providers.call_count, 2)
+            first = self.items[0][0][1]
+            self.follow(100)
+            self.assertEqual(self.items[0][0][2].label, 'Channel 100')
+            self.assertEqual(request.call_count, 1)
+            self.items.clear()
+            self.app.catalog_page(entry['key'], cat)  # Back to the first page
+            self.assertEqual(self.items[0][0][1], first)
+            self.assertEqual(request.call_count, 1)
+            self.follow(101)  # manual refresh
+            self.assertEqual(request.call_count, 2)
+            # The last local page retains the remaining channels.
+            self.items.clear()
+            self.app.catalog_page(entry['key'], cat, offset=500)
+            self.assertEqual(len(self.items), 48)
+            self.assertEqual(self.items[46][0][2].label, 'Channel 546')
+            command = self.items[46][0][2].context[0][1]
+            import sys
+            sys.argv[2] = '?' + command.split('?', 1)[1][:-1]
+            self.app.main()
+            self.assertEqual(self.app.LIVE_LIBRARY.entries('favourites')[0]['meta']['id'], 'channel:546')
+
+    def test_live_channel_only_queries_its_own_provider_and_resolves_fresh_streams(self):
+        entry = self.app.STORE.add(self.url, fetch=lambda url: dict(fixtures.MANIFEST, types=['tv']))
+        self.app.STORE.add('https://other.example/manifest.json', fetch=lambda url: fixtures.MANIFEST)
+        saved = dict(provider=entry['key'], resource_type='tv', live_group='tv',
+                     meta={'id': 'bbc', 'type': 'tv', 'name': 'BBC'})
+        key = self.app.STORE.put([saved])
+        calls = []
+        def query(entries, resource, kind, ident, extras=None):
+            calls.append((resource, [e['key'] for e in entries]))
+            data = {'meta': saved['meta']} if resource == 'meta' else {'streams': [{'url': 'https://example.org/fresh.m3u8'}]}
+            return [(entry, data, None)]
+        with patch.object(self.app, 'aggregate', side_effect=query):
+            self.app.metadata(key, '0')
+            self.app.metadata(key, '0')
+        self.assertEqual(calls, [('meta', [entry['key']]), ('stream', [entry['key']])] * 2)
+        with self.assertRaises(ValueError):
+            self.app.cached_item(key, '-1')
+
+    def test_channel_click_plays_directly_and_manual_sources_remain_in_context_menu(self):
+        entry = self.app.STORE.add(self.url, fetch=lambda url: dict(fixtures.MANIFEST, types=['tv']))
+        preview = {'id': 'channel', 'type': 'tv', 'name': 'Sky Atlantic'}
+        self.app.add_metas([preview], entry['key'], 'tv', live_group='tv')
+        self.assertFalse(self.items[0][1]['isFolder'])
+        self.assertEqual(self.items[0][0][2].properties['IsPlayable'], 'true')
+        manual = self.items[0][0][2].context[1][1]
+        def query(entries, resource, kind, ident, extras=None):
+            data = {'meta': preview} if resource == 'meta' else {'streams': [
+                {'url': 'https://example.org/first.m3u8'}, {'url': 'https://example.org/second.m3u8'}]}
+            return [(entry, data, None)]
+        with patch.object(self.app, 'aggregate', side_effect=query):
+            self.follow(0)
+            self.assertEqual(self.items, [])  # no source chooser is displayed
+            self.assertTrue(self.resolved[-1][1])
+            self.assertEqual(self.resolved[-1][2].path, 'https://example.org/first.m3u8')
+            import sys
+            sys.argv[2] = '?' + manual.split('?', 1)[1][:-1]
+            self.app.main()
+        self.assertEqual(len(self.items), 2)
+        self.assertEqual(self.app.STORE.read(self.app.LIVE_AUTOPLAY.path), {})
+
     def test_live_home_has_requested_categories(self):
         self.app.live_home()
         self.assertEqual([args[2].label for args, _ in self.items],
@@ -134,7 +207,6 @@ class LiveRouteTests(unittest.TestCase):
             return [(entry, data if resource != 'subtitles' else {}, None)]
         with patch.object(self.app, 'aggregate', side_effect=query):
             self.follow(0)
-            self.follow(0)
         self.assertTrue(self.resolved[-1][1])
         self.assertEqual(self.app.LIVE_LIBRARY.entries('recent'), [])
         player = MagicMock()
@@ -168,9 +240,7 @@ class LiveRouteTests(unittest.TestCase):
             self.app.live_catalogues('sports')
             self.follow(0)  # category -> source
             self.follow(0)  # source -> catalogue -> events
-            self.follow(0)  # event -> sources, not a season folder
-            self.assertEqual(len(self.items), 1)
-            self.follow(0)  # source -> Kodi playback resolver
+            self.follow(0)  # event -> automatic Kodi playback resolver
         self.assertIn(('stream', 'sport', 'event:1'), calls)
         self.assertTrue(self.resolved[-1][1])
         self.assertEqual(self.resolved[-1][2].path, 'https://example.org/live.m3u8')
@@ -184,6 +254,26 @@ class LiveRouteTests(unittest.TestCase):
 
 
 class LiveLibraryTests(unittest.TestCase):
+    def test_catalogue_cache_expires_refreshes_and_separates_provider_filters(self):
+        with tempfile.TemporaryDirectory() as directory:
+            store = Store(directory)
+            cache = LiveCatalogueCache(store)
+            fetch = MagicMock(return_value={'metas': [{'id': 'bbc', 'streams': [{'url': 'expired'}]}]})
+            url = 'https://example.org/catalog/tv/uk.json?token=one'
+            with patch('resources.lib.live.time.time', return_value=1000):
+                cached = cache.get(url, fetch)
+            self.assertNotIn('streams', cached['metas'][0])
+            with patch('resources.lib.live.time.time', return_value=1100):
+                cache.get(url, fetch)
+                self.assertEqual(fetch.call_count, 1)
+                cache.get(url + '&genre=news', fetch)
+                self.assertEqual(fetch.call_count, 2)
+                cache.get(url, fetch, refresh=True)
+                self.assertEqual(fetch.call_count, 3)
+            with patch('resources.lib.live.time.time', return_value=1500):
+                cache.get(url, fetch)
+            self.assertEqual(fetch.call_count, 4)
+
     def test_favourites_survive_cache_pruning_and_manifest_url_replacement(self):
         with tempfile.TemporaryDirectory() as directory:
             store = Store(directory)

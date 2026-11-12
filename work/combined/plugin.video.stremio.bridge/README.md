@@ -1,4 +1,4 @@
-# Crimson Blood Requiem (CBR) 0.7.0 — Windows, Android TV and Fire TV
+# Crimson Blood Requiem (CBR) 0.7.1 — Windows, Android TV and Fire TV
 
 **One Kodi add-on includes movies, TV series, a torrent player and Live TV split into TV Channels, Internet TV and Live Sports.** No Elementum, separate Stream Bridge installation, or manual script copying is required.
 
@@ -8,7 +8,7 @@ These packages use public provider defaults and contain no personalized MediaFus
 
 ## Install
 
-1. On Windows, use **Add-ons → Install from zip file** and choose `plugin.video.stremio.bridge-0.7.0.zip`. On Android TV or Fire TV, install `CBR-Fire-TV-Android-Repository-0.1.7.zip`, then install Crimson Blood Requiem, the skin and the setup wizard from **Install from repository → CBR Android Add-on Repository**.
+1. On Windows, use **Add-ons → Install from zip file** and choose `plugin.video.stremio.bridge-0.7.1.zip`. On Android TV or Fire TV, install `CBR-Fire-TV-Android-Repository-0.1.7.zip`, then install Crimson Blood Requiem, the skin and the setup wizard from **Install from repository → CBR Android Add-on Repository**.
 2. Restart Kodi once to start the new background player service.
 3. Open **Video add-ons → Crimson Blood Requiem** (the crimson **CBR** thumbnail).
 4. Choose a movie or TV episode and a source, or open **Live TV** and select a category, catalogue, channel/event and source.
@@ -24,6 +24,14 @@ In CBR choose **Source setup (phone / PC)**. This button is also in **Live TV** 
 On a phone or computer connected to the same home network, open the displayed address in its browser and enter the code. Choose **Edit** next to the source you want to update, paste its full configured manifest URL, and save. You can add different providers, select their Live TV categories, enable/disable entries, remove old sources, and refresh enabled source catalogues. When finished, select OK on the Kodi screen and reopen the catalogue.
 
 Kodi hosts this page only while source setup is active, for up to ten minutes. Provider configurations remain on the Kodi device. Pairing is required before a browser can read or change them. No website hosting account is needed for this local setup mode. Guest Wi-Fi isolation or a VPN that blocks local-network access can prevent a phone or PC from reaching the device.
+
+## Faster Live TV browsing (0.7.1)
+
+Select a live channel to start it directly, without a stream-selection screen. CBR tries compatible direct streams in provider order and uses Kodi's playback callbacks to try the next if startup fails. A working video or a user Stop cancels pending retries. Up to eight alternatives are tried; the short-lived retry plan expires after two minutes and is cleared when video starts. Retry URLs are kept only in the temporary playback plan, not in favourites or catalogue caches. Unsupported transport types and setup notices are not automatically selected. For advanced troubleshooting, long-press the channel and choose **Choose stream manually**.
+
+Live catalogue responses are cached locally for five minutes (one minute in Live Sports). Large responses display 100 channels at a time; **Next page** uses the saved response until more data is needed from the provider. Pressing Back reuses that listing. **Refresh channels** bypasses the cache immediately. Category and configured-URL changes use separate cache entries.
+
+Channel items share one local page record instead of creating two files per channel. Favourites are loaded once per displayed page, and routine cache cleanup runs at most hourly. Selecting a live channel requests metadata and fresh playback sources from its originating provider; movie and TV episode source aggregation is unchanged. Playback URLs and stream responses are not cached by this feature.
 
 ## Live TV browsing and saved channels (0.7.0)
 
@@ -80,7 +88,7 @@ Cancelling preparation or stopping playback removes the active torrent. The Wind
 
 Version 0.3.1 fixes TV playback for ongoing series such as Nocturne: Cinemeta's `hasScheduledVideos` flag no longer bypasses season/episode selection. An empty embedded stream list also falls back to configured providers instead of displaying no sources. Nocturne's first-episode request returned 74 torrent results during diagnosis; availability can change.
 
-The Android package includes the CBR listings, manifest setup, crimson skin and setup wizard. Add-on 0.7.0 requires the integrated CBR Playback Engine module; Kodi installs it automatically from repository 0.1.7. The engine uses TorrServer’s embedded mode and remains inside the Kodi process. Android ARMv7, ARM64 and x86_64 libraries are included.
+The Android package includes the CBR listings, manifest setup, crimson skin and setup wizard. Add-on 0.7.1 requires the integrated CBR Playback Engine module; Kodi installs it automatically from repository 0.1.7. The engine uses TorrServer’s embedded mode and remains inside the Kodi process. Android ARMv7, ARM64 and x86_64 libraries are included.
 
 Tests cover fresh-profile defaults, migration, multiple enabled sources, poster browsing, TV navigation, library exports, HTTP playback/subtitles, the torrent resolver, cancellation, repeated playback requests and service cleanup. A real-engine test downloads a generated local torrent from a local BitTorrent seed, verifies buffering and byte-correct HTTP range seeking, and checks cancellation/shutdown. The public default endpoints were also checked: Cinemeta returned 50 poster listings and Torrentio returned 14 torrent results for the openly licensed Big Buck Bunny test film. These checks do not establish playback of every source or Kodi codec compatibility.
 

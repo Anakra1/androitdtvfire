@@ -7,6 +7,7 @@ import tempfile
 import threading
 import types
 import unittest
+from unittest.mock import patch
 import xml.etree.ElementTree as ET
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlsplit
@@ -75,6 +76,20 @@ class ServerFixture(unittest.TestCase):
 
 
 class ProtocolTests(ServerFixture):
+    def test_routine_cache_cleanup_is_throttled_but_explicit_cleanup_still_runs(self):
+        with tempfile.TemporaryDirectory() as directory:
+            store = core.Store(directory)
+            with patch.object(core.os, 'listdir', wraps=core.os.listdir) as listing:
+                with patch.object(core.time, 'time', return_value=10000):
+                    store.prune()
+                    store.prune()
+                self.assertEqual(listing.call_count, 1)
+                with patch.object(core.time, 'time', return_value=14000):
+                    store.prune()
+                self.assertEqual(listing.call_count, 2)
+                store.prune(days=-1)
+                self.assertEqual(listing.call_count, 3)
+
     def test_manifest_url_normalization_and_rejection(self):
         self.assertEqual(core.normalize_url('stremio://example.org/token/manifest.json'), 'https://example.org/token/manifest.json')
         self.assertEqual(core.normalize_url('https://example.org/token'), 'https://example.org/token/manifest.json')

@@ -177,6 +177,9 @@ class Store:
         return value['data']
 
     def prune(self, days=7):
+        maintenance = os.path.join(self.root, 'cache-maintenance.json')
+        if days == 7 and time.time() - self.read(maintenance, {}).get('pruned', 0) < 3600:
+            return
         for name in os.listdir(self.cache):
             path = os.path.join(self.cache, name)
             try:
@@ -184,6 +187,8 @@ class Store:
                     os.remove(path)
             except OSError:
                 pass
+        if days == 7:
+            self.write(maintenance, {'pruned': time.time()})
 
 
 def aggregate(entries, resource, media_type, item_id, extras=None, fetch=fetch_json):

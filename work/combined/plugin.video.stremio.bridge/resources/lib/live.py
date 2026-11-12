@@ -70,8 +70,13 @@ class LiveLibrary:
     def entries(self, name):
         return self.store.read(self.path(name), [])
 
+    def begin_listing(self):
+        self._providers = {e['key']: e for e in self.store.providers()}
+        self._favourites = {self.identity(x) for x in self.entries('favourites')}
+
     def channel(self, saved):
-        provider = self.store.provider(saved['provider'])
+        provider = (getattr(self, '_providers', {}).get(saved['provider'])
+                    or self.store.provider(saved['provider']))
         meta = {k: v for k, v in saved['meta'].items() if k in (
             'id', 'type', 'name', 'poster', 'logo', 'thumbnail', 'background', 'description', 'genres')}
         return dict(provider=saved['provider'], provider_id=provider['manifest']['id'], meta=meta,
@@ -82,6 +87,8 @@ class LiveLibrary:
         return (channel['provider_id'], channel['resource_type'], channel['meta']['id'])
 
     def is_favourite(self, channel):
+        if hasattr(self, '_favourites'):
+            return self.identity(channel) in self._favourites
         return any(self.identity(x) == self.identity(channel) for x in self.entries('favourites'))
 
     def toggle(self, channel):
@@ -91,6 +98,7 @@ class LiveLibrary:
         if not exists:
             entries.append(channel)
         self.store.write(self.path('favourites'), entries)
+        self._favourites = {self.identity(x) for x in entries}
         return not exists
 
     def resolve(self, channel):
@@ -125,3 +133,23 @@ class LiveLibrary:
         entries = [x for x in self.entries('recent') if self.identity(x) != self.identity(channel)]
         self.store.write(self.path('recent'), [channel] + entries[:49])
         self.store.write(self.path('pending'), {})
+
+
+class LiveCatalogueCache:
+    """Cache listings only, never signed stream URLs or playback responses."""
+    def __init__(self, store):
+        self.store = store
+
+    def get(self, url, fetch, lifetime=300, refresh=False):
+        digest = hashlib.sha256(url.encode()).hexdigest()
+        path = os.path.join(self.store.cache, 'live-catalogue-' + digest + '.json')
+        cached = self.store.read(path, {})
+        if not refresh and time.time() - cached.get('created', 0) < lifetime:
+            return cached['data']
+        data = fetch(url)
+        # Channel previews sometimes embed short-lived streams. Resolve those
+        # at selection time instead of preserving them in the listing cache.
+        data = dict(data, metas=[{k: v for k, v in meta.items() if k != 'streams'}
+                                 for meta in data.get('metas', []) if isinstance(meta, dict)])
+        self.store.write(path, {'created': time.time(), 'data': data})
+        return data

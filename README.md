@@ -10,11 +10,15 @@ CBR provides movie and TV catalogues, posters, separate searches, Live TV catego
 4. Accept Kodi’s dependency list, including **CBR Playback Engine**. Kodi installs the playback engine with the video add-on.
 5. Open CBR and select a movie or episode and a source. On upgrades from older CBR versions, restart Kodi once so its old service unloads.
 
-Current Android versions: repository **0.1.7**, video add-on **0.7.0**, playback engine **0.1.0**. All playback installation and updates use this one Kodi repository.
+Current Android versions: repository **0.1.7**, video add-on **0.7.1**, playback engine **0.1.0**. All playback installation and updates use this one Kodi repository.
 
-If Kodi's cached repository listing still shows 0.6.2, existing Fire TV/Android installations can update directly using **Install from zip file → CBR → cbr070.zip** from the same source. This is the identical 0.7.0 video add-on package, with no uninstall or new source required. Restart Kodi after installing it. Fresh installs should use the repository steps above to install dependencies.
+If Kodi's cached repository listing does not show the latest version, existing Fire TV/Android installations can update directly using **Install from zip file → CBR → cbr071.zip** from the same source. This is the identical 0.7.1 video add-on package, with no uninstall or new source required. Restart Kodi after installing it. Fresh installs should use the repository steps above to install dependencies.
 
-CBR 0.7.0 adds source/country/category browsing for Live TV, a separate search entry, provider channel logos, persistent channel favourites and recently watched channels. Long-press a channel to add or remove a favourite. Restart Kodi after updating to load the playback-history monitor. Programme schedules and a grid EPG require a future schedule-feed integration.
+Version 0.7.1 speeds up Live TV navigation with short-lived local catalogue caching, 100-channel pages, fewer file reads/writes and source-specific live playback requests. Use **Refresh channels** to reload a list immediately. The listing cache does not store playback URLs.
+
+Choosing a live channel starts playback directly, without displaying its links. If Kodi reports a startup failure, CBR tries the next compatible direct stream. Stop cancels retries. A manual stream chooser remains available from the channel's long-press context menu. Restart Kodi after updating so the callback monitor loads.
+
+CBR 0.7.1 adds source/country/category browsing for Live TV, a separate search entry, provider channel logos, persistent channel favourites and recently watched channels. Long-press a channel to add or remove a favourite. Restart Kodi after updating to load the playback-history monitor. Programme schedules and a grid EPG require a future schedule-feed integration.
 
 Install **Crimson Blood Requiem Skin** and **CBR Setup Wizard** from the same repository for the optional interface, then run the wizard. The video add-on also works with Kodi’s normal skin.
 
