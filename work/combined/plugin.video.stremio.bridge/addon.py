@@ -14,7 +14,8 @@ from resources.lib.core import (DEFAULT_URL, PRESETS, Store, aggregate, fetch_js
                                 playback_url, resource_url, stream_kind)
 from resources.lib.library import MovieLibrary
 from resources.lib.defaults import ensure_defaults
-from resources.lib.live import GROUPS, GROUP_NAMES, catalogue_group, entry_catalogs, grouped_catalogues
+from resources.lib.live import (GROUPS, GROUP_NAMES, LiveLibrary, browse_title, catalogue_group,
+                                entry_catalogs, grouped_catalogues, search_only)
 
 ADDON = xbmcaddon.Addon()
 BASE = sys.argv[0]
@@ -22,6 +23,7 @@ HANDLE = int(sys.argv[1])
 DIALOG = xbmcgui.Dialog()
 STORE = Store(xbmcvfs.translatePath(ADDON.getAddonInfo('profile')))
 LIBRARY = MovieLibrary(STORE)
+LIVE_LIBRARY = LiveLibrary(STORE)
 ART = os.path.join(ADDON.getAddonInfo('path'), 'resources', 'art')
 BRAND = 'Crimson Blood Requiem'
 
@@ -30,7 +32,7 @@ def route(action, **kwargs):
     return BASE + '?' + urlencode(dict(action=action, **kwargs))
 
 
-def item(label, action, folder=True, meta=None, artwork=None, **kwargs):
+def item(label, action, folder=True, meta=None, artwork=None, channel=None, **kwargs):
     li = xbmcgui.ListItem(label=str(label))
     art = {'icon': os.path.join(ART, 'crb-icon.png'), 'fanart': os.path.join(ART, 'crb-fanart.jpg')}
     if artwork:
@@ -57,11 +59,17 @@ def item(label, action, folder=True, meta=None, artwork=None, **kwargs):
                     'fanart': meta.get('background') or os.path.join(ART, 'crb-fanart.jpg')})
         if meta.get('logo'):
             art['clearlogo'] = meta['logo']
+            if channel:
+                art.update(icon=meta['logo'], thumb=meta['logo'], poster=meta['logo'])
         if meta.get('type') == 'movie' and action == 'meta':
             li.addContextMenuItems([
                 ('Add to Kodi Movies library', 'RunPlugin({})'.format(route('export', key=kwargs['key']))),
                 ('Movie information', 'Action(Info)'),
             ])
+    if channel:
+        bookmark = LIVE_LIBRARY.channel(channel)
+        label = 'Remove from CBR favourites' if LIVE_LIBRARY.is_favourite(bookmark) else 'Add to CBR favourites'
+        li.addContextMenuItems([(label, 'RunPlugin({})'.format(route('live_favourite', key=STORE.put(bookmark))))])
     li.setArt(art)
     if not folder:
         li.setProperty('IsPlayable', 'true')
@@ -175,6 +183,9 @@ def add_provider(live_group=None):
 
 
 def live_home():
+    item('Favourite channels', 'live_saved', collection='favourites', artwork='live')
+    item('Recently watched', 'live_saved', collection='recent', artwork='live')
+    item('Search Live TV', 'search', live_only='true', artwork='search')
     item('Source setup (phone / PC)', 'web_setup', artwork='settings')
     for group, name in GROUPS:
         item(name, 'live_catalogues', group=group, artwork='live')
@@ -183,15 +194,66 @@ def live_home():
 
 def live_catalogues(group):
     matches = list(grouped_catalogues(STORE.providers(), group))
+    seen = set()
     for entry, catalog in matches:
-        item('{} / {}'.format(entry['label'], catalog.get('name', catalog['id'])), 'catalog',
-             provider=entry['key'], catalog=STORE.put(catalog), artwork='catalogues')
+        if entry['key'] not in seen:
+            item(entry['label'], 'live_source', provider=entry['key'], group=group, artwork='live')
+            seen.add(entry['key'])
+    item('Search Live TV', 'search', live_only='true', artwork='search')
     item('Add another {} source'.format(GROUP_NAMES[group]), 'add', group=group, artwork='settings')
     item('Source setup (phone / PC)', 'web_setup', artwork='settings')
     item('Manage sources', 'manage', artwork='settings')
     if not matches:
         notify('Add a manifest source to this category to load channels or events.')
     xbmcplugin.setPluginCategory(HANDLE, GROUP_NAMES[group])
+    finish()
+
+
+def live_source(provider, group):
+    entry = STORE.provider(provider)
+    matches = [(e, c) for e, c in grouped_catalogues([entry], group) if not search_only(c)]
+    for _, catalog in sorted(matches, key=lambda pair: browse_title(pair[1]).casefold()):
+        item(browse_title(catalog), 'live_categories', provider=provider, catalog=STORE.put(catalog), artwork='live')
+    if not matches:
+        notify('This source offers search only. Use Search this source.')
+    if any(any(x.get('name') == 'search' for x in c.get('extra', [])) for c in entry_catalogs(entry)):
+        item('Search this source', 'search', provider=provider, live_only='true', artwork='search')
+    xbmcplugin.setPluginCategory(HANDLE, entry['label'])
+    finish()
+
+
+def live_categories(provider, catalog):
+    cat = STORE.get(catalog)
+    genres = next((x.get('options', []) for x in cat.get('extra', []) if x.get('name') == 'genre'), [])
+    if not genres:
+        catalog_page(provider, catalog)
+        return
+    item('All channels', 'catalog', provider=provider, catalog=catalog, artwork='live')
+    for genre in sorted(set(genres), key=str.casefold):
+        if genre.casefold() in ('all', 'tutti'):
+            continue
+        item(genre, 'catalog', provider=provider, catalog=catalog,
+             extras=json.dumps({'genre': genre}), artwork='live')
+    xbmcplugin.setPluginCategory(HANDLE, browse_title(cat))
+    finish()
+
+
+def live_saved(collection):
+    if collection not in ('favourites', 'recent'):
+        raise ValueError('Unknown channel collection.')
+    entries = LIVE_LIBRARY.entries(collection)
+    for channel in entries:
+        saved = LIVE_LIBRARY.resolve(channel)
+        if saved:
+            item(channel['meta'].get('name', 'Channel'), 'meta', key=STORE.put(saved),
+                 meta=channel['meta'], channel=saved)
+        else:
+            item(channel['meta'].get('name', 'Channel') + ' — source disabled or removed',
+                 'live_unavailable', key=STORE.put(channel), meta=channel['meta'])
+    if not entries:
+        notify('Long-press a channel to add a favourite.' if collection == 'favourites'
+               else 'Channels appear here after playback starts.')
+    xbmcplugin.setPluginCategory(HANDLE, 'Favourite channels' if collection == 'favourites' else 'Recently watched')
     finish()
 
 
@@ -330,16 +392,19 @@ def add_metas(metas, provider, media_type, seen=None, live_group=None):
         if live_group:
             saved.update(live_group=live_group, resource_type=media_type)
         key = STORE.put(saved)
-        item(meta.get('name', meta['id']), 'meta', meta=meta, key=key)
+        item(meta.get('name', meta['id']), 'meta', meta=meta, key=key, channel=saved if live_group else None)
 
 
 def catalog_page(provider, catalog, extras=None):
     entry = STORE.provider(provider)
     cat = STORE.get(catalog)
+    live_group = catalogue_group(entry, cat)
     extras = dict(extras or {})
     for spec in cat.get('extra', []):
         name = spec.get('name')
         if name == 'skip' or name in extras:
+            continue
+        if live_group and name == 'genre' and not spec.get('isRequired'):
             continue
         if not spec.get('isRequired') and name != 'genre':
             continue
@@ -374,7 +439,7 @@ def catalog_page(provider, catalog, extras=None):
     finish('movies' if cat['type'] == 'movie' else 'videos')
 
 
-def search(media_type=None, live_only=False):
+def search(media_type=None, live_only=False, provider=None):
     if live_only:
         prompt = 'Search Live TV and sports'
     elif media_type == 'movie':
@@ -392,6 +457,7 @@ def search(media_type=None, live_only=False):
     from concurrent.futures import ThreadPoolExecutor
     candidates = [(e, c) for e, c in catalogs(query)
                   if (not media_type or c['type'] == media_type)
+                  and (not provider or e['key'] == provider)
                   and (not live_only or catalogue_group(e, c) is not None) and not any(
         x.get('isRequired') and x.get('name') != 'search' for x in c.get('extra', []))]
     def run(pair):
@@ -405,7 +471,7 @@ def search(media_type=None, live_only=False):
     with ThreadPoolExecutor(max_workers=6) as executor:
         for entry, cat, metas, error in executor.map(run, candidates):
             errors += int(error)
-            add_metas(metas, entry['key'], cat['type'], seen)
+            add_metas(metas, entry['key'], cat['type'], seen, catalogue_group(entry, cat))
     if errors:
         notify('{} catalogue(s) could not be searched.'.format(errors))
     if not seen:
@@ -515,7 +581,7 @@ def metadata(key):
         finish('seasons')
     else:
         video_id = hints.get('defaultVideoId') or meta['id']
-        show_streams(resource_type, video_id, meta, meta.get('streams'))
+        show_streams(resource_type, video_id, meta, meta.get('streams'), channel=saved if live_group else None)
 
 
 def episodes(key):
@@ -536,7 +602,7 @@ def episodes(key):
     finish('episodes')
 
 
-def show_streams(media_type, item_id, meta, inline=None):
+def show_streams(media_type, item_id, meta, inline=None, channel=None):
     streams = []
     if inline:
         streams = [('Embedded source', s) for s in inline]
@@ -555,10 +621,14 @@ def show_streams(media_type, item_id, meta, inline=None):
         elif kind not in ('direct', 'youtube'):
             label = '[{}] '.format({'external': 'External service', 'configuration': 'Setup required',
                                     'unavailable': 'Source unavailable'}.get(kind, 'Unsupported')) + label
-        payload = STORE.put({'stream': stream, 'type': media_type, 'id': item_id, 'meta': meta})
+        saved = {'stream': stream, 'type': media_type, 'id': item_id, 'meta': meta}
+        if channel:
+            saved['channel'] = LIVE_LIBRARY.channel(channel)
+        payload = STORE.put(saved)
         item(label, 'play', folder=False, key=payload, meta=meta)
     if not streams:
-        notify('No streams. Add configured stream providers in Manage sources.')
+        notify('No playback links were returned. The channel or source may be unavailable.'
+               if channel else 'No streams were returned by your enabled providers.')
     finish()
 
 
@@ -602,6 +672,8 @@ def play(key):
         selected = DIALOG.select('Subtitles', choices)
         if selected > 0:
             li.setSubtitles([subtitles[selected - 1]['url']])
+    if saved.get('channel'):
+        LIVE_LIBRARY.pending(saved['channel'], li.getPath())
     xbmcplugin.setResolvedUrl(HANDLE, True, li)
 
 
@@ -646,6 +718,22 @@ def main():
             live_home()
         elif action == 'live_catalogues':
             live_catalogues(params['group'])
+        elif action == 'live_source':
+            live_source(params['provider'], params['group'])
+        elif action == 'live_categories':
+            live_categories(params['provider'], params['catalog'])
+        elif action == 'live_saved':
+            live_saved(params['collection'])
+        elif action == 'live_favourite':
+            added = LIVE_LIBRARY.toggle(STORE.get(params['key']))
+            notify('Added to CBR favourites' if added else 'Removed from CBR favourites')
+            xbmc.executebuiltin('Container.Refresh')
+        elif action == 'live_unavailable':
+            channel = STORE.get(params['key'])
+            DIALOG.ok('Channel source unavailable', 'Enable or reconnect this source in Manage sources.')
+            if LIVE_LIBRARY.is_favourite(channel) and DIALOG.select('Saved channel', ['Keep favourite', 'Remove favourite']) == 1:
+                LIVE_LIBRARY.toggle(channel)
+            live_home()
         elif action == 'library':
             library_setup()
         elif action == 'library_help':
@@ -698,7 +786,7 @@ def main():
         elif action == 'catalog':
             catalog_page(params['provider'], params['catalog'], json.loads(params.get('extras', '{}')))
         elif action == 'search':
-            search(params.get('media_type'), params.get('live_only') == 'true')
+            search(params.get('media_type'), params.get('live_only') == 'true', params.get('provider'))
         elif action == 'meta':
             metadata(params['key'])
         elif action == 'episodes':

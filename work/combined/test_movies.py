@@ -159,6 +159,8 @@ class FakeListItem:
         self.art, self.context, self.properties, self.info = {}, [], {}, {}
     def getVideoInfoTag(self):
         return self
+    def getPath(self):
+        return self.path
     def __getattr__(self, name):
         return lambda *args, **kwargs: None
     def setSubtitles(self, values):

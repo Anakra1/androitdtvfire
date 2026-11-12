@@ -32,7 +32,7 @@ class RepositoryInstallTests(unittest.TestCase):
                          (PROJECT / 'android/addons.xml.md5').read_text().strip())
         addons = {item.attrib['id']: item for item in ET.parse(feed).getroot()}
         video = addons['plugin.video.stremio.bridge']
-        self.assertEqual(video.attrib['version'], '0.6.2')
+        self.assertEqual(video.attrib['version'], '0.7.0')
         requirements = {item.attrib['addon']: item.attrib.get('version') for item in video.find('requires')}
         self.assertEqual(requirements['script.module.cbr.engine'], '0.1.0')
         for addon_id, item in addons.items():

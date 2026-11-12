@@ -8,6 +8,8 @@ import xbmcvfs
 
 from engine import Engine, read_json, write_json
 from resources.lib.setup_web import SetupController
+from resources.lib.core import Store
+from resources.lib.live import LiveLibrary
 
 
 def main():
@@ -19,11 +21,13 @@ def main():
     session_path = os.path.join(root, 'engine-session.json')
     monitor, player = xbmc.Monitor(), xbmc.Player()
     setup = SetupController(root, addon.getAddonInfo('path'), xbmc.getIPAddress)
+    live_library = LiveLibrary(Store(root))
     engine, last_request, touched, current_hash, started = None, 0, 0, '', False
     write_json(endpoint_path, {})
     try:
         while not monitor.abortRequested():
             setup.poll()
+            live_library.poll(player)
             request = read_json(request_path).get('time', 0)
             if request > last_request:
                 last_request, touched, started = request, time.monotonic(), False
