@@ -17,8 +17,11 @@ class RepositoryInstallTests(unittest.TestCase):
         # no DOTALL flag, so each entry is also valid without multiline matching.
         pattern = re.compile(r'<a href="([^"]*)"[^>]*>\s*(.*?)\s*</a>(.+?)(?=<a|</tr|$)', re.I)
         entries = [link for link, name, _ in pattern.findall(html) if link.rstrip('/') == name.strip().rstrip('/')]
-        self.assertEqual(entries, ['repository.cbr.zip'])
-        self.assertTrue((PROJECT / entries[0]).is_file())
+        self.assertEqual(entries, ['repository.cbr.zip', 'cbr070.zip'])
+        for entry in entries:
+            self.assertTrue((PROJECT / entry).is_file())
+        self.assertEqual((PROJECT / 'cbr070.zip').read_bytes(),
+                         (PROJECT / 'android/packages/plugin.video.stremio.bridge/plugin.video.stremio.bridge-0.7.0.zip').read_bytes())
 
     def test_repository_installs_video_and_embedded_engine_from_one_feed(self):
         with ZipFile(PROJECT / 'repository.cbr.zip') as repository:

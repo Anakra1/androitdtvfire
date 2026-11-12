@@ -12,6 +12,8 @@ CBR provides movie and TV catalogues, posters, separate searches, Live TV catego
 
 Current Android versions: repository **0.1.7**, video add-on **0.7.0**, playback engine **0.1.0**. All playback installation and updates use this one Kodi repository.
 
+If Kodi's cached repository listing still shows 0.6.2, existing Fire TV/Android installations can update directly using **Install from zip file → CBR → cbr070.zip** from the same source. This is the identical 0.7.0 video add-on package, with no uninstall or new source required. Restart Kodi after installing it. Fresh installs should use the repository steps above to install dependencies.
+
 CBR 0.7.0 adds source/country/category browsing for Live TV, a separate search entry, provider channel logos, persistent channel favourites and recently watched channels. Long-press a channel to add or remove a favourite. Restart Kodi after updating to load the playback-history monitor. Programme schedules and a grid EPG require a future schedule-feed integration.
 
 Install **Crimson Blood Requiem Skin** and **CBR Setup Wizard** from the same repository for the optional interface, then run the wizard. The video add-on also works with Kodi’s normal skin.
