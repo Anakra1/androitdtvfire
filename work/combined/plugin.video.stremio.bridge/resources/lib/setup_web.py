@@ -13,6 +13,7 @@ import time
 from urllib.parse import urlsplit
 
 from .core import Store, fetch_json, normalize_url, validate_manifest
+from .programmes import COUNTRIES, settings as programme_settings, save_settings as save_programme_settings, save_feed, request_refresh
 
 
 class SetupServer:
@@ -83,6 +84,11 @@ class SetupServer:
                     if self.paired():
                         self.reply(200, {'sources': owner.sources(), 'seconds': max(0, int(owner.expires - time.time()))})
                     return
+                if self.path == '/api/programmes':
+                    if self.paired():
+                        self.reply(200, {'settings': programme_settings(owner.store), 'countries': COUNTRIES,
+                                         'status': owner.store.read(os.path.join(owner.store.root, 'programme-status.json'), {})})
+                    return
                 assets = {'/': ('index.html', 'text/html; charset=utf-8'),
                           '/setup.js': ('setup.js', 'text/javascript; charset=utf-8'),
                           '/style.css': ('style.css', 'text/css; charset=utf-8')}
@@ -140,6 +146,17 @@ class SetupServer:
                             result = {'message': 'Source removed.'}
                         elif self.path == '/api/refresh':
                             result = owner.refresh()
+                        elif self.path == '/api/programmes/save':
+                            save_feed(owner.store, data)
+                            result = {'message': 'Programme feed saved. Schedules will update in the background.'}
+                        elif self.path == '/api/programmes/remove':
+                            config = programme_settings(owner.store)
+                            config['feeds'] = [f for f in config['feeds'] if f['key'] != data.get('key')]
+                            save_programme_settings(owner.store, config)
+                            result = {'message': 'Programme feed removed. Your streaming sources are unchanged.'}
+                        elif self.path == '/api/programmes/refresh':
+                            request_refresh(owner.store)
+                            result = {'message': 'Programme update requested. Return to Kodi and reopen the channel list shortly.'}
                         else:
                             self.reply(404, {'error': 'Unknown setup action.'})
                             return
@@ -164,6 +181,7 @@ class SetupServer:
     def sources(self):
         return [{'key': entry['key'], 'label': entry['label'], 'url': entry['url'],
                  'enabled': entry.get('enabled', True), 'group': entry.get('live_group', ''),
+                 'guide_country': entry.get('guide_country', ''),
                  'provider': entry.get('manifest', {}).get('name', '')}
                 for entry in self.store.providers()]
 
@@ -182,6 +200,11 @@ class SetupServer:
         key = hashlib.sha256(url.encode()).hexdigest()[:24]
         entry = dict(previous or {}, key=key, url=url, label=label or manifest['name'],
                      manifest=manifest, enabled=bool(data.get('enabled', True)))
+        if 'guide_country' in data:
+            country = data.get('guide_country', '')
+            if country and country not in COUNTRIES:
+                raise ValueError('Choose a valid programme country.')
+            entry['guide_country'] = country
         entry.pop('live_group', None)
         if group:
             entry['live_group'] = group

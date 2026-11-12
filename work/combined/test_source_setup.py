@@ -71,6 +71,19 @@ class SourceSetupTests(unittest.TestCase):
         self.assertEqual(status, 200)
         self.assertEqual(len(json.loads(body)['sources']), 2)
 
+    def test_programme_feeds_require_pairing_and_do_not_change_stream_sources(self):
+        self.assertEqual(self.request('/api/programmes')[0], 401)
+        self.assertEqual(self.request('/api/programmes/save', {})[0], 401)
+        self.pair()
+        before = self.store.providers()
+        self.assertEqual(self.request('/api/programmes/save', {'url': 'file:///private', 'country': 'GB'})[0], 400)
+        self.assertEqual(self.request('/api/programmes/save', {'url': 'https://example.org/guide.xml.gz',
+                        'label': 'My guide', 'country': 'GB', 'enabled': True})[0], 200)
+        result = json.loads(self.request('/api/programmes')[1])
+        added = next(f for f in result['settings']['feeds'] if f['label'] == 'My guide')
+        self.assertEqual(self.request('/api/programmes/remove', {'key': added['key']})[0], 200)
+        self.assertEqual(self.store.providers(), before)
+
     def test_wrong_codes_are_rate_limited(self):
         wrong = 'wrong'
         for _ in range(5):

@@ -97,6 +97,6 @@ class LiveAutoplay:
         LiveLibrary(self.store).pending(plan['channel'], path)
         notify('Connecting to ' + plan['title'])
         try:
-            player.play(path, make_item(path, plan['title'], plan['channel']['meta']))
+            player.play(path, make_item(path, plan['title'], plan['channel']))
         except Exception:
             self.signal('error')

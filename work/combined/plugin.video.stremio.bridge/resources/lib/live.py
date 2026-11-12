@@ -78,9 +78,11 @@ class LiveLibrary:
         provider = (getattr(self, '_providers', {}).get(saved['provider'])
                     or self.store.provider(saved['provider']))
         meta = {k: v for k, v in saved['meta'].items() if k in (
-            'id', 'type', 'name', 'poster', 'logo', 'thumbnail', 'background', 'description', 'genres')}
+            'id', 'type', 'name', 'poster', 'logo', 'thumbnail', 'background', 'description', 'genres',
+            'country', 'tvg_id', 'tvgId', 'epg_id', 'epgId')}
         return dict(provider=saved['provider'], provider_id=provider['manifest']['id'], meta=meta,
-                    resource_type=saved.get('resource_type', meta['type']), live_group=saved['live_group'])
+                    resource_type=saved.get('resource_type', meta['type']), live_group=saved['live_group'],
+                    live_country=saved.get('live_country', ''), native_schedule=saved.get('native_schedule', []))
 
     @staticmethod
     def identity(channel):
@@ -132,6 +134,7 @@ class LiveLibrary:
         channel = pending['channel']
         entries = [x for x in self.entries('recent') if self.identity(x) != self.identity(channel)]
         self.store.write(self.path('recent'), [channel] + entries[:49])
+        self.store.write(self.path('playing'), dict(channel=channel, fingerprint=pending['fingerprint']))
         self.store.write(self.path('pending'), {})
 
 

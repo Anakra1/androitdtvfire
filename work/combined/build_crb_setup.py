@@ -12,8 +12,8 @@ OUTPUTS.mkdir(exist_ok=True)
 SKIN = ROOT / 'skin.crimsonbloodrequiem'
 WIZARD = ROOT / 'script.crb.wizard'
 ENGINE = ROOT / 'script.module.cbr.engine'
-VIDEO_ZIP = OUTPUTS / 'plugin.video.stremio.bridge-0.7.2.zip'
-ANDROID_VIDEO_ZIP = OUTPUTS / 'plugin.video.stremio.bridge-0.7.2-android.zip'
+VIDEO_ZIP = OUTPUTS / 'plugin.video.stremio.bridge-0.8.0.zip'
+ANDROID_VIDEO_ZIP = OUTPUTS / 'plugin.video.stremio.bridge-0.8.0-android.zip'
 
 if not VIDEO_ZIP.is_file():
     raise SystemExit('Missing the current CBR video add-on installer.')

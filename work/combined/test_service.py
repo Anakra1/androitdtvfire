@@ -23,6 +23,7 @@ class ServiceTests(unittest.TestCase):
             spec = importlib.util.spec_from_file_location('bridge_service', ROOT / 'service.py')
             module = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(module)
+        module.ProgrammeUpdater = MagicMock()
         mocks['player'] = player
         return module, mocks
 

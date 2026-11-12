@@ -161,11 +161,34 @@ class LiveRouteTests(unittest.TestCase):
         self.assertEqual(len(self.items), 2)
         self.assertEqual(self.app.STORE.read(self.app.LIVE_AUTOPLAY.path), {})
 
+    def test_now_next_is_visible_on_channel_and_playback_without_changing_selection(self):
+        from resources.lib import programmes as epg
+        from test_programmes import XML, NOW
+        path = Path(self.temp.name) / 'schedule.xml'
+        path.write_text(XML)
+        feed = dict(key='uk', country='GB', label='UK', enabled=True)
+        epg.save_settings(self.app.STORE, dict(enabled=True, feeds=[feed], mappings={}))
+        epg.import_xml(self.app.STORE, feed, path, now=NOW)
+        self.app.PROGRAMMES = epg.ProgrammeGuide(self.app.STORE)
+        self.addCleanup(self.app.PROGRAMMES.close)
+        preview = {'id': 'vavoo_SKY%20ATLANTIC|group:uk', 'type': 'tv', 'name': 'SKY ATLANTIC'}
+        def query(entries, resource, kind, ident, extras=None):
+            return [(self.entry, {'meta': preview} if resource == 'meta' else
+                     {'streams': [{'url': 'https://example.org/live.m3u8'}]}, None)]
+        with patch.object(epg.time, 'time', return_value=NOW), patch.object(self.app, 'aggregate', side_effect=query):
+            self.app.add_metas([preview], self.entry['key'], 'tv', live_group='tv')
+            self.assertEqual(self.items[0][0][2].properties['CBR.Now'], 'Current show')
+            self.assertIn('Next show', self.items[0][0][2].info['plot'])
+            self.follow(0)
+            self.assertEqual(self.items, [])
+            self.assertTrue(self.resolved[-1][1])
+            self.assertIn('Current synopsis', self.resolved[-1][2].info['plot'])
+
     def test_live_home_has_requested_categories(self):
         self.app.live_home()
         self.assertEqual([args[2].label for args, _ in self.items],
                          ['Favourite channels', 'Recently watched', 'Search Live TV',
-                          'Source setup (phone / PC)', 'TV Channels', 'Internet TV', 'Live Sports'])
+                          'Source setup (phone / PC)', 'TV Channels', 'Internet TV', 'Live Sports', 'Programme information settings'])
         self.assertIn('action=web_setup', self.items[3][0][1])
 
     def test_country_browse_has_genre_folders_and_search_separate(self):

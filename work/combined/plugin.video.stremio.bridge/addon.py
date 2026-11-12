@@ -14,6 +14,8 @@ from resources.lib.core import (DEFAULT_URL, PRESETS, Store, aggregate, fetch_js
                                 playback_url, resource_url, stream_kind)
 from resources.lib.library import MovieLibrary
 from resources.lib.live_player import LiveAutoplay, probe_stream
+from resources.lib.programmes import (ProgrammeGuide, country_for, programme_text, request_refresh,
+                                     provider_programmes, settings as programme_settings, save_settings as save_programme_settings)
 from resources.lib.defaults import ensure_defaults
 from resources.lib.live import (GROUPS, GROUP_NAMES, LiveCatalogueCache, LiveLibrary, browse_title, catalogue_group,
                                 entry_catalogs, grouped_catalogues, search_only)
@@ -27,6 +29,7 @@ LIBRARY = MovieLibrary(STORE)
 LIVE_LIBRARY = LiveLibrary(STORE)
 LIVE_CATALOGUES = LiveCatalogueCache(STORE)
 LIVE_AUTOPLAY = LiveAutoplay(STORE)
+PROGRAMMES = ProgrammeGuide(STORE)
 ART = os.path.join(ADDON.getAddonInfo('path'), 'resources', 'art')
 BRAND = 'Crimson Blood Requiem'
 
@@ -71,12 +74,24 @@ def item(label, action, folder=True, meta=None, artwork=None, channel=None, **kw
             ])
     if channel:
         bookmark = LIVE_LIBRARY.channel(channel)
+        if PROGRAMMES.config.get('enabled', True):
+            schedule = PROGRAMMES.lookup(bookmark, meta)
+            plot = programme_text(schedule)
+            if meta.get('description'):
+                plot += '\n\n' + meta['description']
+            li.getVideoInfoTag().setPlot(plot)
+            now, following = (schedule or {}).get('now'), (schedule or {}).get('next')
+            li.setLabel2(now['title'] if now else 'Programme information unavailable')
+            li.setProperty('CBR.Now', now['title'] if now else '')
+            li.setProperty('CBR.Next', following['title'] if following else '')
         label = 'Remove from CBR favourites' if LIVE_LIBRARY.is_favourite(bookmark) else 'Add to CBR favourites'
         arguments = {'key': kwargs['key']}
         if 'index' in kwargs:
             arguments['index'] = kwargs['index']
         li.addContextMenuItems([(label, 'RunPlugin({})'.format(route('live_favourite', **arguments)))])
         li.addContextMenuItems([('Choose stream manually', 'Container.Update({})'.format(route('meta', **arguments)))])
+        li.addContextMenuItems([('Programme information', 'RunPlugin({})'.format(route('programme_info', **arguments))),
+                                ('Match programme channel', 'RunPlugin({})'.format(route('programme_match', **arguments)))])
     li.setArt(art)
     if not folder:
         li.setProperty('IsPlayable', 'true')
@@ -84,6 +99,7 @@ def item(label, action, folder=True, meta=None, artwork=None, channel=None, **kw
 
 
 def finish(content='videos'):
+    PROGRAMMES.close()
     xbmcplugin.setContent(HANDLE, content)
     xbmcplugin.endOfDirectory(HANDLE, cacheToDisc=False)
 
@@ -196,6 +212,7 @@ def live_home():
     item('Source setup (phone / PC)', 'web_setup', artwork='settings')
     for group, name in GROUPS:
         item(name, 'live_catalogues', group=group, artwork='live')
+    item('Programme information settings', 'programme_settings', artwork='settings')
     finish()
 
 
@@ -385,7 +402,7 @@ def catalogues(media_type=None):
     finish()
 
 
-def add_metas(metas, provider, media_type, seen=None, live_group=None):
+def add_metas(metas, provider, media_type, seen=None, live_group=None, live_country=''):
     records = []
     for meta in metas:
         if not isinstance(meta, dict) or not meta.get('id'):
@@ -399,7 +416,7 @@ def add_metas(metas, provider, media_type, seen=None, live_group=None):
             seen.add(identity)
         saved = {'meta': meta, 'provider': provider}
         if live_group:
-            saved.update(live_group=live_group, resource_type=media_type)
+            saved.update(live_group=live_group, resource_type=media_type, live_country=live_country)
         if live_group:
             records.append(saved)
         else:
@@ -448,7 +465,8 @@ def catalog_page(provider, catalog, extras=None, offset=0, refresh=False):
     metas = data.get('metas', [])
     offset = max(0, int(offset)) if live_group else 0
     displayed = metas[offset:offset + 100] if live_group else metas
-    add_metas(displayed, provider, cat['type'], live_group=live_group)
+    hint = country_for({'genres': [cat.get('name', ''), extras.get('genre', '')]}) if live_group else ''
+    add_metas(displayed, provider, cat['type'], live_group=live_group, live_country=hint)
     if cat['type'] == 'movie' and metas:
         item('Add this page to Kodi Movies library', 'export_page',
              key=STORE.put([dict(m, type='movie') for m in metas if isinstance(m, dict) and m.get('type', 'movie') == 'movie']),
@@ -596,6 +614,70 @@ def cached_item(key, index=None):
     return saved
 
 
+def programme_channel(key, index=None):
+    saved = cached_item(key, index)
+    return saved if saved.get('provider_id') else LIVE_LIBRARY.channel(saved)
+
+
+def programme_info(key, index=None):
+    channel = programme_channel(key, index)
+    result = PROGRAMMES.lookup(channel)
+    if result is None:
+        entry = STORE.provider(channel['provider'])
+        for _, data, _ in aggregate([entry], 'meta', channel['resource_type'], channel['meta']['id']):
+            if isinstance(data.get('meta'), dict):
+                result = PROGRAMMES.lookup(channel, data['meta'])
+                break
+    text = programme_text(result)
+    if not result or not (result.get('now') or result.get('next')):
+        text += '\n\nProgramme data may still be downloading. Use Programme information settings to check updates, '
+        text += 'or Match programme channel from the channel menu if an automatic match is unavailable.'
+    DIALOG.textviewer(channel['meta'].get('name', 'Programme information'), text)
+    PROGRAMMES.close()
+
+
+def programme_match(key, index=None):
+    channel = programme_channel(key, index)
+    choices = PROGRAMMES.channels()
+    if not choices:
+        DIALOG.ok('Programme information', 'No schedule channels are loaded yet. Open Live TV → Programme information settings and request an update.')
+        return
+    selected = DIALOG.select('Match ' + channel['meta'].get('name', 'channel'),
+                             ['Use automatic matching'] + [x['name'] + ' / ' + x['label'] for x in choices])
+    if selected >= 0:
+        PROGRAMMES.map_channel(channel, choices[selected - 1] if selected else None)
+        notify('Programme channel match saved')
+        xbmc.executebuiltin('Container.Refresh')
+    PROGRAMMES.close()
+
+
+def programme_options():
+    config = programme_settings(STORE)
+    selected = DIALOG.select('Programme information', ['Update programmes now', 'Manage schedule feeds on phone / PC',
+        'View update status', 'Turn off programme information' if config.get('enabled', True) else 'Turn on programme information'])
+    if selected == 0:
+        request_refresh(STORE)
+        notify('Programme information will update in the background')
+    elif selected == 1:
+        web_setup()
+        return
+    elif selected == 2:
+        status = STORE.read(os.path.join(STORE.root, 'programme-status.json'), {})
+        text = []
+        for feed in config['feeds']:
+            state = status.get(feed['key'], {})
+            updated = state.get('updated')
+            from datetime import datetime
+            text.append('{}: {}\n{} channels, {} programmes\nLast update: {}'.format(feed['label'],
+                state.get('state', 'Waiting for first download'), state.get('channels', 0), state.get('programmes', 0),
+                datetime.fromtimestamp(updated).strftime('%d %b %H:%M') if updated else 'Not yet downloaded'))
+        DIALOG.textviewer('Programme update status', '\n\n'.join(text) or 'No schedule feeds configured.')
+    elif selected == 3:
+        config['enabled'] = not config.get('enabled', True)
+        save_programme_settings(STORE, config)
+    live_home()
+
+
 def metadata(key, index=None, autoplay=False):
     saved = cached_item(key, index)
     preview = saved['meta']
@@ -610,6 +692,8 @@ def metadata(key, index=None, autoplay=False):
     results = aggregate(providers, 'meta', resource_type, preview['id'])
     meta = next((data['meta'] for _, data, _ in results if isinstance(data.get('meta'), dict) and data['meta']), preview)
     meta = dict(preview, **meta)
+    if live_group:
+        saved = dict(saved, native_schedule=provider_programmes(meta))
     hints = meta.get('behaviorHints') or {}
     # Cinemeta sets hasScheduledVideos for ongoing series with future episodes.
     # Series still need season/episode selection; that hint only changes the
@@ -664,6 +748,8 @@ def show_streams(media_type, item_id, meta, inline=None, channel=None, autoplay=
             li = xbmcgui.ListItem(path=path)
             li.getVideoInfoTag().setTitle(meta.get('name', 'Live TV'))
             li.setArt({'thumb': meta.get('logo') or meta.get('poster', '')})
+            li.getVideoInfoTag().setPlot(programme_text(PROGRAMMES.lookup(bookmark, meta))
+                                       if PROGRAMMES.config.get('enabled', True) else meta.get('description', ''))
             LIVE_LIBRARY.pending(bookmark, path)
             xbmcplugin.setResolvedUrl(HANDLE, True, li)
         else:
@@ -854,6 +940,12 @@ def main():
             metadata(params['key'], params.get('index'))
         elif action == 'live_play':
             metadata(params['key'], params.get('index'), autoplay=True)
+        elif action == 'programme_info':
+            programme_info(params['key'], params.get('index'))
+        elif action == 'programme_match':
+            programme_match(params['key'], params.get('index'))
+        elif action == 'programme_settings':
+            programme_options()
         elif action == 'episodes':
             episodes(params['key'])
         elif action == 'streams':

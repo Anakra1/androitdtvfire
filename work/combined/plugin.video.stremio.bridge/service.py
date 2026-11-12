@@ -12,6 +12,7 @@ from resources.lib.setup_web import SetupController
 from resources.lib.core import Store
 from resources.lib.live import LiveLibrary
 from resources.lib.live_player import LiveAutoplay
+from resources.lib.programmes import ProgrammeGuide, ProgrammeUpdater, ProgrammePlaybackInfo, programme_text
 
 
 class PlaybackPlayer(xbmc.Player):
@@ -32,10 +33,18 @@ class PlaybackPlayer(xbmc.Player):
         self.autoplay.signal('stopped')
 
 
-def live_item(path, title, meta):
+def live_item(path, title, channel):
+    meta = channel['meta']
     item = xbmcgui.ListItem(path=path)
     item.getVideoInfoTag().setTitle(title)
     item.setArt({'thumb': meta.get('logo') or meta.get('poster', '')})
+    profile = xbmcvfs.translatePath(xbmcaddon.Addon('plugin.video.stremio.bridge').getAddonInfo('profile'))
+    guide = ProgrammeGuide(Store(profile))
+    try:
+        item.getVideoInfoTag().setPlot(programme_text(guide.lookup(channel))
+                                       if guide.config.get('enabled', True) else meta.get('description', ''))
+    finally:
+        guide.close()
     return item
 
 
@@ -51,14 +60,19 @@ def main():
     monitor, player = xbmc.Monitor(), PlaybackPlayer(autoplay)
     setup = SetupController(root, addon.getAddonInfo('path'), xbmc.getIPAddress)
     live_library = LiveLibrary(Store(root))
+    programmes = ProgrammeUpdater(Store(root))
+    programme_info = ProgrammePlaybackInfo(Store(root))
+    live_library.store.write(live_library.path('playing'), {})
     engine, last_request, touched, current_hash, started = None, 0, 0, '', False
     write_json(endpoint_path, {})
     try:
         while not monitor.abortRequested():
             setup.poll()
+            programmes.poll()
             autoplay.poll(player, live_item, lambda message: xbmcgui.Dialog().notification(
                 'Crimson Blood Requiem', message, xbmcgui.NOTIFICATION_INFO, 4000))
             live_library.poll(player)
+            programme_info.poll(player, live_item)
             request = read_json(request_path).get('time', 0)
             if request > last_request:
                 last_request, touched, started = request, time.monotonic(), False
@@ -102,6 +116,7 @@ def main():
                     write_json(endpoint_path, {})
             monitor.waitForAbort(0.5)
     finally:
+        programmes.close()
         autoplay.clear()
         setup.close()
         if engine:
