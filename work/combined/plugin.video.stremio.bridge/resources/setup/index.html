@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CBR Source Setup</title><link rel="stylesheet" href="/style.css"><script src="/setup.js" defer></script></head>
 <body><main>
 <header><span class="badge">CBR</span><div><p class="eyebrow">CRIMSON BLOOD REQUIEM</p><h1>Source setup</h1></div></header>
-<p>Paste manifest links here to save them directly to CBR on your TV.</p>
+<p>Paste manifest links or M3U playlist URLs here to save them directly to CBR on your TV.</p>
 <p id="status" role="status" aria-live="polite"></p>
 <section id="pair-panel"><h2>Connect to your TV</h2><form id="pair-form"><label for="code">Pairing code shown in Kodi</label><input id="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" required><button>Connect</button></form><p class="muted">Keep the source setup screen open in Kodi. This connection lasts ten minutes.</p></section>
 <div id="workspace" hidden>
@@ -19,7 +19,7 @@
 <section><h2 id="editor-title">Add a source</h2><form id="source-form">
 <input type="hidden" id="source-key">
 <label for="label">Source name</label><input id="label" placeholder="For example, Sports Streams" maxlength="100" required>
-<label for="url">Full manifest URL</label><textarea id="url" rows="3" placeholder="https://provider.example/your-configuration/manifest.json" spellcheck="false" autocapitalize="off" required></textarea>
+<label for="url">Manifest or M3U playlist URL</label><textarea id="url" rows="3" placeholder="https://provider.example/manifest.json or https://example.org/channels.m3u" spellcheck="false" autocapitalize="off" required></textarea>
 <label for="group">Live TV category</label><select id="group"><option value="">Automatic / movies and series</option><option value="tv">TV Channels</option><option value="internet">Internet TV</option><option value="sports">Live Sports</option></select>
 <label for="guide-country">Programme country</label><select id="guide-country"><option value="">Automatic from channel</option></select><p class="muted">For mixed-country sources, leave Automatic selected. Choose a country only when the source contains channels from that country.</p>
 <label class="check"><input id="enabled" type="checkbox" checked> Enabled in CBR</label>

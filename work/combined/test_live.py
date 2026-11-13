@@ -31,7 +31,8 @@ class LiveConfigurationTests(unittest.TestCase):
             tv = list(grouped_catalogues(entries, 'tv'))
             internet = list(grouped_catalogues(entries, 'internet'))
             sports = list(grouped_catalogues(entries, 'sports'))
-            self.assertEqual([c['id'] for _, c in tv], ['live_tv'])
+            self.assertEqual([c['id'] for e, c in tv if e.get('kind') != 'm3u'], ['live_tv'])
+            self.assertIn('m3u_uk', [c['id'] for e, c in tv if e.get('kind') == 'm3u'])
             self.assertEqual({e['label'] for e, _ in internet}, {'Pluto TV'})
             self.assertEqual(len(sports), 17)
             self.assertEqual({e['label'] for e, _ in sports}, {'Sports Streams'})
@@ -56,7 +57,7 @@ class LiveConfigurationTests(unittest.TestCase):
             ensure_defaults(store, str(ROOT))
             self.assertEqual(len(store.providers()), 2)
             ensure_live_defaults(store, str(ROOT), force=True)
-            self.assertEqual(len(store.providers()), 5)
+            self.assertEqual(len(store.providers()), 6)
 
     def test_refresh_preserves_live_group_scope_and_supplemental_catalogue(self):
         with tempfile.TemporaryDirectory() as directory:

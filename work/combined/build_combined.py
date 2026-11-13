@@ -12,7 +12,7 @@ outputs = here.parent.parent / 'outputs' if here.parent.name == 'work' else here
 outputs.mkdir(exist_ok=True)
 readme = outputs / 'Crimson-Blood-Requiem-README.md' if here.parent.name == 'work' else here / 'README.md'
 version = ET.parse(source / 'addon.xml').getroot().attrib['version']
-assert version == '0.9.2'
+assert version == '0.9.3'
 assert 'plugin.video.stremio.bridge' in (source / 'service.py').read_text(encoding='utf-8-sig')
 for path in source.rglob('*.py'):
     py_compile.compile(str(path), doraise=True)
@@ -21,6 +21,8 @@ for path in (source / 'resources/defaults').glob('*.json'):
     data = json.loads(path.read_text(encoding='utf-8-sig'))
     if path.name == 'live-providers.json':
         assert isinstance(data, list) and len(data) == 3
+    elif path.name == 'm3u-countries.json':
+        assert data.get('GB') == 'United Kingdom'
     else:
         assert all(key in data for key in ('id', 'name', 'version'))
 binary = source / 'resources/bin/windows-x64/TorrServer.exe'

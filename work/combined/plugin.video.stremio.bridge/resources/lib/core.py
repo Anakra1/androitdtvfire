@@ -14,7 +14,7 @@ PRESETS = [
     'OpenSubtitles v3', 'OpenSubtitles', 'MediaFusion | ElfHosted',
     'M3U/EPG TV Addon', 'Comet | ElfHosted | RD', 'Torrentio',
     'PlavioLive', 'Streaming Catalogs', 'Other add-on',
-    'Pluto TV', 'Sports Streams', 'StreamsPPV',
+    'Pluto TV', 'Sports Streams', 'StreamsPPV', 'M3U IPTV playlist',
 ]
 
 
@@ -28,6 +28,8 @@ def normalize_url(value):
     if parts.username or parts.password or parts.fragment:
         raise ValueError('Use the full manifest URL without credentials or a fragment.')
     path = parts.path.rstrip('/')
+    if path.lower().endswith(('.m3u', '.m3u8')):
+        return urlunsplit((parts.scheme, parts.netloc, path, parts.query, ''))
     if path.endswith('/configure'):
         raise ValueError('This is a configuration page. Copy the Share addon manifest URL instead.')
     if not path.endswith('/manifest.json'):
@@ -37,6 +39,10 @@ def normalize_url(value):
 
 def resource_url(manifest_url, resource, media_type, item_id, extras=None):
     parts = urlsplit(normalize_url(manifest_url))
+    if parts.path.lower().endswith(('.m3u', '.m3u8')):
+        # An opaque catalogue-cache key; never sent to the remote playlist host.
+        return urlunsplit((parts.scheme, parts.netloc, parts.path, parts.query,
+                           urlencode(dict(resource=resource, type=media_type, id=item_id, **(extras or {})))))
     base_path = parts.path[:-len('/manifest.json')]
     path = '/'.join(quote(str(x), safe='') for x in (resource, media_type, item_id))
     if extras:
@@ -65,6 +71,18 @@ def validate_manifest(manifest):
     if manifest.get('behaviorHints', {}).get('configurationRequired'):
         raise ValueError('Configure this add-on in Stremio first, then copy its installed manifest URL.')
     return manifest
+
+
+def load_manifest(url, fetch=fetch_json):
+    from . import m3u
+    return m3u.manifest(url, m3u.load(url, force=True)) if m3u.is_playlist(url) else validate_manifest(fetch(url))
+
+
+def fetch_resource(entry, resource, media_type, identity, extras=None, fetch=fetch_json):
+    if entry.get('kind') == 'm3u':
+        from . import m3u
+        return m3u.resource(entry, resource, media_type, identity, extras)
+    return fetch(resource_url(entry['url'], resource, media_type, identity, extras))
 
 
 def supports(manifest, resource, media_type, item_id):
@@ -147,13 +165,20 @@ class Store:
 
     def add(self, url, label='', fetch=fetch_json):
         url = normalize_url(url)
-        manifest = validate_manifest(fetch(url))
+        manifest = load_manifest(url, fetch)
         entries = self.providers()
         key = hashlib.sha256(url.encode()).hexdigest()[:24]
         previous = next((x for x in entries if x['key'] == key), {})
         entry = dict(previous, key=key, url=url, manifest=manifest,
                      label=label or previous.get('label') or manifest['name'],
                      enabled=previous.get('enabled', True))
+        if urlsplit(url).path.lower().endswith(('.m3u', '.m3u8')):
+            entry['kind'] = 'm3u'
+            entry.setdefault('live_group', 'tv')
+            entry['scope_types'] = ['tv']
+        else:
+            if previous.get('kind') == 'm3u': entry.pop('scope_types', None)
+            entry.pop('kind', None)
         entries = [entry if x['key'] == key else x for x in entries]
         if not any(x['key'] == key for x in entries):
             entries.append(entry)
@@ -197,7 +222,7 @@ def aggregate(entries, resource, media_type, item_id, extras=None, fetch=fetch_j
                   and supports(x['manifest'], resource, media_type, item_id)]
     def query(entry):
         try:
-            return entry, fetch(resource_url(entry['url'], resource, media_type, item_id, extras)), None
+            return entry, fetch_resource(entry, resource, media_type, item_id, extras, fetch=fetch), None
         except Exception:
             # Never return exception strings: urllib errors can contain configured URLs/tokens.
             return entry, {}, 'Provider request failed'

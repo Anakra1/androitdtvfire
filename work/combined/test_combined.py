@@ -21,12 +21,12 @@ class DefaultsTests(unittest.TestCase):
             store = Store(temp)
             ensure_defaults(store, str(ROOT))
             entries = store.providers()
-            self.assertEqual({e['label'] for e in entries}, {'Cinemeta', 'Torrentio', 'MediaFusion TV', 'Pluto TV', 'Sports Streams'})
+            self.assertEqual({e['label'] for e in entries}, {'Cinemeta', 'Torrentio', 'MediaFusion TV', 'Pluto TV', 'Sports Streams', 'IPTV-org'})
             streams = aggregate(entries, 'stream', 'movie', 'tt1', fetch=lambda url: {'streams': [{'infoHash': 'a' * 40}]})
             self.assertEqual(len(streams), 1)
             self.assertEqual(streams[0][0]['label'], 'Torrentio')
             ensure_defaults(store, str(ROOT))
-            self.assertEqual(len(store.providers()), 5)
+            self.assertEqual(len(store.providers()), 6)
 
     def test_migration_preserves_personalised_and_disabled_providers(self):
         with tempfile.TemporaryDirectory() as temp:
@@ -38,7 +38,7 @@ class DefaultsTests(unittest.TestCase):
             store.save_providers(entries)
             ensure_defaults(store, str(ROOT))
             entries = store.providers()
-            self.assertEqual(len(entries), 5)
+            self.assertEqual(len(entries), 6)
             self.assertFalse(entries[0]['enabled'])
             self.assertEqual(entries[0]['url'], 'https://example.org/personal-token/manifest.json')
             self.assertEqual(entries[0]['label'], 'My configured provider')
@@ -51,7 +51,7 @@ class DefaultsTests(unittest.TestCase):
             ensure_defaults(store, str(ROOT))
             self.assertEqual(store.providers(), [])
             ensure_defaults(store, str(ROOT), force=True)
-            self.assertEqual(len(store.providers()), 5)
+            self.assertEqual(len(store.providers()), 6)
 
     def test_multiple_sources_aggregate_and_disabled_source_is_excluded(self):
         with tempfile.TemporaryDirectory() as temp:

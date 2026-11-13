@@ -2,6 +2,7 @@
 from datetime import datetime, timezone
 import gzip
 import hashlib
+import json
 import os
 import re
 import sqlite3
@@ -18,6 +19,8 @@ DEFAULT_FEED = 'https://epgshare01.online/epgshare01/epg_ripper_UK1.xml.gz'
 COUNTRIES = {'GB': 'United Kingdom', 'IE': 'Ireland', 'US': 'United States', 'CA': 'Canada',
              'AU': 'Australia', 'IT': 'Italy', 'FR': 'France', 'DE': 'Germany', 'ES': 'Spain',
              'PT': 'Portugal', 'NL': 'Netherlands', 'PL': 'Poland', 'RO': 'Romania', 'BG': 'Bulgaria'}
+with open(os.path.join(os.path.dirname(__file__), '../defaults/m3u-countries.json'), encoding='utf8') as _countries_file:
+    COUNTRIES = dict(json.load(_countries_file), **COUNTRIES)
 
 
 def feed_key(url):

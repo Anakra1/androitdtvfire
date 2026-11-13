@@ -12,7 +12,7 @@ import threading
 import time
 from urllib.parse import urlsplit
 
-from .core import Store, fetch_json, normalize_url, validate_manifest
+from .core import Store, fetch_json, normalize_url, validate_manifest, load_manifest
 from .programmes import COUNTRIES, settings as programme_settings, save_settings as save_programme_settings, save_feed, request_refresh
 from . import pvr
 
@@ -93,7 +93,7 @@ class SetupServer:
                 if self.path == '/api/pvr':
                     if self.paired():
                         self.reply(200, {'config': pvr.config(owner.store), 'groups': pvr.GROUPS,
-                            'sources': [{key: source[key] for key in ('key', 'label', 'default')} for source in pvr.sources(owner.store)],
+                            'sources': [{key: source[key] for key in ('key', 'label', 'default', 'playlist')} for source in pvr.sources(owner.store)],
                             'status': owner.store.read(os.path.join(owner.store.root, 'pvr-status.json'), {}),
                             **pvr.editor(owner.store)})
                     return
@@ -221,7 +221,7 @@ class SetupServer:
         group = data.get('group', '')
         if group not in ('', 'tv', 'internet', 'sports'):
             raise ValueError('Choose a valid category.')
-        manifest = validate_manifest(self.fetch(url))
+        manifest = load_manifest(url, self.fetch)
         entries = self.store.providers()
         previous_key = data.get('key', '')
         previous = next((entry for entry in entries if entry['key'] == previous_key), None)
@@ -230,6 +230,14 @@ class SetupServer:
         key = hashlib.sha256(url.encode()).hexdigest()[:24]
         entry = dict(previous or {}, key=key, url=url, label=label or manifest['name'],
                      manifest=manifest, enabled=bool(data.get('enabled', True)))
+        from .m3u import is_playlist
+        if is_playlist(url):
+            entry['kind'] = 'm3u'
+            entry['scope_types'] = ['tv']
+            if not group: group = 'tv'
+        else:
+            if (previous or {}).get('kind') == 'm3u': entry.pop('scope_types', None)
+            entry.pop('kind', None)
         if 'guide_country' in data:
             country = data.get('guide_country', '')
             if country and country not in COUNTRIES:
@@ -258,7 +266,7 @@ class SetupServer:
             if not entry.get('enabled', True):
                 continue
             try:
-                entry['manifest'] = validate_manifest(self.fetch(entry['url']))
+                entry['manifest'] = load_manifest(entry['url'], self.fetch)
                 updated += 1
             except Exception:
                 failed.append(entry['label'])

@@ -9,7 +9,7 @@ import time
 from urllib.parse import urlencode, urlsplit
 import xml.etree.ElementTree as ET
 
-from .core import fetch_json, resource_url
+from .core import fetch_json, resource_url, fetch_resource
 from .live import entry_catalogs, search_only
 from .programmes import ProgrammeGuide, country_for, normalized, channel_key, settings as guide_settings, save_settings as save_guide_settings
 from .channel_names import compact
@@ -19,7 +19,7 @@ FREEVIEW = {'bbc one': 1, 'bbc two': 2, 'itv1': 3, 'itv': 3, 'channel 4': 4, 'ch
             'bbc three': 23, 'bbc four': 9, 'itv2': 6, 'itv3': 10, 'itv4': 26,
             'e4': 13, 'more4': 18, 'film4': 14, 'cbbc': 201, 'cbeebies': 202,
             'bbc news': 231, 'bbc parliament': 232}
-GROUPS = ('Freeview', 'Sky', 'Entertainment', 'Movies', 'Sports', 'News', 'Kids', 'Music', 'Other channels')
+GROUPS = ('Freeview', 'Sky', 'Entertainment', 'Movies', 'Sports', 'News', 'Kids', 'Music', 'Other channels', 'IPTV playlists')
 
 
 def digest(value):
@@ -59,7 +59,7 @@ def sources(store):
                 key = digest([entry['manifest']['id'], cat['type'], cat['id'], extras])
                 result[key] = dict(key=key, label=entry['label'] + ' / ' + cat.get('name', cat['id']) + (' / ' + genre if genre else ''),
                                    provider=entry['key'], provider_id=entry['manifest']['id'], catalog=cat,
-                                   extras=extras, country=country, default=country == 'GB')
+                                   extras=extras, country=country, default=country == 'GB', playlist=entry.get('kind') == 'm3u')
     return list(result.values())
 
 
@@ -98,7 +98,7 @@ def collect_source(store, source, fetch=fetch_json):
     entry, cat = store.provider(source['provider']), source['catalog']
     extras, result, seen, pages = dict(source['extras']), [], set(), set()
     for _ in range(25):
-        data = fetch(resource_url(entry['url'], 'catalog', cat['type'], cat['id'], extras))
+        data = fetch_resource(entry, 'catalog', cat['type'], cat['id'], extras, fetch=fetch)
         metas = data.get('metas', [])
         signature = digest([m.get('id') for m in metas if isinstance(m, dict)])
         if not metas or signature in pages:
@@ -120,7 +120,7 @@ def collect_source(store, source, fetch=fetch_json):
         if len(result) == before or not any(x.get('name') == 'skip' for x in cat.get('extra', [])) or len(result) >= 3000:
             break
         extras['skip'] = int(extras.get('skip', 0)) + len(metas)
-    return result[:3000]
+    return result[:25000 if entry.get('kind') == 'm3u' else 3000]
 
 
 def merge_channels(variants, previous=None, overrides=None):
@@ -167,6 +167,8 @@ def merge_channels(variants, previous=None, overrides=None):
                              else 0 if re.search(r'\b(FHD|HD)\b', c['meta']['name'], re.I) else 1)
         best = row['variants'][0]['meta']
         row['name'], row['logo'] = best['name'], best.get('logo') or best.get('poster', row['logo'])
+        if any(v['provider_id'].startswith('org.cbr.m3u.') for v in row['variants']):
+            row['groups'] = list(dict.fromkeys(row['groups'] + ['IPTV playlists']))
     for row in sorted(merged.values(), key=lambda r: (FREEVIEW.get(normalized(r['name'], True), 999), r['name'].casefold())):
         if row['id'] in overrides:
             row['number'] = overrides[row['id']]['number']
@@ -187,8 +189,8 @@ def channels(store):
     return [dict(row, **overrides.get(row['id'], {})) for row in rows]
 
 
-def resolve_variant(store, variant):
-    entries = [e for e in store.providers() if e.get('enabled', True)]
+def resolve_variant(store, variant, entries=None):
+    if entries is None: entries = [e for e in store.providers() if e.get('enabled', True)]
     entry = next((e for e in entries if e['key'] == variant['provider']), None)
     if entry is None:
         entry = next((e for e in entries if e['manifest']['id'] == variant['provider_id']
@@ -221,8 +223,9 @@ def atomically(path, raw):
 def export(store):
     folder = os.path.join(store.root, 'pvr')
     os.makedirs(folder, exist_ok=True)
+    entries = [e for e in store.providers() if e.get('enabled', True)]
     rows = [r for r in channels(store) if r.get('visible', True)
-            and any(resolve_variant(store, v) for v in r['variants'])]
+            and any(resolve_variant(store, v, entries) for v in r['variants'])]
     rows.sort(key=lambda r: (r['number'], r['name'].casefold()))
     def escaped(value):
         return str(value).replace('\r', ' ').replace('\n', ' ').replace('"', "'")
@@ -242,7 +245,7 @@ def export(store):
                 ET.SubElement(node, 'icon', {'src': row['logo']})
             programmes = []
             for variant in row['variants']:
-                current = resolve_variant(store, variant)
+                current = resolve_variant(store, variant, entries)
                 if current:
                     programmes = guide.schedule(current, time.time() - 3600, time.time() + 7 * 86400)
                     if programmes:
@@ -289,12 +292,13 @@ def save_channels(store, edits):
 
 def editor(store):
     guide = ProgrammeGuide(store)
+    entries = [e for e in store.providers() if e.get('enabled', True)]
     try:
         options = guide.channels()
         labels = {(o['feed'], o['channel']): o for o in options}
         rows = []
         for row in channels(store):
-            variants = [v for saved in row['variants'] if (v := resolve_variant(store, saved))]
+            variants = [v for saved in row['variants'] if (v := resolve_variant(store, saved, entries))]
             matches = [m for v in variants if (m := guide.match(v))]
             matched = matches[0] if matches else None
             upcoming = bool(matched and guide.database().execute(

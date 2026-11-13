@@ -17,11 +17,11 @@ class RepositoryInstallTests(unittest.TestCase):
         # no DOTALL flag, so each entry is also valid without multiline matching.
         pattern = re.compile(r'<a href="([^"]*)"[^>]*>\s*(.*?)\s*</a>(.+?)(?=<a|</tr|$)', re.I)
         entries = [link for link, name, _ in pattern.findall(html) if link.rstrip('/') == name.strip().rstrip('/')]
-        self.assertEqual(entries, ['repository.cbr.zip', 'windowsrepo.zip', 'cbr092.zip', 'cbrwindows.zip'])
+        self.assertEqual(entries, ['repository.cbr.zip', 'windowsrepo.zip', 'cbr093.zip', 'cbrwindows.zip'])
         for entry in entries:
             self.assertTrue((PROJECT / entry).is_file())
-        self.assertEqual((PROJECT / 'cbr092.zip').read_bytes(),
-                         (PROJECT / 'android/packages/plugin.video.stremio.bridge/plugin.video.stremio.bridge-0.9.2.zip').read_bytes())
+        self.assertEqual((PROJECT / 'cbr093.zip').read_bytes(),
+                         (PROJECT / 'android/packages/plugin.video.stremio.bridge/plugin.video.stremio.bridge-0.9.3.zip').read_bytes())
 
     def test_windows_repository_keeps_the_windows_player_in_future_updates(self):
         with ZipFile(PROJECT / 'windowsrepo.zip') as archive:
@@ -34,7 +34,7 @@ class RepositoryInstallTests(unittest.TestCase):
         for item in ET.parse(feed).getroot():
             package = PROJECT / 'windows/packages' / item.get('id') / '{}-{}.zip'.format(item.get('id'), item.get('version'))
             self.assertTrue(package.is_file())
-        video = PROJECT / 'windows/packages/plugin.video.stremio.bridge/plugin.video.stremio.bridge-0.9.2.zip'
+        video = PROJECT / 'windows/packages/plugin.video.stremio.bridge/plugin.video.stremio.bridge-0.9.3.zip'
         self.assertEqual(video.read_bytes(), (PROJECT / 'cbrwindows.zip').read_bytes())
         with ZipFile(video) as archive:
             self.assertTrue(archive.read('plugin.video.stremio.bridge/resources/bin/windows-x64/TorrServer.exe').startswith(b'MZ'))
@@ -57,7 +57,7 @@ class RepositoryInstallTests(unittest.TestCase):
                          (PROJECT / 'android/addons.xml.md5').read_text().strip())
         addons = {item.attrib['id']: item for item in ET.parse(feed).getroot()}
         video = addons['plugin.video.stremio.bridge']
-        self.assertEqual(video.attrib['version'], '0.9.2')
+        self.assertEqual(video.attrib['version'], '0.9.3')
         requirements = {item.attrib['addon']: item.attrib.get('version') for item in video.find('requires')}
         self.assertEqual(requirements['script.module.cbr.engine'], '0.1.0')
         self.assertEqual(video.find("extension[@point='xbmc.addon.metadata']/platform").text, 'android')

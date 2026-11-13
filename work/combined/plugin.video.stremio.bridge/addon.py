@@ -11,7 +11,7 @@ import xbmcplugin
 import xbmcvfs
 
 from resources.lib.core import (DEFAULT_URL, PRESETS, Store, aggregate, fetch_json,
-                                playback_url, resource_url, stream_kind)
+                                playback_url, resource_url, stream_kind, fetch_resource)
 from resources.lib.library import MovieLibrary
 from resources.lib.live_player import LiveAutoplay, probe_stream
 from resources.lib.programmes import (ProgrammeGuide, country_for, programme_text, request_refresh,
@@ -198,7 +198,8 @@ def add_provider(live_group=None):
     if index < 0:
         return
     label = PRESETS[index]
-    url = DIALOG.input('Paste installed add-on manifest URL', DEFAULT_URL if index == 0 else '')
+    url = DIALOG.input('Paste manifest or M3U playlist URL', DEFAULT_URL if index == 0 else
+                       'https://iptv-org.github.io/iptv/index.m3u' if label == 'M3U IPTV playlist' else '')
     if url.strip():
         entry = STORE.add(url, label)
         if live_group in GROUP_NAMES:
@@ -239,7 +240,7 @@ def live_catalogues(group):
 def live_source(provider, group):
     entry = STORE.provider(provider)
     matches = [(e, c) for e, c in grouped_catalogues([entry], group) if not search_only(c)]
-    for _, catalog in sorted(matches, key=lambda pair: browse_title(pair[1]).casefold()):
+    for _, catalog in sorted(matches, key=lambda pair: (pair[1].get('country') != 'GB', browse_title(pair[1]).casefold())):
         item(browse_title(catalog), 'live_categories', provider=provider, catalog=STORE.put(catalog), artwork='live')
     if not matches:
         notify('This source offers search only. Use Search this source.')
@@ -463,8 +464,9 @@ def catalog_page(provider, catalog, extras=None, offset=0, refresh=False):
                 return
             extras[name] = value
     url = resource_url(entry['url'], 'catalog', cat['type'], cat['id'], extras)
-    data = (LIVE_CATALOGUES.get(url, request, lifetime=60 if live_group == 'sports' else 300, refresh=refresh)
-            if live_group else request(url))
+    loader = (lambda ignored: fetch_resource(entry, 'catalog', cat['type'], cat['id'], dict(extras, _refresh=refresh))) if entry.get('kind') == 'm3u' else request
+    data = (LIVE_CATALOGUES.get(url, loader, lifetime=60 if live_group == 'sports' else 300, refresh=refresh)
+            if live_group else loader(url))
     metas = data.get('metas', [])
     offset = max(0, int(offset)) if live_group else 0
     displayed = metas[offset:offset + 100] if live_group else metas
@@ -512,7 +514,8 @@ def search(media_type=None, live_only=False, provider=None):
     def run(pair):
         e, c = pair
         try:
-            data = fetch_json(resource_url(e['url'], 'catalog', c['type'], c['id'], {'search': query.strip()}))
+            if e.get('kind') == 'm3u' and c['id'] != 'm3u_all': return e, c, [], False
+            data = fetch_resource(e, 'catalog', c['type'], c['id'], {'search': query.strip()}, fetch=fetch_json)
             return e, c, data.get('metas', []), False
         except Exception:
             return e, c, [], True
@@ -755,16 +758,27 @@ def pvr_setup():
 
 def pvr_play(identity):
     row, variants = pvr.channel(STORE, identity)
-    path = None
+    path, fallback = None, None
     for variant in variants:
         entry = STORE.provider(variant['provider'])
         streams = []
         for _, data, _ in aggregate([entry], 'stream', variant['resource_type'], variant['meta']['id']):
             streams.extend(s for s in data.get('streams', []) if isinstance(s, dict))
-        path = LIVE_AUTOPLAY.begin(variant['meta'], variant, streams, probe=probe_stream)
+        states = {}
+        def checked(stream):
+            state = probe_stream(stream)
+            states[playback_url(stream)] = state
+            return state
+        path = LIVE_AUTOPLAY.begin(variant['meta'], variant, streams, probe=checked)
         LIVE_AUTOPLAY.clear()
         if path:
-            break
+            if states.get(path) is True:
+                break
+            if fallback is None:
+                fallback = path, variant
+            path = None
+    if path is None and fallback:
+        path, variant = fallback
     # PVR owns channel switching and stopping. Select a working URL here but do
     # not let the video add-on's retry service replace PVR with ordinary playback.
     if not path:

@@ -236,6 +236,7 @@ class KodiRouteTests(ServerFixture):
         self.entry = self.app.STORE.add(self.url)
         self.app.STORE.write(os.path.join(self.temp.name, 'combined-defaults-v1.json'), True)
         self.app.STORE.write(os.path.join(self.temp.name, 'live-defaults-v1.json'), True)
+        self.app.STORE.write(os.path.join(self.temp.name, 'm3u-defaults-v1.json'), True)
 
     def restore_modules(self):
         for key, value in self.old_modules.items():

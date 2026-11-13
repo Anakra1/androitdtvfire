@@ -7,7 +7,7 @@ import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).parent / 'plugin.video.stremio.bridge'
 sys.path.insert(0, str(ROOT))
-from resources.lib import pvr, programmes
+from resources.lib import pvr, programmes, m3u
 from resources.lib.core import Store
 from test_programmes import XML, NOW
 import test_movies as fixtures
@@ -178,3 +178,28 @@ class PVRRouteTests(unittest.TestCase):
         self.assertTrue(self.resolved[-1][1])
         self.assertIn('https://example.org/video.mp4', self.resolved[-1][2].path)
         self.assertEqual(self.app.STORE.read(self.app.LIVE_AUTOPLAY.path), {})
+
+    def test_reachable_m3u_alternative_wins_over_timed_out_manifest_source(self):
+        rows = m3u.parse('#EXTM3U\n#EXTINF:-1 tvg-id="BBCNews.uk",BBC News\nhttps://example.org/fresh.m3u8', 'https://example.org/list.m3u')
+        with patch.object(m3u, 'load', return_value=rows):
+            entry = self.app.STORE.add('https://example.org/list.m3u')
+            old = dict(provider=self.entry['key'], provider_id=self.entry['manifest']['id'], provider_label=self.entry['label'],
+                       resource_type='tv', live_country='GB', live_group='tv', meta=dict(id='bbc', type='tv', name='BBC News HD'))
+            new = dict(old, provider=entry['key'], provider_id=entry['manifest']['id'], provider_label=entry['label'],
+                       meta={k:v for k,v in rows[0].items() if k!='streams'})
+            merged = pvr.merge_channels([old, new]); self.app.STORE.write(str(Path(self.temp.name)/'pvr-channels.json'),merged)
+            with patch.object(self.app, 'probe_stream', side_effect=lambda stream: True if stream['url'].endswith('fresh.m3u8') else None):
+                self.app.pvr_play(merged[0]['id'])
+        self.assertTrue(self.resolved[-1][1])
+        self.assertIn('/fresh.m3u8',self.resolved[-1][2].path)
+
+    def test_m3u_backup_browsing_to_automatic_playback(self):
+        rows = m3u.parse('#EXTM3U\n#EXTINF:-1 tvg-id="BBCNews.uk",BBC News\nhttps://example.org/fresh.m3u8', 'https://example.org/list.m3u')
+        with patch.object(m3u, 'load', return_value=rows), patch.object(self.app,'probe_stream',return_value=True):
+            entry = self.app.STORE.add('https://example.org/list.m3u')
+            self.items.clear()
+            self.app.catalog_page(entry['key'],self.app.STORE.put(entry['manifest']['catalogs'][0]))
+            self.assertEqual(self.items[0][0][2].label,'BBC News')
+            self.follow(0)
+        self.assertTrue(self.resolved[-1][1])
+        self.assertIn('/fresh.m3u8',self.resolved[-1][2].path)

@@ -12,13 +12,13 @@ CBR provides movie and TV catalogues, posters, separate searches, Live TV catego
 4. Accept Kodi’s dependency list, including **CBR Playback Engine**. Kodi installs the playback engine with the video add-on.
 5. Open CBR and select a movie or episode and a source. On upgrades from older CBR versions, restart Kodi once so its old service unloads.
 
-Current Android versions: repository **0.1.7**, video add-on **0.9.2**, playback engine **0.1.0**. All playback installation and updates use this one Kodi repository.
+Current Android versions: repository **0.1.7**, video add-on **0.9.3**, playback engine **0.1.0**. All playback installation and updates use this one Kodi repository.
 
 **0.8.0 adds Now/Next programme information.** Restart Kodi to start the automatic background UK schedule download. Long-press a channel → **Programme information** for titles, times and descriptions; **Match programme channel** sets an explicit match when automatic matching is unavailable. The PC setup page has a separate XMLTV programme-feed section for other countries. List browsing and channel selection keep their existing behaviour, including automatic playback.
 
 Version 0.8.0 checks HTTP availability before automatic live playback and skips explicitly blocked links, allowing a working third or later link to be chosen without a source-selection screen. Checks run on the Kodi device and do not save playback URLs to the catalogue cache. Upstream picture loops cannot be detected reliably from HTTP availability alone.
 
-If Kodi's cached repository listing does not show the latest version, existing Fire TV/Android installations can update directly using **Install from zip file → CBR → cbr092.zip** from the same source. This is the identical 0.9.2 video add-on package, with no uninstall or new source required. Restart Kodi after installing it. Fresh installs should use the repository steps above to install dependencies.
+If Kodi's cached repository listing does not show the latest version, existing Fire TV/Android installations can update directly using **Install from zip file → CBR → cbr093.zip** from the same source. This is the identical 0.9.3 video add-on package, with no uninstall or new source required. Restart Kodi after installing it. Fresh installs should use the repository steps above to install dependencies.
 
 Version 0.8.0 speeds up Live TV navigation with short-lived local catalogue caching, 100-channel pages, fewer file reads/writes and source-specific live playback requests. Use **Refresh channels** to reload a list immediately. The listing cache does not store playback URLs.
 
@@ -27,6 +27,18 @@ Choosing a live channel starts playback directly, without displaying its links. 
 CBR includes source/country/category browsing for Live TV, a separate search entry, provider channel logos, persistent channel favourites and recently watched channels. Long-press a channel to add or remove a favourite. Restart Kodi after updating to load background services.
 
 Install **Crimson Blood Requiem Skin** and **CBR Setup Wizard** from the same repository for the optional interface, then run the wizard. The video add-on also works with Kodi’s normal skin.
+
+## IPTV-org and M3U playlists (0.9.3)
+
+Restart Kodi after updating, then open CBR once to add IPTV-org as an extra TV source. **CBR → Live TV → TV Channels → IPTV-org → United Kingdom** uses `https://iptv-org.github.io/iptv/countries/uk.m3u`. Other country catalogues are selectable; the worldwide master is `https://iptv-org.github.io/iptv/index.m3u`.
+
+Existing Kodi TV setups add the UK catalogue to their selected sources and rebuild in the background. Look for the **IPTV playlists** group in Kodi TV. Existing sources, channel numbers and manual edits are preserved. Other M3U country options are collapsed under **Other M3U playlist countries** on the paired PC page; select the countries you want and save TV sources. Custom HTTP(S) `.m3u` or `.m3u8` channel-list URLs can be entered in the same source manager as manifests. HLS video playlists are rejected as channel sources.
+
+Channel names, logos, programme IDs and alternate links are imported. Stream selection reloads the relevant playlist for current URLs. Known M3U request headers are preserved; entries explicitly declaring unsupported DRM license settings are skipped. This does not bypass provider restrictions. Schedule data still comes from the separate XMLTV feeds.
+
+The checked UK file had 310 stream entries, producing 300 merged channels in an isolated export. GB News and Red Bull TV UK returned video samples in the PC checks. Some BBC/ITV entries were blocked, unavailable or pointed to a hostname that did not resolve; a BBC One DASH manifest loaded, which alone is not proof of successful playback. The list is an additional source, not a guaranteed replacement for Sky or ITV1. Availability and regional restrictions depend on the stream provider.
+
+Native TV selection now checks other channel variants for a confirmed reachable link before falling back to an inconclusive probe. Stream failures after decoding starts still belong to Kodi/PVR playback handling. Restart Kodi after updating.
 
 ## Windows install dependency fix (0.9.2)
 

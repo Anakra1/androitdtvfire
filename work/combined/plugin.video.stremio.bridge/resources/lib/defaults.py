@@ -31,6 +31,8 @@ def ensure_defaults(store, addon_path, force=False):
 
 
 def ensure_live_defaults(store, addon_path, force=False):
+    from .m3u import ensure_default
+    ensure_default(store, force)
     marker = os.path.join(store.root, 'live-defaults-v1.json')
     if not force and store.read(marker):
         return

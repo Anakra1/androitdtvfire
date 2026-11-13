@@ -48,7 +48,7 @@ $('pair-form').addEventListener('submit', async event => {
   catch (error) { message(error.message, true); }
 });
 $('source-form').addEventListener('submit', async event => {
-  event.preventDefault(); $('save').disabled = true; message('Checking the manifest and saving…');
+  event.preventDefault(); $('save').disabled = true; message('Checking the source and saving…');
   try {
     const result = await api('/api/save', {key: $('source-key').value, label: $('label').value, url: $('url').value,
                                          group: $('group').value, enabled: $('enabled').checked,
@@ -128,12 +128,18 @@ async function loadPvr() {
   groupSelect.replaceChildren(new Option('All groups', ''));
   for (const group of pvrData.groups) groupSelect.add(new Option(group, group));
   groupSelect.value = currentGroup;
+  const otherCountries = document.createElement('details');
+  const countrySummary = document.createElement('summary'); countrySummary.textContent = 'Other M3U playlist countries'; otherCountries.append(countrySummary);
+  let otherCount = 0;
   for (const source of pvrData.sources) {
     const label = document.createElement('label'); label.className = 'check';
     const checkbox = document.createElement('input'); checkbox.type = 'checkbox'; checkbox.value = source.key;
     checkbox.checked = pvrData.config.selected === null ? source.default : pvrData.config.selected.includes(source.key);
-    label.append(checkbox, document.createTextNode(source.label)); $('pvr-sources').append(label);
+    label.append(checkbox, document.createTextNode(source.label));
+    if (source.playlist && !source.default) { otherCountries.append(label); otherCount++; }
+    else $('pvr-sources').append(label);
   }
+  if (otherCount) $('pvr-sources').append(otherCountries);
   renderPvrChannels();
 }
 function renderPvrChannels() {
