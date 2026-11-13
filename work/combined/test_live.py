@@ -187,9 +187,9 @@ class LiveRouteTests(unittest.TestCase):
     def test_live_home_has_requested_categories(self):
         self.app.live_home()
         self.assertEqual([args[2].label for args, _ in self.items],
-                         ['Favourite channels', 'Recently watched', 'Search Live TV',
+                         ['Kodi TV and guide', 'Favourite channels', 'Recently watched', 'Search Live TV',
                           'Source setup (phone / PC)', 'TV Channels', 'Internet TV', 'Live Sports', 'Programme information settings'])
-        self.assertIn('action=web_setup', self.items[3][0][1])
+        self.assertIn('action=web_setup', self.items[4][0][1])
 
     def test_country_browse_has_genre_folders_and_search_separate(self):
         manifest = dict(fixtures.MANIFEST, types=['tv'], catalogs=[

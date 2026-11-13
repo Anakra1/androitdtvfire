@@ -6,6 +6,11 @@
 <p id="status" role="status" aria-live="polite"></p>
 <section id="pair-panel"><h2>Connect to your TV</h2><form id="pair-form"><label for="code">Pairing code shown in Kodi</label><input id="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" required><button>Connect</button></form><p class="muted">Keep the source setup screen open in Kodi. This connection lasts ten minutes.</p></section>
 <div id="workspace" hidden>
+<section><div class="row"><h2>Kodi TV and guide</h2><button id="pvr-refresh" type="button" class="secondary">Build / refresh TV</button></div>
+<p class="muted">Choose the channel sources for Kodi’s TV section. UK catalogues are selected initially. After the first build, run CBR → Live TV → Kodi TV and guide → Set up Kodi TV on the television.</p>
+<p id="pvr-status" class="muted"></p><button id="pvr-reload" type="button" class="secondary">Reload TV status / channel list</button><form id="pvr-sources-form"><div id="pvr-sources"></div><button>Save TV sources</button></form>
+<h3>Channel names, numbers and groups</h3><label for="pvr-filter">Find a channel</label><input id="pvr-filter" type="search" placeholder="For example, Sky Atlantic"><div id="pvr-channels"></div><button id="pvr-save" type="button">Save channel changes</button>
+<p class="muted">These are CBR’s custom channel numbers and groups. Regional Freeview/Sky line-ups may differ. The crimson CBR skin also styles Kodi’s native TV guide.</p></section>
 <section><div class="row"><h2>Your sources</h2><button id="refresh" type="button" class="secondary">Refresh catalogues</button></div><p class="muted">Choose Edit to replace an expired manifest without entering it on the TV remote.</p><div id="sources"></div></section>
 <section><h2 id="editor-title">Add a source</h2><form id="source-form">
 <input type="hidden" id="source-key">

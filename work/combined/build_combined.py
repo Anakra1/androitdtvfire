@@ -12,7 +12,7 @@ outputs = here.parent.parent / 'outputs' if here.parent.name == 'work' else here
 outputs.mkdir(exist_ok=True)
 readme = outputs / 'Crimson-Blood-Requiem-README.md' if here.parent.name == 'work' else here / 'README.md'
 version = ET.parse(source / 'addon.xml').getroot().attrib['version']
-assert version == '0.8.0'
+assert version == '0.9.0'
 assert 'plugin.video.stremio.bridge' in (source / 'service.py').read_text(encoding='utf-8-sig')
 for path in source.rglob('*.py'):
     py_compile.compile(str(path), doraise=True)

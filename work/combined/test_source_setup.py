@@ -11,7 +11,7 @@ ROOT = Path(__file__).parent / 'plugin.video.stremio.bridge'
 sys.path.insert(0, str(ROOT))
 from resources.lib.core import Store
 from resources.lib.setup_web import SetupController, SetupServer
-from resources.lib import setup_web
+from resources.lib import setup_web, pvr
 
 
 def manifest(url):
@@ -89,6 +89,32 @@ class SourceSetupTests(unittest.TestCase):
         for _ in range(5):
             self.assertEqual(self.request('/api/pair', {'code': wrong})[0], 403)
         self.assertEqual(self.request('/api/pair', {'code': self.server.code})[0], 429)
+
+    def test_pvr_pairing_source_selection_and_channel_edits(self):
+        self.assertEqual(self.request('/api/pvr')[0], 401)
+        self.assertEqual(self.request('/api/pvr/sources', {'selected': []})[0], 401)
+        tv = dict(id='test.tv', name='Test TV', version='1', resources=['catalog', 'stream'],
+                  types=['tv'], catalogs=[dict(id='channels_uk', name='UK', type='tv')])
+        entry = self.store.add('https://tv.example/private-token/manifest.json', fetch=lambda url: tv)
+        variant = dict(provider=entry['key'], provider_id=tv['id'], provider_label=entry['label'],
+                       resource_type='tv', live_country='GB', live_group='tv',
+                       meta=dict(id='sky', name='Sky Atlantic', type='tv'))
+        rows = pvr.merge_channels([variant])
+        self.store.write(str(Path(self.temp.name) / 'pvr-channels.json'), rows)
+        self.pair()
+        result = json.loads(self.request('/api/pvr')[1])
+        self.assertNotIn('private-token', json.dumps(result))
+        self.assertEqual(result['channels'][0]['visible'], True)
+        for selected in ([], ['missing'], [{}]):
+            self.assertEqual(self.request('/api/pvr/sources', {'selected': selected})[0], 400)
+        selected = [result['sources'][0]['key']]
+        self.assertEqual(self.request('/api/pvr/sources', {'selected': selected})[0], 200)
+        self.assertEqual(pvr.config(self.store)['selected'], selected)
+        self.assertEqual(self.request('/api/pvr/channels', {'channels': ['invalid']})[0], 400)
+        edit = dict(id=rows[0]['id'], name='Atlantic', number=150, groups=['Sky'], visible=True)
+        self.assertEqual(self.request('/api/pvr/channels', {'channels': [edit]})[0], 200)
+        self.assertEqual(pvr.channels(self.store)[0]['number'], 150)
+        self.assertFalse(self.store.read(str(Path(self.temp.name) / 'pvr-request.json'))['collect'])
 
     def test_foreign_origin_and_rebinding_host_are_rejected(self):
         self.pair()

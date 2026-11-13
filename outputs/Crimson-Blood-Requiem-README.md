@@ -1,4 +1,4 @@
-# Crimson Blood Requiem (CBR) 0.8.0 — Windows, Android TV and Fire TV
+# Crimson Blood Requiem (CBR) 0.9.0 — Windows, Android TV and Fire TV
 
 **One Kodi add-on includes movies, TV series, a torrent player and Live TV split into TV Channels, Internet TV and Live Sports.** No Elementum, separate Stream Bridge installation, or manual script copying is required.
 
@@ -8,7 +8,7 @@ These packages use public provider defaults and contain no personalized MediaFus
 
 ## Install
 
-1. On Windows, use **Add-ons → Install from zip file** and choose `plugin.video.stremio.bridge-0.8.0.zip`. On Android TV or Fire TV, install `CBR-Fire-TV-Android-Repository-0.1.7.zip`, then install Crimson Blood Requiem, the skin and the setup wizard from **Install from repository → CBR Android Add-on Repository**.
+1. On Windows, use **Add-ons → Install from zip file** and choose `plugin.video.stremio.bridge-0.9.0.zip`. On Android TV or Fire TV, install `CBR-Fire-TV-Android-Repository-0.1.7.zip`, then install Crimson Blood Requiem, the skin and the setup wizard from **Install from repository → CBR Android Add-on Repository**.
 2. Restart Kodi once to start the new background player service.
 3. Open **Video add-ons → Crimson Blood Requiem** (the crimson **CBR** thumbnail).
 4. Choose a movie or TV episode and a source, or open **Live TV** and select a category, catalogue, channel/event and source.
@@ -25,6 +25,20 @@ On a phone or computer connected to the same home network, open the displayed ad
 
 Kodi hosts this page only while source setup is active, for up to ten minutes. Provider configurations remain on the Kodi device. Pairing is required before a browser can read or change them. No website hosting account is needed for this local setup mode. Guest Wi-Fi isolation or a VPN that blocks local-network access can prevent a phone or PC from reaching the device.
 
+## Kodi TV channels and timeline guide (0.9.0)
+
+1. Update the **video add-on** to 0.9.0 and fully restart Kodi.
+2. Open **CBR → Live TV → Kodi TV and guide → Set up Kodi TV / IPTV Simple Client**. Allow Kodi to install its official PVR IPTV Simple Client if needed. CBR builds the channel playlist and connects a separate **CBR TV** instance.
+3. Open Kodi's main **TV → Channels** or **TV → Guide**. Select the **CBR TV**, **Freeview**, **Sky** or other channel groups. The existing CBR Live TV browser remains available as a backup.
+
+UK catalogues are selected initially. Use the paired **Source setup (phone / PC)** page's **Kodi TV and guide** section to choose other linear-TV catalogues, change names/numbers/groups, or hide channels. Build/refresh runs in the background; use **Reload status / channels** to see the result. IPTV Simple reads changes every 30 minutes; restarting Kodi applies them sooner. If Kodi already has other IPTV instances, their files and global numbering preference are preserved. Use **Use CBR channel numbers in Kodi TV** if you want backend channel numbers across Kodi.
+
+CBR creates a local M3U playlist of stable channel routes and matching XMLTV programme IDs. Selecting a channel requests fresh streams from its current manifest and selects an available HTTP link. Expiring playback links are not written to the playlist. No companion APK or separate server is required. Channel catalogues refresh every six hours; programme updates rebuild the XMLTV file. Existing IPTV instances are not overwritten.
+
+Freeview/Sky are editable channel groups with starter numbering, not an exact regional provider lineup. Guide coverage depends on XMLTV matches; channels with missing schedules can still play. Sports event catalogues and movie/series catalogues remain in CBR rather than being treated as linear TV channels. The existing CBR skin already styles Kodi's TV and guide windows.
+
+Validated with a separate Kodi 21 profile: native TV groups, channel numbers, current/next programme import, and live playback through a test channel. A public TVVoo UK catalogue exported 572 merged channels and schedules for 122 channels in the test snapshot. This does not guarantee every provider stream or programme schedule is available.
+
 ## Programme information: Now / Next (0.8.0)
 
 Restart Kodi after updating. CBR downloads the included **UK programmes** XMLTV feed in the background and refreshes it every six hours. Channel lists use the local indexed schedule database, so opening a country does not download programme data for every channel. The first download must finish before schedules are available. Check **Live TV → Programme information settings → View update status** or choose **Update programmes now**.
@@ -35,7 +49,7 @@ Matching uses explicit XMLTV channel IDs when provided, otherwise country-scoped
 
 The paired **Source setup (phone / PC)** page now has a separate **Programme information** section for XMLTV (.xml/.xml.gz) feeds. Add feeds for other supported countries there; streaming manifests remain separate. Mixed-country sources should keep **Programme country: Automatic from channel**. Only assign a fixed country when the streaming source really contains that country's channels. Multiple feeds for a country use their configured order. Structured native provider schedules are also supported where returned.
 
-The default feed is supplied by [EPGShare01](https://epgshare01.online/epgshare01/epg_ripper_UK1.xml.gz). Schedules are downloaded to the device, not bundled or hosted in this repository. Availability and channel coverage depend on the feed. Failed, empty or malformed updates preserve the previous schedule database. This release adds programme information and the schedule foundation; the timeline channel-guide screen is the next stage.
+The default feed is supplied by [EPGShare01](https://epgshare01.online/epgshare01/epg_ripper_UK1.xml.gz). Schedules are downloaded to the device, not bundled or hosted in this repository. Availability and channel coverage depend on the feed. Failed, empty or malformed updates preserve the previous schedule database. The native timeline guide is available through Kodi TV setup in version 0.9.0.
 
 ## Live stream selection fix (0.7.2)
 
@@ -104,7 +118,7 @@ Cancelling preparation or stopping playback removes the active torrent. The Wind
 
 Version 0.3.1 fixes TV playback for ongoing series such as Nocturne: Cinemeta's `hasScheduledVideos` flag no longer bypasses season/episode selection. An empty embedded stream list also falls back to configured providers instead of displaying no sources. Nocturne's first-episode request returned 74 torrent results during diagnosis; availability can change.
 
-The Android package includes the CBR listings, manifest setup, crimson skin and setup wizard. Add-on 0.8.0 requires the integrated CBR Playback Engine module; Kodi installs it automatically from repository 0.1.7. The engine uses TorrServer’s embedded mode and remains inside the Kodi process. Android ARMv7, ARM64 and x86_64 libraries are included.
+The Android package includes the CBR listings, manifest setup, crimson skin and setup wizard. Add-on 0.9.0 requires the integrated CBR Playback Engine module; Kodi installs it automatically from repository 0.1.7. The engine uses TorrServer’s embedded mode and remains inside the Kodi process. Android ARMv7, ARM64 and x86_64 libraries are included.
 
 Tests cover fresh-profile defaults, migration, multiple enabled sources, poster browsing, TV navigation, library exports, HTTP playback/subtitles, the torrent resolver, cancellation, repeated playback requests and service cleanup. A real-engine test downloads a generated local torrent from a local BitTorrent seed, verifies buffering and byte-correct HTTP range seeking, and checks cancellation/shutdown. The public default endpoints were also checked: Cinemeta returned 50 poster listings and Torrentio returned 14 torrent results for the openly licensed Big Buck Bunny test film. These checks do not establish playback of every source or Kodi codec compatibility.
 

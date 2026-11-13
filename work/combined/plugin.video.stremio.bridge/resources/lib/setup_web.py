@@ -14,6 +14,7 @@ from urllib.parse import urlsplit
 
 from .core import Store, fetch_json, normalize_url, validate_manifest
 from .programmes import COUNTRIES, settings as programme_settings, save_settings as save_programme_settings, save_feed, request_refresh
+from . import pvr
 
 
 class SetupServer:
@@ -89,6 +90,14 @@ class SetupServer:
                         self.reply(200, {'settings': programme_settings(owner.store), 'countries': COUNTRIES,
                                          'status': owner.store.read(os.path.join(owner.store.root, 'programme-status.json'), {})})
                     return
+                if self.path == '/api/pvr':
+                    if self.paired():
+                        self.reply(200, {'config': pvr.config(owner.store), 'groups': pvr.GROUPS,
+                            'sources': [{key: source[key] for key in ('key', 'label', 'default')} for source in pvr.sources(owner.store)],
+                            'status': owner.store.read(os.path.join(owner.store.root, 'pvr-status.json'), {}),
+                            'channels': [{key: row.get(key, True if key == 'visible' else '')
+                                          for key in ('id', 'name', 'number', 'groups', 'visible')} for row in pvr.channels(owner.store)]})
+                    return
                 assets = {'/': ('index.html', 'text/html; charset=utf-8'),
                           '/setup.js': ('setup.js', 'text/javascript; charset=utf-8'),
                           '/style.css': ('style.css', 'text/css; charset=utf-8')}
@@ -157,6 +166,25 @@ class SetupServer:
                         elif self.path == '/api/programmes/refresh':
                             request_refresh(owner.store)
                             result = {'message': 'Programme update requested. Return to Kodi and reopen the channel list shortly.'}
+                        elif self.path == '/api/pvr/sources':
+                            selected = data.get('selected')
+                            valid = {s['key'] for s in pvr.sources(owner.store)}
+                            if not isinstance(selected, list) or not selected or any(not isinstance(key, str) or key not in valid for key in selected):
+                                raise ValueError('Select at least one available TV source.')
+                            value = pvr.config(owner.store)
+                            value['selected'] = list(dict.fromkeys(selected))
+                            pvr.save_config(owner.store, value)
+                            pvr.refresh(owner.store)
+                            result = {'message': 'TV sources saved. Channels will rebuild in the background.'}
+                        elif self.path == '/api/pvr/refresh':
+                            pvr.refresh(owner.store)
+                            result = {'message': 'Kodi TV channels and guide will update in the background.'}
+                        elif self.path == '/api/pvr/channels':
+                            edits = data.get('channels')
+                            if not isinstance(edits, list) or len(edits) > 100:
+                                raise ValueError('Save up to 100 channel edits at a time.')
+                            pvr.save_channels(owner.store, edits)
+                            result = {'message': 'Channel changes saved. IPTV Simple will read them on its next refresh; restart Kodi to apply sooner.'}
                         else:
                             self.reply(404, {'error': 'Unknown setup action.'})
                             return

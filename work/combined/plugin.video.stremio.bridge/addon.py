@@ -16,6 +16,7 @@ from resources.lib.library import MovieLibrary
 from resources.lib.live_player import LiveAutoplay, probe_stream
 from resources.lib.programmes import (ProgrammeGuide, country_for, programme_text, request_refresh,
                                      provider_programmes, settings as programme_settings, save_settings as save_programme_settings)
+from resources.lib import pvr
 from resources.lib.defaults import ensure_defaults
 from resources.lib.live import (GROUPS, GROUP_NAMES, LiveCatalogueCache, LiveLibrary, browse_title, catalogue_group,
                                 entry_catalogs, grouped_catalogues, search_only)
@@ -134,6 +135,7 @@ def tools():
     item('Browse all catalogues', 'catalogues', artwork='catalogues')
     item('Manage sources / add manifest URL', 'manage', artwork='settings')
     item('Live TV', 'live', artwork='live')
+    item('Kodi TV and guide', 'pvr', artwork='live')
     item('Built-in player settings', 'configure', artwork='settings')
     item('Kodi Movies library setup', 'library', artwork='library')
     item('Play a local video', 'local', artwork='library')
@@ -206,6 +208,7 @@ def add_provider(live_group=None):
 
 
 def live_home():
+    item('Kodi TV and guide', 'pvr', artwork='live')
     item('Favourite channels', 'live_saved', collection='favourites', artwork='live')
     item('Recently watched', 'live_saved', collection='recent', artwork='live')
     item('Search Live TV', 'search', live_only='true', artwork='search')
@@ -678,6 +681,104 @@ def programme_options():
     live_home()
 
 
+def pvr_menu():
+    item('Set up Kodi TV / IPTV Simple Client', 'pvr_setup', artwork='settings')
+    item('Build / update TV channels and guide', 'pvr_refresh', artwork='live')
+    item('Choose sources / edit channel numbers on PC', 'web_setup', artwork='settings')
+    item('Open Kodi TV channels', 'pvr_channels', artwork='live')
+    item('Open Kodi channel guide', 'pvr_guide', artwork='live')
+    item('Use CBR channel numbers in Kodi TV', 'pvr_numbers', artwork='settings')
+    item('TV setup status', 'pvr_status', artwork='settings')
+    finish()
+
+
+def pvr_setup():
+    import time
+    heartbeat = STORE.read(os.path.join(STORE.root, 'pvr-service.json'), {}).get('time', 0)
+    if time.time() - heartbeat > 60:
+        DIALOG.ok('Restart Kodi', 'Fully close and reopen Kodi to start the new CBR TV service, then run this setup again.')
+        pvr_menu()
+        return
+    if xbmc.Player().isPlaying():
+        DIALOG.ok('Kodi TV setup', 'Stop the current video before connecting IPTV Simple Client.')
+        pvr_menu()
+        return
+    if not xbmc.getCondVisibility('System.HasAddon(pvr.iptvsimple)'):
+        xbmc.executebuiltin('InstallAddon(pvr.iptvsimple)', True)
+    if not xbmc.getCondVisibility('System.HasAddon(pvr.iptvsimple)'):
+        DIALOG.ok('IPTV Simple Client', 'Install PVR IPTV Simple Client from Kodi Add-on repository → PVR clients, then run this setup again.')
+        pvr_menu()
+        return
+    pvr.refresh(STORE)
+    requested = STORE.read(os.path.join(STORE.root, 'pvr-request.json'))['time']
+    progress, monitor = xbmcgui.DialogProgress(), xbmc.Monitor()
+    progress.create('CBR Kodi TV', 'Preparing channels and programme guide…')
+    ready = False
+    try:
+        for step in range(360):
+            state = STORE.read(os.path.join(STORE.root, 'pvr-status.json'), {})
+            if state.get('state') == 'ready' and state.get('updated', 0) >= requested:
+                ready = True
+                break
+            if state.get('state') == 'error' and state.get('attempted', 0) >= requested:
+                break
+            if progress.iscanceled() or monitor.waitForAbort(0.25):
+                break
+            progress.update(min(95, step // 4), 'Building your TV channels in the background…')
+    finally:
+        progress.close()
+    if not ready:
+        DIALOG.ok('CBR Kodi TV', 'The channel build has not completed. Check TV setup status and the selected sources on the PC setup page, then run setup again.')
+        pvr_menu()
+        return
+    root = 'special://profile/addon_data/plugin.video.stremio.bridge/pvr/'
+    profile = xbmcvfs.translatePath('special://profile/addon_data/pvr.iptvsimple/')
+    pvr.configure_instance(profile, root + 'channels.m3u', root + 'guide.xml')
+    other_instances = []
+    import xml.etree.ElementTree as ET
+    for name in os.listdir(profile):
+        if name.startswith('instance-settings-') and name.endswith('.xml'):
+            try:
+                data = {n.get('id'): n.text for n in ET.parse(os.path.join(profile, name)).getroot()}
+                if data.get('kodi_addon_instance_name') != 'CBR TV':
+                    other_instances.append(name)
+            except (ET.ParseError, OSError):
+                continue
+    if not other_instances:
+        rpc('Settings.SetSettingValue', {'setting': 'pvrmanager.usebackendchannelnumbers', 'value': True})
+    rpc('Addons.SetAddonEnabled', {'addonid': 'pvr.iptvsimple', 'enabled': False})
+    monitor.waitForAbort(0.5)
+    rpc('Addons.SetAddonEnabled', {'addonid': 'pvr.iptvsimple', 'enabled': True})
+    DIALOG.ok('CBR Kodi TV', 'CBR TV is connected. Open Kodi → TV → Channels or Guide. If the new instance has not appeared yet, restart Kodi once. Channel numbers can be edited through the PC setup page.')
+    pvr_menu()
+
+
+def pvr_play(identity):
+    row, variants = pvr.channel(STORE, identity)
+    path = None
+    for variant in variants:
+        entry = STORE.provider(variant['provider'])
+        streams = []
+        for _, data, _ in aggregate([entry], 'stream', variant['resource_type'], variant['meta']['id']):
+            streams.extend(s for s in data.get('streams', []) if isinstance(s, dict))
+        path = LIVE_AUTOPLAY.begin(variant['meta'], variant, streams, probe=probe_stream)
+        LIVE_AUTOPLAY.clear()
+        if path:
+            break
+    # PVR owns channel switching and stopping. Select a working URL here but do
+    # not let the video add-on's retry service replace PVR with ordinary playback.
+    if not path:
+        notify('This TV channel is currently unavailable.')
+        xbmcplugin.setResolvedUrl(HANDLE, False, xbmcgui.ListItem())
+        return
+    li = xbmcgui.ListItem(path=path)
+    li.getVideoInfoTag().setTitle(row['name'])
+    li.getVideoInfoTag().setPlot(programme_text(PROGRAMMES.lookup(variant)))
+    li.setArt({'thumb': row['logo']})
+    li.setProperty('IsPlayable', 'true')
+    xbmcplugin.setResolvedUrl(HANDLE, True, li)
+
+
 def metadata(key, index=None, autoplay=False):
     saved = cached_item(key, index)
     preview = saved['meta']
@@ -862,6 +963,32 @@ def main():
             tools()
         elif action == 'live':
             live_home()
+        elif action == 'pvr':
+            pvr_menu()
+        elif action == 'pvr_setup':
+            pvr_setup()
+        elif action == 'pvr_refresh':
+            pvr.refresh(STORE)
+            notify('Kodi TV channels and guide will update in the background')
+            pvr_menu()
+        elif action == 'pvr_channels':
+            xbmc.executebuiltin('ActivateWindow(TVChannels)')
+            pvr_menu()
+        elif action == 'pvr_guide':
+            xbmc.executebuiltin('ActivateWindow(TVGuide)')
+            pvr_menu()
+        elif action == 'pvr_status':
+            state = STORE.read(os.path.join(STORE.root, 'pvr-status.json'), {})
+            DIALOG.textviewer('CBR Kodi TV status', '{}\n{} channels\n{} channels with guide data\n{} programmes\n{}'.format(
+                state.get('state', 'Not configured'), state.get('channels', 0), state.get('guide_channels', 0),
+                state.get('programmes', 0), state.get('message', '')))
+            pvr_menu()
+        elif action == 'pvr_numbers':
+            rpc('Settings.SetSettingValue', {'setting': 'pvrmanager.usebackendchannelnumbers', 'value': True})
+            notify('Kodi TV will use channel numbers supplied by its TV clients')
+            pvr_menu()
+        elif action == 'pvr_play':
+            pvr_play(params['channel'])
         elif action == 'live_catalogues':
             live_catalogues(params['group'])
         elif action == 'live_source':
@@ -963,7 +1090,7 @@ def main():
         # Only controlled, user-safe messages; never log raw URLs or response bodies.
         text = str(error) if isinstance(error, (ValueError, RuntimeError)) else 'Unable to complete this action. Refresh the provider manifest or reopen the catalogue.'
         DIALOG.ok(BRAND, text)
-        if action in ('play', 'library_play', 'live_play'):
+        if action in ('play', 'library_play', 'live_play', 'pvr_play'):
             xbmcplugin.setResolvedUrl(HANDLE, False, xbmcgui.ListItem())
         elif HANDLE >= 0:
             xbmcplugin.endOfDirectory(HANDLE, succeeded=False, cacheToDisc=False)

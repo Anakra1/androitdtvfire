@@ -44,7 +44,7 @@ async function loadSources() {
 }
 $('pair-form').addEventListener('submit', async event => {
   event.preventDefault();
-  try { await api('/api/pair', {code: $('code').value.trim()}); await loadSources(); await loadProgrammes(); message('Connected. You can now add or edit your TV’s sources.'); }
+  try { await api('/api/pair', {code: $('code').value.trim()}); await loadSources(); await loadProgrammes(); await loadPvr(); message('Connected. You can now add or edit your TV’s sources.'); }
   catch (error) { message(error.message, true); }
 });
 $('source-form').addEventListener('submit', async event => {
@@ -114,4 +114,62 @@ $('programme-refresh').onclick = async () => {
   try { const result = await api('/api/programmes/refresh', {}); await loadProgrammes(); message(result.message); }
   catch (error) { message(error.message, true); }
 };
-loadSources().then(loadProgrammes).catch(() => {});
+let pvrData = null;
+const pvrEdits = new Map();
+async function loadPvr() {
+  pvrData = await api('/api/pvr');
+  pvrData.channels.sort((a, b) => a.number - b.number);
+  const status = pvrData.status;
+  $('pvr-status').textContent = `${status.state || 'Not configured'} · ${status.channels || 0} channels · ${status.guide_channels || 0} with guide data` + (status.message ? ` · ${status.message}` : '');
+  $('pvr-sources').replaceChildren();
+  for (const source of pvrData.sources) {
+    const label = document.createElement('label'); label.className = 'check';
+    const checkbox = document.createElement('input'); checkbox.type = 'checkbox'; checkbox.value = source.key;
+    checkbox.checked = pvrData.config.selected === null ? source.default : pvrData.config.selected.includes(source.key);
+    label.append(checkbox, document.createTextNode(source.label)); $('pvr-sources').append(label);
+  }
+  renderPvrChannels();
+}
+function renderPvrChannels() {
+  if (!pvrData) return;
+  const query = $('pvr-filter').value.toLowerCase().trim();
+  const rows = pvrData.channels.filter(row => row.name.toLowerCase().includes(query)).slice(0, 40);
+  $('pvr-channels').replaceChildren();
+  for (const original of rows) {
+    const row = pvrEdits.get(original.id) || {...original, groups: [...original.groups]};
+    const card = document.createElement('article'); card.className = 'source';
+    const title = document.createElement('h3'); title.textContent = original.name;
+    const number = document.createElement('input'); number.type = 'number'; number.min = 1; number.max = 9999; number.value = row.number; number.setAttribute('aria-label', `${original.name} channel number`);
+    const name = document.createElement('input'); name.value = row.name; name.maxLength = 100; name.setAttribute('aria-label', `${original.name} channel name`);
+    const visible = document.createElement('input'); visible.type = 'checkbox'; visible.checked = row.visible;
+    const show = document.createElement('label'); show.className = 'check'; show.append(visible, document.createTextNode('Show channel'));
+    const groups = document.createElement('div'); groups.className = 'group-options';
+    const save = () => { row.name = name.value; row.number = Number(number.value); row.visible = visible.checked; pvrEdits.set(row.id, row); };
+    number.onchange = save; name.onchange = save; visible.onchange = save;
+    for (const group of pvrData.groups) {
+      const label = document.createElement('label'); label.className = 'check';
+      const checkbox = document.createElement('input'); checkbox.type = 'checkbox'; checkbox.checked = row.groups.includes(group);
+      checkbox.onchange = () => { row.groups = checkbox.checked ? [...new Set([...row.groups, group])] : row.groups.filter(g => g !== group); save(); };
+      label.append(checkbox, document.createTextNode(group)); groups.append(label);
+    }
+    card.append(title, number, name, show, groups); $('pvr-channels').append(card);
+  }
+  if (!rows.length) $('pvr-channels').textContent = 'Build TV channels first, or try another channel name.';
+}
+$('pvr-filter').oninput = renderPvrChannels;
+$('pvr-reload').onclick = () => loadPvr().catch(error => message(error.message, true));
+$('pvr-sources-form').onsubmit = async event => {
+  event.preventDefault();
+  const selected = [...$('pvr-sources').querySelectorAll('input:checked')].map(input => input.value);
+  try { const result = await api('/api/pvr/sources', {selected}); message(result.message); await loadPvr(); }
+  catch (error) { message(error.message, true); }
+};
+$('pvr-refresh').onclick = async () => {
+  try { const result = await api('/api/pvr/refresh', {}); message(result.message); await loadPvr(); }
+  catch (error) { message(error.message, true); }
+};
+$('pvr-save').onclick = async () => {
+  try { const result = await api('/api/pvr/channels', {channels: [...pvrEdits.values()]}); pvrEdits.clear(); await loadPvr(); message(result.message); }
+  catch (error) { message(error.message, true); }
+};
+loadSources().then(loadProgrammes).then(loadPvr).catch(() => {});
