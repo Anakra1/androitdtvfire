@@ -10,8 +10,9 @@ from urllib.parse import urlencode, urlsplit
 import xml.etree.ElementTree as ET
 
 from .core import fetch_json, resource_url
-from .live import entry_catalogs, LiveLibrary, search_only
-from .programmes import ProgrammeGuide, country_for, normalized
+from .live import entry_catalogs, search_only
+from .programmes import ProgrammeGuide, country_for, normalized, channel_key, settings as guide_settings, save_settings as save_guide_settings
+from .channel_names import compact
 
 BASE = 'plugin://plugin.video.stremio.bridge/'
 FREEVIEW = {'bbc one': 1, 'bbc two': 2, 'itv1': 3, 'itv': 3, 'channel 4': 4, 'channel 5': 5,
@@ -66,7 +67,7 @@ def group_names(name, genres, country='GB'):
     name = normalized(name, True)
     text = name + ' ' + ' '.join(str(g).lower() for g in genres)
     groups = []
-    if country == 'GB' and (name in FREEVIEW or name.startswith(('bbc one ', 'bbc two '))):
+    if country == 'GB' and (compact(name) in {compact(n) for n in FREEVIEW} or name.startswith(('bbc one ', 'bbc two '))):
         groups.append('Freeview')
     if country == 'GB' and name.startswith('sky '):
         groups.append('Sky')
@@ -124,6 +125,8 @@ def collect_source(store, source, fetch=fetch_json):
 
 def merge_channels(variants, previous=None, overrides=None):
     overrides = overrides or {}
+    previous_rows = {r['id']: r for r in previous or []}
+    previous_owner = {alias: r['id'] for r in previous or [] for alias in r.get('aliases', [])}
     previous = {r['id']: r['number'] for r in previous or []}
     merged = {}
     for channel in variants:
@@ -136,6 +139,27 @@ def merge_channels(variants, previous=None, overrides=None):
         identity = (channel['provider_id'], channel['resource_type'], meta['id'])
         if not any((c['provider_id'], c['resource_type'], c['meta']['id']) == identity for c in row['variants']):
             row['variants'].append(channel)
+    buckets = {}
+    for row in merged.values():
+        variant = row['variants'][0]
+        country = country_for(variant['meta'], variant) or 'ZZ'
+        # An explicitly edited row keeps its independent identity and choices.
+        owner = previous_owner.get(row['id'], row['id'])
+        key = ('manual', owner) if owner in overrides else (
+            country, compact(row['name']), variant['provider_id'] if country == 'ZZ' else '')
+        buckets.setdefault(key, []).append(row)
+    merged = {}
+    for bucket in buckets.values():
+        bucket.sort(key=lambda r: (r['id'] not in previous, previous.get(r['id'], 99999), r['id']))
+        leader = bucket[0]
+        aliases = set()
+        for row in bucket:
+            aliases.update(previous_rows.get(row['id'], {}).get('aliases', []))
+            if row is not leader:
+                aliases.add(row['id'])
+                leader['variants'].extend(row['variants'])
+        leader['aliases'] = sorted(aliases - {leader['id']})
+        merged[leader['id']] = leader
     used = {o['number'] for key, o in overrides.items() if key in merged}
     reserved = used | {number for key, number in previous.items() if key in merged}
     for row in merged.values():
@@ -178,7 +202,7 @@ def resolve_variant(store, variant):
 def channel(store, identity):
     if not re.fullmatch(r'cbr\.[a-f0-9]{24}', identity):
         raise ValueError('Invalid TV channel.')
-    row = next((r for r in channels(store) if r['id'] == identity and r.get('visible', True)), None)
+    row = next((r for r in channels(store) if (r['id'] == identity or identity in r.get('aliases', [])) and r.get('visible', True)), None)
     if not row:
         raise ValueError('This TV channel has changed. Refresh CBR TV channels.')
     variants = [current for v in row['variants'] if (current := resolve_variant(store, v))]
@@ -263,6 +287,56 @@ def save_channels(store, edits):
     refresh(store, collect=False)
 
 
+def editor(store):
+    guide = ProgrammeGuide(store)
+    try:
+        options = guide.channels()
+        labels = {(o['feed'], o['channel']): o for o in options}
+        rows = []
+        for row in channels(store):
+            variants = [v for saved in row['variants'] if (v := resolve_variant(store, saved))]
+            matches = [m for v in variants if (m := guide.match(v))]
+            matched = matches[0] if matches else None
+            upcoming = bool(matched and guide.database().execute(
+                'SELECT 1 FROM programmes WHERE source=? AND channel=? AND stop>? AND start<? LIMIT 1',
+                (*matched, time.time(), time.time() + 7 * 86400)).fetchone())
+            manual = next((guide.config.get('mappings', {}).get(channel_key(v)) for v in variants
+                           if guide.config.get('mappings', {}).get(channel_key(v))), None)
+            rows.append(dict({key: row.get(key, True if key == 'visible' else '')
+                              for key in ('id', 'name', 'number', 'groups', 'visible')},
+                             alternatives=len(variants), guide=labels.get(matched), manual_guide=manual,
+                             has_programmes=upcoming))
+        return dict(channels=rows, guide_options=options)
+    finally:
+        guide.close()
+
+
+def save_mapping(store, identity, mapping):
+    # Hidden channels can also be prepared before showing them again.
+    row = next((r for r in channels(store) if r['id'] == identity), None)
+    if not row:
+        raise ValueError('This channel has changed. Reload the channel editor.')
+    variants = [v for saved in row['variants'] if (v := resolve_variant(store, saved))]
+    if not variants:
+        raise ValueError('Enable this channel source before changing its guide.')
+    guide = ProgrammeGuide(store)
+    try:
+        if mapping is not None and (not isinstance(mapping, dict) or
+                (mapping.get('feed'), mapping.get('channel')) not in {(o['feed'], o['channel']) for o in guide.channels()}):
+            raise ValueError('Choose an available programme channel or Automatic matching.')
+        value = guide_settings(store)
+        mappings = value.setdefault('mappings', {})
+        for variant in variants:
+            if mapping is None:
+                mappings.pop(channel_key(variant), None)
+            else:
+                mappings[channel_key(variant)] = dict(feed=mapping['feed'], channel=mapping['channel'])
+        save_guide_settings(store, value)
+        refresh(store, collect=False)
+    finally:
+        guide.close()
+
+
 def configure_instance(profile, m3u, xmltv):
     """Create/update only CBR's own instance; preserve all unrelated instances."""
     os.makedirs(profile, exist_ok=True)
@@ -317,7 +391,8 @@ class PVRUpdater:
         state = self.store.read(os.path.join(self.store.root, 'pvr-status.json'), {})
         guide = digest([self.store.read(os.path.join(self.store.root, name), {}) for name in
                         ('programme-status.json', 'programme-settings.json')])
-        collect = forced and message.get('collect', True) or time.time() - state.get('updated', 0) > 6 * 3600
+        collect = (forced and message.get('collect', True) or time.time() - state.get('updated', 0) > 6 * 3600
+                   or state.get('lineup_version', 0) < 2)
         if collect and time.time() - state.get('attempted', 0) < 300 and request <= self.last_request:
             return
         if forced or collect or guide != self.last_guide:
@@ -354,7 +429,8 @@ class PVRUpdater:
                     self.store.read(os.path.join(self.store.root, 'pvr-channels.json'), []), value.get('overrides', {})))
             result = export(self.store)
             self.store.write(path, dict(result, state='ready', updated=time.time() if collect else previous.get('updated', 0),
-                                       attempted=time.time(), failed=failed))
+                                       attempted=time.time(), failed=failed,
+                                       lineup_version=2 if collect else previous.get('lineup_version', 0)))
         except Exception:
             self.store.write(path, dict(previous, attempted=time.time(), state='error',
                                        message='TV channels could not be updated. Previous files are kept. Check the selected sources.'))

@@ -1,4 +1,6 @@
 /android/addons.xml -text
 /android/addons.xml.md5 -text
+/windows/addons.xml -text
+/windows/addons.xml.md5 -text
 /work/combined/repository.crb.android/addons.xml -text
 /work/combined/repository.crb.android/addons.xml.md5 -text

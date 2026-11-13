@@ -73,6 +73,37 @@ class ProgrammeTests(unittest.TestCase):
         self.guide.map_channel(channel, None)
         self.assertIsNone(self.guide.match(channel))
 
+    def test_uk_abbreviations_and_spacing_match_without_guessing_regions_or_rebrands(self):
+        names = ['SkySp Cricket HD', 'SkySpMainEvHD', '5ACTION', 'BBC One Lon HD',
+                 'BBC One Wal HD', 'Sky Action HD', 'Cartoon Net HD']
+        xml = '<tv>' + ''.join('<channel id="c{}"><display-name>{}</display-name></channel>'.format(i, n)
+                               for i, n in enumerate(names)) + '</tv>'
+        # Keep one programme so the import is a valid complete feed.
+        xml = xml.replace('</tv>', '<programme channel="c0" start="20261112120000 +0000" stop="20261112130000 +0000"><title>Cricket</title></programme></tv>')
+        self.xml.write_text(xml, encoding='utf8'); epg.import_xml(self.store, self.feed, self.xml, now=NOW)
+        expected = [('Sky Sports Cricket', 'c0'), ('Sky Sports Main Event', 'c1'), ('5 ACTION', 'c2'),
+                    ('BBC One London', 'c3'), ('BBC One Wales', 'c4'), ('Sky Cinema Action', 'c5'),
+                    ('Cartoon Network', 'c6')]
+        for name, identity in expected:
+            channel = dict(self.channel, meta=dict(self.channel['meta'], name=name))
+            self.assertEqual(self.guide.match(channel), ('uk', identity), name)
+        for name in ['BBC One', 'BBC One Northern Ireland', 'Sky Sports Cricket+1', 'BT Sport 1']:
+            self.assertIsNone(self.guide.match(dict(self.channel, meta=dict(self.channel['meta'], name=name))), name)
+        foreign = dict(self.channel, meta=dict(self.channel['meta'], name='5 ACTION', country='IT', id='foreign.it'))
+        self.assertIsNone(self.guide.match(foreign))
+
+    def test_ambiguous_quality_matches_require_identical_nonempty_upcoming_schedules(self):
+        db = self.guide.database()
+        channel = dict(self.channel, meta=dict(self.channel['meta'], name='Example'))
+        self.assertIsNone(self.guide.match(channel))
+        for identity in ('examplehd.uk', 'examplesd.uk'):
+            db.execute('INSERT INTO programmes VALUES(?,?,?,?,?,?)', ('uk', identity, NOW-100, NOW+100, 'Same show', ''))
+        db.commit()
+        with patch.object(epg.time, 'time', return_value=NOW):
+            self.assertIsNotNone(self.guide.match(channel))
+            db.execute('UPDATE programmes SET title=? WHERE channel=?', ('Different regional show', 'examplesd.uk')); db.commit()
+            self.assertIsNone(self.guide.match(channel))
+
     def test_failed_or_empty_import_keeps_last_working_schedule(self):
         for data in ('<tv><programme', '<tv></tv>'):
             self.xml.write_text(data)

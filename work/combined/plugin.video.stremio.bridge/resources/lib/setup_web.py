@@ -95,8 +95,7 @@ class SetupServer:
                         self.reply(200, {'config': pvr.config(owner.store), 'groups': pvr.GROUPS,
                             'sources': [{key: source[key] for key in ('key', 'label', 'default')} for source in pvr.sources(owner.store)],
                             'status': owner.store.read(os.path.join(owner.store.root, 'pvr-status.json'), {}),
-                            'channels': [{key: row.get(key, True if key == 'visible' else '')
-                                          for key in ('id', 'name', 'number', 'groups', 'visible')} for row in pvr.channels(owner.store)]})
+                            **pvr.editor(owner.store)})
                     return
                 assets = {'/': ('index.html', 'text/html; charset=utf-8'),
                           '/setup.js': ('setup.js', 'text/javascript; charset=utf-8'),
@@ -185,6 +184,9 @@ class SetupServer:
                                 raise ValueError('Save up to 100 channel edits at a time.')
                             pvr.save_channels(owner.store, edits)
                             result = {'message': 'Channel changes saved. IPTV Simple will read them on its next refresh; restart Kodi to apply sooner.'}
+                        elif self.path == '/api/pvr/guide':
+                            pvr.save_mapping(owner.store, data.get('id'), data.get('mapping'))
+                            result = {'message': 'Programme match saved. The guide will rebuild in the background. Restart Kodi to apply it sooner.'}
                         else:
                             self.reply(404, {'error': 'Unknown setup action.'})
                             return

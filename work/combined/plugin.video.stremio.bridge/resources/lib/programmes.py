@@ -12,6 +12,7 @@ import unicodedata
 from urllib.parse import unquote, urlsplit
 from urllib.request import Request, urlopen
 import xml.etree.ElementTree as ET
+from .channel_names import uk_guide_name
 
 DEFAULT_FEED = 'https://epgshare01.online/epgshare01/epg_ripper_UK1.xml.gz'
 COUNTRIES = {'GB': 'United Kingdom', 'IE': 'Ireland', 'US': 'United States', 'CA': 'Canada',
@@ -169,6 +170,7 @@ class ProgrammeGuide:
         self.providers = {entry['key']: entry for entry in store.providers()}
         self.connection = None
         self.memo = {}
+        self.alias_index = {}
 
     def database(self):
         if self.connection is None and os.path.isfile(self.path):
@@ -222,7 +224,34 @@ class ProgrammeGuide:
                 if len(candidates) == 1:
                     return next(iter(candidates))
                 if len(candidates) > 1:
-                    return None  # Regions and +1 services must never be guessed.
+                    return self.equivalent(candidates)
+        if country == 'GB':
+            # Known spelling/abbreviation differences only, within a UK feed.
+            # No fuzzy matching or generic-to-regional substitutions.
+            value = uk_guide_name(meta.get('name', ''))
+            for feed in ordered:
+                if feed['key'] not in self.alias_index:
+                    index = {}
+                    for row in db.execute('SELECT id,name FROM channels WHERE source=?', (feed['key'],)):
+                        index.setdefault(uk_guide_name(row['name']), set()).add((feed['key'], row['id']))
+                    self.alias_index[feed['key']] = index
+                candidates = self.alias_index[feed['key']].get(value, set())
+                if len(candidates) == 1:
+                    return next(iter(candidates))
+                if candidates:
+                    return self.equivalent(candidates)
+        return None
+
+    def equivalent(self, candidates):
+        """HD/SD alternatives are safe only when their next-day schedules agree."""
+        schedules = []
+        now = time.time()
+        for source, identity in sorted(candidates):
+            rows = self.database().execute('SELECT start,stop,title FROM programmes WHERE source=? AND channel=? AND stop>? AND start<? ORDER BY start',
+                                           (source, identity, now, now + 86400)).fetchall()
+            schedules.append([tuple(row) for row in rows])
+        if schedules and schedules[0] and all(s == schedules[0] for s in schedules):
+            return sorted(candidates)[0]
         return None
 
     def lookup(self, channel, meta=None):

@@ -17,11 +17,27 @@ class RepositoryInstallTests(unittest.TestCase):
         # no DOTALL flag, so each entry is also valid without multiline matching.
         pattern = re.compile(r'<a href="([^"]*)"[^>]*>\s*(.*?)\s*</a>(.+?)(?=<a|</tr|$)', re.I)
         entries = [link for link, name, _ in pattern.findall(html) if link.rstrip('/') == name.strip().rstrip('/')]
-        self.assertEqual(entries, ['repository.cbr.zip', 'cbr090.zip'])
+        self.assertEqual(entries, ['repository.cbr.zip', 'windowsrepo.zip', 'cbr091.zip', 'cbrwindows.zip'])
         for entry in entries:
             self.assertTrue((PROJECT / entry).is_file())
-        self.assertEqual((PROJECT / 'cbr090.zip').read_bytes(),
-                         (PROJECT / 'android/packages/plugin.video.stremio.bridge/plugin.video.stremio.bridge-0.9.0.zip').read_bytes())
+        self.assertEqual((PROJECT / 'cbr091.zip').read_bytes(),
+                         (PROJECT / 'android/packages/plugin.video.stremio.bridge/plugin.video.stremio.bridge-0.9.1.zip').read_bytes())
+
+    def test_windows_repository_keeps_the_windows_player_in_future_updates(self):
+        with ZipFile(PROJECT / 'windowsrepo.zip') as archive:
+            manifest = ET.fromstring(archive.read('repository.crb.windows/addon.xml'))
+        directory = manifest.find("extension[@point='xbmc.addon.repository']/dir")
+        self.assertEqual(directory.findtext('info'), 'https://anakra1.github.io/androitdtvfire/windows/addons.xml')
+        self.assertEqual(directory.findtext('datadir'), 'https://anakra1.github.io/androitdtvfire/windows/packages/')
+        feed = PROJECT / 'windows/addons.xml'
+        self.assertEqual(hashlib.md5(feed.read_bytes()).hexdigest(), (PROJECT / 'windows/addons.xml.md5').read_text().strip())
+        for item in ET.parse(feed).getroot():
+            package = PROJECT / 'windows/packages' / item.get('id') / '{}-{}.zip'.format(item.get('id'), item.get('version'))
+            self.assertTrue(package.is_file())
+        video = PROJECT / 'windows/packages/plugin.video.stremio.bridge/plugin.video.stremio.bridge-0.9.1.zip'
+        self.assertEqual(video.read_bytes(), (PROJECT / 'cbrwindows.zip').read_bytes())
+        with ZipFile(video) as archive:
+            self.assertTrue(archive.read('plugin.video.stremio.bridge/resources/bin/windows-x64/TorrServer.exe').startswith(b'MZ'))
 
     def test_repository_installs_video_and_embedded_engine_from_one_feed(self):
         with ZipFile(PROJECT / 'repository.cbr.zip') as repository:
@@ -35,7 +51,7 @@ class RepositoryInstallTests(unittest.TestCase):
                          (PROJECT / 'android/addons.xml.md5').read_text().strip())
         addons = {item.attrib['id']: item for item in ET.parse(feed).getroot()}
         video = addons['plugin.video.stremio.bridge']
-        self.assertEqual(video.attrib['version'], '0.9.0')
+        self.assertEqual(video.attrib['version'], '0.9.1')
         requirements = {item.attrib['addon']: item.attrib.get('version') for item in video.find('requires')}
         self.assertEqual(requirements['script.module.cbr.engine'], '0.1.0')
         for addon_id, item in addons.items():

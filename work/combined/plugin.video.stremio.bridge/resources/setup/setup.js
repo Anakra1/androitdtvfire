@@ -115,6 +115,8 @@ $('programme-refresh').onclick = async () => {
   catch (error) { message(error.message, true); }
 };
 let pvrData = null;
+let pvrPage = 0;
+let pvrDisplayed = [];
 const pvrEdits = new Map();
 async function loadPvr() {
   pvrData = await api('/api/pvr');
@@ -122,6 +124,10 @@ async function loadPvr() {
   const status = pvrData.status;
   $('pvr-status').textContent = `${status.state || 'Not configured'} · ${status.channels || 0} channels · ${status.guide_channels || 0} with guide data` + (status.message ? ` · ${status.message}` : '');
   $('pvr-sources').replaceChildren();
+  const groupSelect = $('pvr-group'), currentGroup = groupSelect.value;
+  groupSelect.replaceChildren(new Option('All groups', ''));
+  for (const group of pvrData.groups) groupSelect.add(new Option(group, group));
+  groupSelect.value = currentGroup;
   for (const source of pvrData.sources) {
     const label = document.createElement('label'); label.className = 'check';
     const checkbox = document.createElement('input'); checkbox.type = 'checkbox'; checkbox.value = source.key;
@@ -133,7 +139,19 @@ async function loadPvr() {
 function renderPvrChannels() {
   if (!pvrData) return;
   const query = $('pvr-filter').value.toLowerCase().trim();
-  const rows = pvrData.channels.filter(row => row.name.toLowerCase().includes(query)).slice(0, 40);
+  const group = $('pvr-group').value, view = $('pvr-view').value;
+  const filtered = pvrData.channels.filter(original => {
+    const row = pvrEdits.get(original.id) || original;
+    return row.name.toLowerCase().includes(query) && (!group || row.groups.includes(group)) &&
+      (view !== 'missing' || !original.has_programmes) && (view !== 'hidden' || !row.visible) &&
+      (view !== 'alternatives' || original.alternatives > 1);
+  });
+  pvrPage = Math.min(pvrPage, Math.max(0, Math.ceil(filtered.length / 40) - 1));
+  const rows = filtered.slice(pvrPage * 40, (pvrPage + 1) * 40);
+  pvrDisplayed = rows;
+  $('pvr-count').textContent = `${filtered.length} matching channels · page ${pvrPage + 1} of ${Math.max(1, Math.ceil(filtered.length / 40))} · ${pvrEdits.size} unsaved edits`;
+  $('pvr-prev').disabled = pvrPage === 0;
+  $('pvr-next').disabled = (pvrPage + 1) * 40 >= filtered.length;
   $('pvr-channels').replaceChildren();
   for (const original of rows) {
     const row = pvrEdits.get(original.id) || {...original, groups: [...original.groups]};
@@ -144,7 +162,10 @@ function renderPvrChannels() {
     const visible = document.createElement('input'); visible.type = 'checkbox'; visible.checked = row.visible;
     const show = document.createElement('label'); show.className = 'check'; show.append(visible, document.createTextNode('Show channel'));
     const groups = document.createElement('div'); groups.className = 'group-options';
-    const save = () => { row.name = name.value; row.number = Number(number.value); row.visible = visible.checked; pvrEdits.set(row.id, row); };
+    const save = () => {
+      row.name = name.value; row.number = Number(number.value); row.visible = visible.checked; pvrEdits.set(row.id, row);
+      $('pvr-count').textContent = $('pvr-count').textContent.replace(/\d+ unsaved edits/, `${pvrEdits.size} unsaved edits`);
+    };
     number.onchange = save; name.onchange = save; visible.onchange = save;
     for (const group of pvrData.groups) {
       const label = document.createElement('label'); label.className = 'check';
@@ -152,11 +173,49 @@ function renderPvrChannels() {
       checkbox.onchange = () => { row.groups = checkbox.checked ? [...new Set([...row.groups, group])] : row.groups.filter(g => g !== group); save(); };
       label.append(checkbox, document.createTextNode(group)); groups.append(label);
     }
-    card.append(title, number, name, show, groups); $('pvr-channels').append(card);
+    const info = document.createElement('p'); info.className = 'muted';
+    info.textContent = `${original.alternatives} channel alternative(s) · ` + (original.guide ?
+      `Guide: ${original.guide.name}${original.has_programmes ? '' : ' (no upcoming programmes)'}` : 'No programme match') +
+      (original.manual_guide ? ' · Manual match' : ' · Automatic match');
+    const details = document.createElement('details');
+    const summary = document.createElement('summary'); summary.textContent = 'Choose programme guide match'; details.append(summary);
+    let loaded = false;
+    details.ontoggle = () => {
+      if (!details.open || loaded) return;
+      loaded = true;
+      const select = document.createElement('select'); select.setAttribute('aria-label', `${original.name} programme guide`);
+      select.add(new Option('Automatic matching', ''));
+      for (const option of pvrData.guide_options) select.add(new Option(`${option.name} — ${option.label}`, JSON.stringify({feed: option.feed, channel: option.channel})));
+      select.value = original.manual_guide ? JSON.stringify(original.manual_guide) : '';
+      const apply = document.createElement('button'); apply.type = 'button'; apply.textContent = 'Apply programme match';
+      apply.onclick = async () => {
+        apply.disabled = true;
+        try {
+          const result = await api('/api/pvr/guide', {id: original.id, mapping: select.value ? JSON.parse(select.value) : null});
+          await loadPvr(); message(result.message);
+        } catch (error) { message(error.message, true); apply.disabled = false; }
+      };
+      details.append(select, apply);
+    };
+    card.append(title, info, number, name, show, groups, details); $('pvr-channels').append(card);
   }
   if (!rows.length) $('pvr-channels').textContent = 'Build TV channels first, or try another channel name.';
 }
-$('pvr-filter').oninput = renderPvrChannels;
+function filterPvr() { pvrPage = 0; renderPvrChannels(); }
+$('pvr-filter').oninput = filterPvr;
+$('pvr-group').onchange = filterPvr;
+$('pvr-view').onchange = filterPvr;
+$('pvr-prev').onclick = () => { pvrPage--; renderPvrChannels(); };
+$('pvr-next').onclick = () => { pvrPage++; renderPvrChannels(); };
+function showPvrPage(visible) {
+  for (const original of pvrDisplayed) {
+    const row = pvrEdits.get(original.id) || {...original, groups: [...original.groups]};
+    row.visible = visible; pvrEdits.set(row.id, row);
+  }
+  renderPvrChannels();
+}
+$('pvr-hide').onclick = () => showPvrPage(false);
+$('pvr-show').onclick = () => showPvrPage(true);
 $('pvr-reload').onclick = () => loadPvr().catch(error => message(error.message, true));
 $('pvr-sources-form').onsubmit = async event => {
   event.preventDefault();
@@ -169,6 +228,7 @@ $('pvr-refresh').onclick = async () => {
   catch (error) { message(error.message, true); }
 };
 $('pvr-save').onclick = async () => {
+  if (pvrEdits.size > 100) { message('Save up to 100 channel edits at a time. Reload the page to discard unsaved changes.', true); return; }
   try { const result = await api('/api/pvr/channels', {channels: [...pvrEdits.values()]}); pvrEdits.clear(); await loadPvr(); message(result.message); }
   catch (error) { message(error.message, true); }
 };

@@ -92,6 +92,7 @@ class SourceSetupTests(unittest.TestCase):
 
     def test_pvr_pairing_source_selection_and_channel_edits(self):
         self.assertEqual(self.request('/api/pvr')[0], 401)
+        self.assertEqual(self.request('/api/pvr/guide', {})[0], 401)
         self.assertEqual(self.request('/api/pvr/sources', {'selected': []})[0], 401)
         tv = dict(id='test.tv', name='Test TV', version='1', resources=['catalog', 'stream'],
                   types=['tv'], catalogs=[dict(id='channels_uk', name='UK', type='tv')])
@@ -105,6 +106,11 @@ class SourceSetupTests(unittest.TestCase):
         result = json.loads(self.request('/api/pvr')[1])
         self.assertNotIn('private-token', json.dumps(result))
         self.assertEqual(result['channels'][0]['visible'], True)
+        self.assertIn('guide_options', result)
+        self.assertEqual(result['channels'][0]['alternatives'], 1)
+        self.assertFalse(result['channels'][0]['has_programmes'])
+        self.assertEqual(self.request('/api/pvr/guide', {'id': rows[0]['id'], 'mapping': {'feed': 'bad', 'channel': 'bad'}})[0], 400)
+        self.assertEqual(self.request('/api/pvr/guide', {'id': rows[0]['id'], 'mapping': None})[0], 200)
         for selected in ([], ['missing'], [{}]):
             self.assertEqual(self.request('/api/pvr/sources', {'selected': selected})[0], 400)
         selected = [result['sources'][0]['key']]

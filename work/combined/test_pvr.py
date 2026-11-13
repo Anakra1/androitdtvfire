@@ -64,6 +64,55 @@ class PVRTests(unittest.TestCase):
         self.assertTrue(all(n.get('channel') == rows[0]['id'] for n in guide.findall('programme')))
         self.assertEqual(guide.find('programme/title').text, 'Current show')
 
+    def test_spacing_duplicates_preserve_numbers_old_routes_and_manual_choices(self):
+        a = dict(self.variant, meta=dict(self.variant['meta'], id='a', name='5 ACTION'))
+        b = dict(self.variant, meta=dict(self.variant['meta'], id='b', name='5ACTION HD'))
+        old_a = pvr.merge_channels([a])[0]; old_a['number'] = 104
+        old_b = pvr.merge_channels([b])[0]; old_b['number'] = 205
+        rows = pvr.merge_channels([a, b], [old_a, old_b])
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]['id'], old_a['id'])
+        self.assertEqual(rows[0]['number'], 104)
+        self.store.write(str(Path(self.temp.name) / 'pvr-channels.json'), rows)
+        self.assertEqual(pvr.channel(self.store, old_b['id'])[0]['id'], old_a['id'])
+        override = {old_a['id']: dict(name='Action', number=900, groups=['Movies'], visible=False)}
+        rebuilt = pvr.merge_channels([a, b], rows, override)
+        self.assertEqual(len(rebuilt), 1)
+        self.assertEqual(rebuilt[0]['number'], 900)
+        # Independently edited duplicates remain independent.
+        overrides = {r['id']: dict(number=r['number']) for r in [old_a, old_b]}
+        self.assertEqual(len(pvr.merge_channels([a, b], [old_a, old_b], overrides)), 2)
+
+    def test_spacing_dedup_never_combines_countries_regions_or_timeshifts(self):
+        variants = [dict(self.variant, meta=dict(self.variant['meta'], id=str(i), name=name), live_country=country)
+                    for i, (name, country) in enumerate([('BBC One London', 'GB'), ('BBC One Wales', 'GB'),
+                                                         ('BBC One London+1', 'GB'), ('BBC One London', 'IE')])]
+        self.assertEqual(len(pvr.merge_channels(variants)), 4)
+
+    def test_editor_can_map_all_alternatives_including_hidden_channels_and_reset(self):
+        second = dict(self.variant, meta=dict(self.variant['meta'], id='second', name='Sky Atlantic'))
+        rows = pvr.merge_channels([self.variant, second])
+        self.store.write(str(Path(self.temp.name) / 'pvr-channels.json'), rows)
+        xml = Path(self.temp.name) / 'fixture.xml'; xml.write_text(XML, encoding='utf8')
+        feed = dict(key='uk', country='GB', label='UK', enabled=True)
+        programmes.save_settings(self.store, dict(enabled=True, feeds=[feed], mappings={}))
+        programmes.import_xml(self.store, feed, xml, now=NOW)
+        pvr.save_channels(self.store, [dict(id=rows[0]['id'], name='Atlantic', number=150, groups=['Sky'], visible=False)])
+        with self.assertRaises(ValueError):
+            pvr.save_mapping(self.store, rows[0]['id'], dict(feed='bad', channel='bad'))
+        pvr.save_mapping(self.store, rows[0]['id'], dict(feed='uk', channel='atlantic.uk'))
+        value = programmes.settings(self.store)
+        self.assertEqual(len(value['mappings']), 2)
+        with patch.object(pvr.time, 'time', return_value=NOW):
+            result = pvr.editor(self.store)
+        row = result['channels'][0]
+        self.assertFalse(row['visible'])
+        self.assertTrue(row['has_programmes'])
+        self.assertEqual(row['guide']['channel'], 'atlantic.uk')
+        self.assertEqual(row['alternatives'], 2)
+        pvr.save_mapping(self.store, rows[0]['id'], None)
+        self.assertEqual(programmes.settings(self.store)['mappings'], {})
+
     def test_renaming_and_numbering_does_not_change_stream_identity_or_allow_collisions(self):
         second = dict(self.variant, meta=dict(self.variant['meta'], id='news', name='Sky News'))
         rows = pvr.merge_channels([self.variant, second])

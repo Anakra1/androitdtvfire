@@ -12,7 +12,7 @@ outputs = here.parent.parent / 'outputs' if here.parent.name == 'work' else here
 outputs.mkdir(exist_ok=True)
 readme = outputs / 'Crimson-Blood-Requiem-README.md' if here.parent.name == 'work' else here / 'README.md'
 version = ET.parse(source / 'addon.xml').getroot().attrib['version']
-assert version == '0.9.0'
+assert version == '0.9.1'
 assert 'plugin.video.stremio.bridge' in (source / 'service.py').read_text(encoding='utf-8-sig')
 for path in source.rglob('*.py'):
     py_compile.compile(str(path), doraise=True)
@@ -53,6 +53,7 @@ with ZipFile(bundle, 'w', ZIP_DEFLATED) as archive:
             archive.write(path, path.relative_to(here).as_posix())
     archive.write(here / 'build_combined.py', 'build_combined.py')
     archive.write(here / 'build_crb_setup.py', 'build_crb_setup.py')
+    archive.write(here / 'publish_packages.py', 'publish_packages.py')
     archive.write(here / 'build_native_engine.ps1', 'build_native_engine.ps1')
     for path in (here / 'script.module.cbr.engine').rglob('*'):
         if path.is_file() and '__pycache__' not in path.parts and not ('resources' in path.parts and 'lib' in path.parts):
