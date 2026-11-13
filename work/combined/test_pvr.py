@@ -45,6 +45,46 @@ class PVRTests(unittest.TestCase):
         updated = pvr.merge_channels([new, plain, self.variant, shifted], previous=rows)
         self.assertEqual(next(r for r in updated if r['id'] == main['id'])['number'], main['number'])
 
+    def test_mediafusion_cinema_alias_keeps_existing_route_and_distinct_channels(self):
+        old = dict(self.variant, meta=dict(id='old', name='Sky Premiere HD', type='tv'))
+        media = dict(self.variant, provider_id='mediafusion', meta=dict(id='new', name='Sky Cinema Premiere', type='tv'))
+        previous = pvr.merge_channels([old]); previous[0]['number'] = 410
+        shifted = dict(media, meta=dict(media['meta'], id='plus', name='Sky Cinema Premiere+1'))
+        foreign = dict(media, live_country='IT')
+        rows = pvr.merge_channels([old, media, shifted, foreign], previous)
+        self.assertEqual(len(rows), 3)
+        main = next(r for r in rows if len(r['variants']) == 2)
+        self.assertEqual((main['id'], main['number']), (previous[0]['id'], 410))
+
+    def test_mediafusion_migration_adds_uk_sources_once_without_replacing_private_url(self):
+        mf = dict(self.manifest, id='stremio.addons.mediafusion|elfhosted', catalogs=[])
+        entry = self.store.add('https://example.org/configured/manifest.json', fetch=lambda url: mf)
+        entries = self.store.providers()
+        next(e for e in entries if e['key'] == entry['key'])['scope_types'] = ['tv']
+        self.store.save_providers(entries)
+        original = pvr.sources(self.store)[0]['key']
+        pvr.save_config(self.store, dict(enabled=True, selected=[original], overrides={}))
+        pvr.ensure_mediafusion_fallbacks(self.store, str(ROOT))
+        selected = pvr.config(self.store)['selected']
+        self.assertIn(original, selected)
+        self.assertTrue(any(s['provider'] == entry['key'] and s['key'] in selected for s in pvr.sources(self.store)))
+        self.assertEqual(self.store.provider(entry['key'])['url'], entry['url'])
+        value = pvr.config(self.store); value['selected'] = [original]; pvr.save_config(self.store, value)
+        pvr.ensure_mediafusion_fallbacks(self.store, str(ROOT))
+        self.assertEqual(pvr.config(self.store)['selected'], [original])
+
+    def test_mediafusion_migration_respects_disabled_and_movie_only_sources(self):
+        for enabled, scope in [(False, ['tv']), (True, ['movie'])]:
+            entry = self.store.add('https://example.org/' + str(enabled) + '/manifest.json',
+                fetch=lambda url: dict(self.manifest, id='mediafusion.' + str(enabled), catalogs=[]))
+            entries = self.store.providers()
+            current = next(e for e in entries if e['key'] == entry['key'])
+            current.update(enabled=enabled, scope_types=scope)
+            self.store.save_providers(entries)
+        pvr.save_config(self.store, dict(enabled=True, selected=[], overrides={}))
+        pvr.ensure_mediafusion_fallbacks(self.store, str(ROOT))
+        self.assertEqual(pvr.config(self.store)['selected'], [])
+
     def test_m3u_uses_non_expiring_plugin_routes_and_xmltv_ids_match(self):
         rows = pvr.merge_channels([self.variant])
         self.store.write(str(Path(self.temp.name) / 'pvr-channels.json'), rows)
@@ -192,6 +232,26 @@ class PVRRouteTests(unittest.TestCase):
                 self.app.pvr_play(merged[0]['id'])
         self.assertTrue(self.resolved[-1][1])
         self.assertIn('/fresh.m3u8',self.resolved[-1][2].path)
+
+    def test_mediafusion_plays_after_both_primary_links_fail(self):
+        mf = self.app.STORE.add('https://example.org/mediafusion/manifest.json',
+            fetch=lambda url: dict(self.entry['manifest'], id='mediafusion', catalogs=[]))
+        primary = dict(provider=self.entry['key'], provider_id=self.entry['manifest']['id'], provider_label=self.entry['label'],
+                       resource_type='tv', live_country='GB', live_group='tv', meta=dict(id='old', type='tv', name='Sky Premiere HD'))
+        backup = dict(primary, provider=mf['key'], provider_id=mf['manifest']['id'], provider_label=mf['label'],
+                      meta=dict(id='new', type='tv', name='Sky Cinema Premiere'))
+        rows = pvr.merge_channels([primary, backup])
+        self.assertEqual(len(rows), 1)
+        self.app.STORE.write(str(Path(self.temp.name)/'pvr-channels.json'),rows)
+        def streams(entries, *args):
+            urls = ['https://example.org/fail1.m3u8', 'https://example.org/fail2.m3u8'] if entries[0]['key'] == self.entry['key'] else ['https://example.org/backup.m3u8']
+            return [(entries[0], {'streams':[{'url':url} for url in urls]}, None)]
+        with patch.object(self.app, 'aggregate', side_effect=streams), patch.object(self.app,'probe_stream',
+                side_effect=lambda s: s['url'].endswith('backup.m3u8')):
+            self.app.pvr_play(rows[0]['id'])
+        self.assertTrue(self.resolved[-1][1])
+        self.assertIn('/backup.m3u8',self.resolved[-1][2].path)
+        self.assertEqual(self.app.STORE.read(self.app.LIVE_AUTOPLAY.path), {})
 
     def test_m3u_backup_browsing_to_automatic_playback(self):
         rows = m3u.parse('#EXTM3U\n#EXTINF:-1 tvg-id="BBCNews.uk",BBC News\nhttps://example.org/fresh.m3u8', 'https://example.org/list.m3u')

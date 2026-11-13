@@ -12,7 +12,7 @@ import xml.etree.ElementTree as ET
 from .core import fetch_json, resource_url, fetch_resource
 from .live import entry_catalogs, search_only
 from .programmes import ProgrammeGuide, country_for, normalized, channel_key, settings as guide_settings, save_settings as save_guide_settings
-from .channel_names import compact
+from .channel_names import compact, uk_guide_name
 
 BASE = 'plugin://plugin.video.stremio.bridge/'
 FREEVIEW = {'bbc one': 1, 'bbc two': 2, 'itv1': 3, 'itv': 3, 'channel 4': 4, 'channel 5': 5,
@@ -61,6 +61,37 @@ def sources(store):
                                    provider=entry['key'], provider_id=entry['manifest']['id'], catalog=cat,
                                    extras=extras, country=country, default=country == 'GB', playlist=entry.get('kind') == 'm3u')
     return list(result.values())
+
+
+def ensure_mediafusion_fallbacks(store, addon_path):
+    """Add enabled UK MediaFusion TV sources once, keeping later user choices."""
+    marker = os.path.join(store.root, 'pvr-mediafusion-fallbacks-v1.json')
+    if store.read(marker):
+        return
+    entries = store.providers()
+    template_path = os.path.join(addon_path, 'resources', 'defaults', 'live-providers.json')
+    with open(template_path, encoding='utf-8-sig') as source:
+        template = next(d for d in json.load(source) if d.get('manifest_file') == 'mediafusion-live.json')
+    keys = set()
+    for entry in entries:
+        if not entry.get('enabled', True) or 'mediafusion' not in entry.get('manifest', {}).get('id', '').lower():
+            continue
+        # Movie-only configurations remain movie-only; never copy account URLs.
+        if not (entry.get('live_group') == 'tv' or 'tv' in entry.get('scope_types', [])
+                or any(c.get('type') == 'tv' for c in entry_catalogs(entry))):
+            continue
+        if not any(c.get('type') == 'tv' for c in entry_catalogs(entry)):
+            entry['extra_catalogs'] = template['extra_catalogs']
+        keys.add(entry['key'])
+    store.save_providers(entries)
+    value = config(store)
+    if value.get('selected') is not None:
+        value['selected'] = list(dict.fromkeys(value['selected'] + [s['key'] for s in sources(store)
+                                    if s['provider'] in keys and s['default']]))
+        save_config(store, value)
+    if value.get('enabled'):
+        refresh(store)
+    store.write(marker, True)
 
 
 def group_names(name, genres, country='GB'):
@@ -146,7 +177,8 @@ def merge_channels(variants, previous=None, overrides=None):
         # An explicitly edited row keeps its independent identity and choices.
         owner = previous_owner.get(row['id'], row['id'])
         key = ('manual', owner) if owner in overrides else (
-            country, compact(row['name']), variant['provider_id'] if country == 'ZZ' else '')
+            country, uk_guide_name(row['name']) if country == 'GB' else compact(row['name']),
+            variant['provider_id'] if country == 'ZZ' else '')
         buckets.setdefault(key, []).append(row)
     merged = {}
     for bucket in buckets.values():
@@ -396,7 +428,7 @@ class PVRUpdater:
         guide = digest([self.store.read(os.path.join(self.store.root, name), {}) for name in
                         ('programme-status.json', 'programme-settings.json')])
         collect = (forced and message.get('collect', True) or time.time() - state.get('updated', 0) > 6 * 3600
-                   or state.get('lineup_version', 0) < 2)
+                   or state.get('lineup_version', 0) < 3)
         if collect and time.time() - state.get('attempted', 0) < 300 and request <= self.last_request:
             return
         if forced or collect or guide != self.last_guide:
@@ -434,7 +466,7 @@ class PVRUpdater:
             result = export(self.store)
             self.store.write(path, dict(result, state='ready', updated=time.time() if collect else previous.get('updated', 0),
                                        attempted=time.time(), failed=failed,
-                                       lineup_version=2 if collect else previous.get('lineup_version', 0)))
+                                       lineup_version=3 if collect else previous.get('lineup_version', 0)))
         except Exception:
             self.store.write(path, dict(previous, attempted=time.time(), state='error',
                                        message='TV channels could not be updated. Previous files are kept. Check the selected sources.'))

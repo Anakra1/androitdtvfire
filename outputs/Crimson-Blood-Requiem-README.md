@@ -1,4 +1,4 @@
-# Crimson Blood Requiem (CBR) 0.9.3 — Windows, Android TV and Fire TV
+# Crimson Blood Requiem (CBR) 0.9.4 — Windows, Android TV and Fire TV
 
 **One Kodi add-on includes movies, TV series, a torrent player and Live TV split into TV Channels, Internet TV and Live Sports.** No Elementum, separate Stream Bridge installation, or manual script copying is required.
 
@@ -8,7 +8,7 @@ These packages use public provider defaults and contain no personalized MediaFus
 
 ## Install
 
-1. On Windows, use **Add-ons → Install from zip file** and choose `plugin.video.stremio.bridge-0.9.3.zip`. On Android TV or Fire TV, install `CBR-Fire-TV-Android-Repository-0.1.7.zip`, then install Crimson Blood Requiem, the skin and the setup wizard from **Install from repository → CBR Android Add-on Repository**.
+1. On Windows, use **Add-ons → Install from zip file** and choose `plugin.video.stremio.bridge-0.9.4.zip`. On Android TV or Fire TV, install `CBR-Fire-TV-Android-Repository-0.1.7.zip`, then install Crimson Blood Requiem, the skin and the setup wizard from **Install from repository → CBR Android Add-on Repository**.
 2. Restart Kodi once to start the new background player service.
 3. Open **Video add-ons → Crimson Blood Requiem** (the crimson **CBR** thumbnail).
 4. Choose a movie or TV episode and a source, or open **Live TV** and select a category, catalogue, channel/event and source.
@@ -17,7 +17,7 @@ On Fire TV/Android, Kodi automatically installs **CBR Playback Engine** with the
 
 On a fresh profile, **Cinemeta** supplies movie/TV listings and posters, and **Torrentio** supplies stream results. They are enabled automatically on first launch; no account or default-URL entry is needed. Manifests describe sources and catalogues; the package does not contain movies or guarantee that every listed title has a working source. Playback depends on available peers, providers, network and Kodi codec support.
 
-## IPTV-org and M3U playlists (0.9.3)
+## IPTV-org and M3U playlists (0.9.4)
 
 Restart Kodi after updating, then open CBR once to add IPTV-org as an extra TV source. **CBR → Live TV → TV Channels → IPTV-org → United Kingdom** uses `https://iptv-org.github.io/iptv/countries/uk.m3u`. Other country catalogues are selectable; the worldwide master is `https://iptv-org.github.io/iptv/index.m3u`.
 
@@ -162,3 +162,7 @@ The integration is GPL-3.0-or-later and includes earlier MIT-licensed Movies com
 
 - [TorrServer release and source](https://github.com/YouROK/TorrServer/releases/tag/MatriX.150)
 - [Stremio add-on protocol](https://github.com/Stremio/stremio-addon-sdk/blob/master/docs/protocol.md)
+
+## MediaFusion channel fallbacks (0.9.4)
+
+Enabled MediaFusion UK TV sources are added once to the native Kodi TV selection. Existing source selections, configured URLs, channel numbers and manual edits are retained. Known UK channel-name aliases share alternatives, including Sky Premiere / Sky Cinema Premiere. Playback checks alternatives across selected providers and uses a reachable link when earlier links fail. It cannot create streams for channels a provider does not return. Restart Kodi and open CBR once after updating; the background TV refresh rebuilds the lineup. Later source deselections are respected.

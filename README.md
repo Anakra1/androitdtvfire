@@ -12,13 +12,13 @@ CBR provides movie and TV catalogues, posters, separate searches, Live TV catego
 4. Accept Kodi’s dependency list, including **CBR Playback Engine**. Kodi installs the playback engine with the video add-on.
 5. Open CBR and select a movie or episode and a source. On upgrades from older CBR versions, restart Kodi once so its old service unloads.
 
-Current Android versions: repository **0.1.7**, video add-on **0.9.3**, playback engine **0.1.0**. All playback installation and updates use this one Kodi repository.
+Current Android versions: repository **0.1.7**, video add-on **0.9.4**, playback engine **0.1.0**. All playback installation and updates use this one Kodi repository.
 
 **0.8.0 adds Now/Next programme information.** Restart Kodi to start the automatic background UK schedule download. Long-press a channel → **Programme information** for titles, times and descriptions; **Match programme channel** sets an explicit match when automatic matching is unavailable. The PC setup page has a separate XMLTV programme-feed section for other countries. List browsing and channel selection keep their existing behaviour, including automatic playback.
 
 Version 0.8.0 checks HTTP availability before automatic live playback and skips explicitly blocked links, allowing a working third or later link to be chosen without a source-selection screen. Checks run on the Kodi device and do not save playback URLs to the catalogue cache. Upstream picture loops cannot be detected reliably from HTTP availability alone.
 
-If Kodi's cached repository listing does not show the latest version, existing Fire TV/Android installations can update directly using **Install from zip file → CBR → cbr093.zip** from the same source. This is the identical 0.9.3 video add-on package, with no uninstall or new source required. Restart Kodi after installing it. Fresh installs should use the repository steps above to install dependencies.
+If Kodi's cached repository listing does not show the latest version, existing Fire TV/Android installations can update directly using **Install from zip file → CBR → cbr094.zip** from the same source. This is the identical 0.9.4 video add-on package, with no uninstall or new source required. Restart Kodi after installing it. Fresh installs should use the repository steps above to install dependencies.
 
 Version 0.8.0 speeds up Live TV navigation with short-lived local catalogue caching, 100-channel pages, fewer file reads/writes and source-specific live playback requests. Use **Refresh channels** to reload a list immediately. The listing cache does not store playback URLs.
 
@@ -28,7 +28,7 @@ CBR includes source/country/category browsing for Live TV, a separate search ent
 
 Install **Crimson Blood Requiem Skin** and **CBR Setup Wizard** from the same repository for the optional interface, then run the wizard. The video add-on also works with Kodi’s normal skin.
 
-## IPTV-org and M3U playlists (0.9.3)
+## IPTV-org and M3U playlists (0.9.4)
 
 Restart Kodi after updating, then open CBR once to add IPTV-org as an extra TV source. **CBR → Live TV → TV Channels → IPTV-org → United Kingdom** uses `https://iptv-org.github.io/iptv/countries/uk.m3u`. Other country catalogues are selectable; the worldwide master is `https://iptv-org.github.io/iptv/index.m3u`.
 
@@ -93,3 +93,7 @@ The source is in `work/combined`. Build native libraries with `build_native_engi
 The four public website pages live in `website/`. Edit their content in `work/build_website.py`, shared styling in `website/assets/site.css` and browser behaviour in `website/assets/site.js`. Run `work/build_website.py` to regenerate HTML. The public package builder also refreshes the website, and its version labels read the platform feeds. The root `index.html` remains a Kodi-compatible ZIP listing.
 
 The integration and TorrServer-derived engine are GPL-3.0-or-later. Earlier MIT notices are preserved. Matching upstream source is included at `source/TorrServer-MatriX.150-source.zip`; CBR’s C ABI wrapper and native build script are included in the repository.
+
+## MediaFusion channel fallbacks (0.9.4)
+
+Enabled MediaFusion UK TV sources are added once to the native Kodi TV selection. Existing source selections, configured URLs, channel numbers and manual edits are retained. Known UK channel-name aliases share alternatives, including Sky Premiere / Sky Cinema Premiere. Playback checks alternatives across selected providers and uses a reachable link when earlier links fail. It cannot create streams for channels a provider does not return. Restart Kodi and open CBR once after updating; the background TV refresh rebuilds the lineup. Later source deselections are respected.

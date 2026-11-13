@@ -33,6 +33,8 @@ def ensure_defaults(store, addon_path, force=False):
 def ensure_live_defaults(store, addon_path, force=False):
     from .m3u import ensure_default
     ensure_default(store, force)
+    from .pvr import ensure_mediafusion_fallbacks
+    ensure_mediafusion_fallbacks(store, addon_path)
     marker = os.path.join(store.root, 'live-defaults-v1.json')
     if not force and store.read(marker):
         return
