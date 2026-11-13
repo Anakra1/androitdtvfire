@@ -3,6 +3,8 @@ from pathlib import Path
 from zipfile import ZipFile, ZIP_DEFLATED
 import hashlib
 import shutil
+import subprocess
+import sys
 import xml.etree.ElementTree as ET
 
 HERE = Path(__file__).resolve().parent
@@ -113,3 +115,6 @@ for path in [android_zip, windows_zip, PROJECT / 'windowsrepo.zip']:
     with ZipFile(path) as archive:
         assert archive.testzip() is None
 print('Prepared public packages and separate Windows/Android feeds for CBR {}.'.format(version))
+website_builder = PROJECT / 'work/build_website.py'
+if website_builder.is_file():
+    subprocess.run([sys.executable, str(website_builder)], check=True)

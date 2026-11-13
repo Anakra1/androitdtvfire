@@ -2,6 +2,8 @@
 
 CBR provides movie and TV catalogues, posters, separate searches, Live TV categories, multiple Stremio-compatible manifests, and integrated torrent buffering. The optional skin and wizard provide the crimson space interface.
 
+**[Visit the CBR website](https://anakra1.github.io/androitdtvfire/website/)** for an introduction, separate Windows and Android/Fire TV installation guides, pairing help and release notes. The Kodi source remains `https://anakra1.github.io/androitdtvfire/`.
+
 ## Fire TV and Android installation
 
 1. In Kodi File Manager, add `https://anakra1.github.io/androitdtvfire/` as a source named CBR.
@@ -74,6 +76,8 @@ Open **Sources and player settings → Manage sources / add manifest URL** to ad
 
 Android playback uses a shared engine library loaded inside Kodi through the CBR Playback Engine module. The engine buffers torrents in memory and provides a seekable HTTP stream on loopback for Kodi’s player. Libraries are included in the Kodi dependency and verified before loading. The loader respects the bitness of Kodi’s process.
 
-The source is in `work/combined`. Build native libraries with `build_native_engine.ps1` using Go and Android NDK, then run `build_combined.py` and `build_crb_setup.py`. The Android repository uses its own HTTPS metadata and packages under `android/`, avoiding the former shared localhost repository service.
+The source is in `work/combined`. Build native libraries with `build_native_engine.ps1` using Go and Android NDK, then run `build_combined.py` and `publish_packages.py` for the public platform packages. The Android repository uses its own HTTPS metadata and packages under `android/`, avoiding the former shared localhost repository service.
+
+The four public website pages live in `website/`. Edit their content in `work/build_website.py`, shared styling in `website/assets/site.css` and browser behaviour in `website/assets/site.js`. Run `work/build_website.py` to regenerate HTML. The public package builder also refreshes the website, and its version labels read the platform feeds. The root `index.html` remains a Kodi-compatible ZIP listing.
 
 The integration and TorrServer-derived engine are GPL-3.0-or-later. Earlier MIT notices are preserved. Matching upstream source is included at `source/TorrServer-MatriX.150-source.zip`; CBR’s C ABI wrapper and native build script are included in the repository.
