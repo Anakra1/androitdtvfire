@@ -2,7 +2,7 @@
 
 CBR provides movie and TV catalogues, posters, separate searches, Live TV categories, multiple Stremio-compatible manifests, and integrated torrent buffering. The optional skin and wizard provide the crimson space interface.
 
-**[Visit the CBR website](https://anakra1.github.io/androitdtvfire/website/)** for an introduction, separate Windows and Android/Fire TV installation guides, pairing help and release notes. The Kodi source remains `https://anakra1.github.io/androitdtvfire/`.
+**[Visit the CBR website](https://anakra1.github.io/androitdtvfire/website/)** for an introduction, separate Windows and Android/Fire TV installation guides, pairing help, platform-specific uninstall instructions and release notes. The Kodi source remains `https://anakra1.github.io/androitdtvfire/`.
 
 ## Fire TV and Android installation
 
