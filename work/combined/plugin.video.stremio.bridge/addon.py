@@ -464,7 +464,7 @@ def catalog_page(provider, catalog, extras=None, offset=0, refresh=False):
                 return
             extras[name] = value
     url = resource_url(entry['url'], 'catalog', cat['type'], cat['id'], extras)
-    loader = (lambda ignored: fetch_resource(entry, 'catalog', cat['type'], cat['id'], dict(extras, _refresh=refresh))) if entry.get('kind') == 'm3u' else request
+    loader = (lambda ignored: fetch_resource(entry, 'catalog', cat['type'], cat['id'], dict(extras, _refresh=refresh))) if entry.get('kind') in ('m3u', 'daddylive') else request
     data = (LIVE_CATALOGUES.get(url, loader, lifetime=60 if live_group == 'sports' else 300, refresh=refresh)
             if live_group else loader(url))
     metas = data.get('metas', [])

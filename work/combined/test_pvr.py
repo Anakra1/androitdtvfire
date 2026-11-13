@@ -7,7 +7,7 @@ import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).parent / 'plugin.video.stremio.bridge'
 sys.path.insert(0, str(ROOT))
-from resources.lib import pvr, programmes, m3u
+from resources.lib import pvr, programmes, m3u, daddylive
 from resources.lib.core import Store
 from test_programmes import XML, NOW
 import test_movies as fixtures
@@ -263,3 +263,17 @@ class PVRRouteTests(unittest.TestCase):
             self.follow(0)
         self.assertTrue(self.resolved[-1][1])
         self.assertIn('/fresh.m3u8',self.resolved[-1][2].path)
+
+    def test_daddylive_browsing_to_automatic_playback_without_source_picker(self):
+        page = '<a class="card" href="watch.php?id=362" data-title="sky atlantic"></a>'
+        daddylive._cache.clear()
+        entry = self.app.STORE.add(daddylive.DEFAULT_URL)
+        with patch.object(daddylive.decoders, 'fetch_page', return_value=page), \
+             patch.object(daddylive, 'resolve', return_value=[{'url':'https://example.org/daddy-fresh.m3u8'}]), \
+             patch.object(self.app, 'probe_stream', return_value=True):
+            self.items.clear()
+            self.app.catalog_page(entry['key'], self.app.STORE.put(entry['manifest']['catalogs'][0]))
+            self.assertEqual(self.items[0][0][2].label, 'Sky Atlantic')
+            self.follow(0)
+        self.assertTrue(self.resolved[-1][1])
+        self.assertIn('/daddy-fresh.m3u8', self.resolved[-1][2].path)

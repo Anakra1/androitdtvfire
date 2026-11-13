@@ -74,11 +74,17 @@ def validate_manifest(manifest):
 
 
 def load_manifest(url, fetch=fetch_json):
+    from . import daddylive
+    if daddylive.is_source(url):
+        return daddylive.manifest()
     from . import m3u
     return m3u.manifest(url, m3u.load(url, force=True)) if m3u.is_playlist(url) else validate_manifest(fetch(url))
 
 
 def fetch_resource(entry, resource, media_type, identity, extras=None, fetch=fetch_json):
+    if entry.get('kind') == 'daddylive':
+        from . import daddylive
+        return daddylive.resource(entry, resource, media_type, identity, extras)
     if entry.get('kind') == 'm3u':
         from . import m3u
         return m3u.resource(entry, resource, media_type, identity, extras)
@@ -179,6 +185,8 @@ class Store:
         else:
             if previous.get('kind') == 'm3u': entry.pop('scope_types', None)
             entry.pop('kind', None)
+        if manifest['id'] == 'org.cbr.daddylive':
+            entry.update(kind='daddylive', live_group='tv', scope_types=['tv'])
         entries = [entry if x['key'] == key else x for x in entries]
         if not any(x['key'] == key for x in entries):
             entries.append(entry)

@@ -31,6 +31,8 @@ def ensure_defaults(store, addon_path, force=False):
 
 
 def ensure_live_defaults(store, addon_path, force=False):
+    from .daddylive import ensure_default as ensure_daddylive
+    ensure_daddylive(store, force)
     from .m3u import ensure_default
     ensure_default(store, force)
     from .pvr import ensure_mediafusion_fallbacks

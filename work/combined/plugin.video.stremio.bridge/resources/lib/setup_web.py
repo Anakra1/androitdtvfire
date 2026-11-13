@@ -238,6 +238,9 @@ class SetupServer:
         else:
             if (previous or {}).get('kind') == 'm3u': entry.pop('scope_types', None)
             entry.pop('kind', None)
+        if manifest['id'] == 'org.cbr.daddylive':
+            entry.update(kind='daddylive', scope_types=['tv'])
+            if not group: group = 'tv'
         if 'guide_country' in data:
             country = data.get('guide_country', '')
             if country and country not in COUNTRIES:
