@@ -1,4 +1,4 @@
-# Crimson Blood Requiem (CBR) 0.9.1 — Windows, Android TV and Fire TV
+# Crimson Blood Requiem (CBR) 0.9.2 — Windows, Android TV and Fire TV
 
 **One Kodi add-on includes movies, TV series, a torrent player and Live TV split into TV Channels, Internet TV and Live Sports.** No Elementum, separate Stream Bridge installation, or manual script copying is required.
 
@@ -8,7 +8,7 @@ These packages use public provider defaults and contain no personalized MediaFus
 
 ## Install
 
-1. On Windows, use **Add-ons → Install from zip file** and choose `plugin.video.stremio.bridge-0.9.1.zip`. On Android TV or Fire TV, install `CBR-Fire-TV-Android-Repository-0.1.7.zip`, then install Crimson Blood Requiem, the skin and the setup wizard from **Install from repository → CBR Android Add-on Repository**.
+1. On Windows, use **Add-ons → Install from zip file** and choose `plugin.video.stremio.bridge-0.9.2.zip`. On Android TV or Fire TV, install `CBR-Fire-TV-Android-Repository-0.1.7.zip`, then install Crimson Blood Requiem, the skin and the setup wizard from **Install from repository → CBR Android Add-on Repository**.
 2. Restart Kodi once to start the new background player service.
 3. Open **Video add-ons → Crimson Blood Requiem** (the crimson **CBR** thumbnail).
 4. Choose a movie or TV episode and a source, or open **Live TV** and select a category, catalogue, channel/event and source.
@@ -16,6 +16,10 @@ These packages use public provider defaults and contain no personalized MediaFus
 On Fire TV/Android, Kodi automatically installs **CBR Playback Engine** with the video add-on. It loads the bundled shared library inside Kodi and buffers torrent pieces for Kodi’s player. All installation and updates use the CBR Kodi repository.
 
 On a fresh profile, **Cinemeta** supplies movie/TV listings and posters, and **Torrentio** supplies stream results. They are enabled automatically on first launch; no account or default-URL entry is needed. Manifests describe sources and catalogues; the package does not contain movies or guarantee that every listed title has a working source. Playback depends on available peers, providers, network and Kodi codec support.
+
+## Windows install dependency fix (0.9.2)
+
+The Windows package now uses only its bundled Windows engine and no longer requires the Android CBR Playback Engine module. Platform-specific manifests prevent the Android package from being offered as a Windows update. To recover a failed Windows install, choose **Install from zip file → CBR → cbrwindows.zip**, then restart Kodi. Android/Fire TV retains its existing native-engine dependency; working 0.9.1 installations do not need this fix.
 
 ## Windows repository installation
 

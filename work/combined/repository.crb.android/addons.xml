@@ -52,14 +52,14 @@
     <license>GPL-3.0-or-later</license>
     <source>https://github.com/Anakra1/androitdtvfire</source>
   </extension>
-</addon><addon id="plugin.video.stremio.bridge" name="Crimson Blood Requiem" version="0.9.1" provider-name="Community">
+</addon><addon id="plugin.video.stremio.bridge" name="Crimson Blood Requiem" version="0.9.2" provider-name="Community">
   <requires><import addon="xbmc.python" version="3.0.1" /><import addon="script.module.cbr.engine" version="0.1.0" /></requires>
   <extension point="xbmc.python.pluginsource" library="addon.py"><provides>video</provides></extension>
   <extension point="xbmc.service" library="service.py" start="startup" />
   <extension point="xbmc.addon.metadata">
     <summary lang="en_GB">CBR movies, series, live TV and built-in Windows/Android torrent player</summary>
     <description lang="en_GB">Crimson Blood Requiem for Windows, Android TV and Fire TV: movies, TV episodes, torrent buffering, TV Channels, Internet TV and Live Sports. Kodi automatically installs CBR Playback Engine for integrated Android torrent buffering.</description>
-    <platform>all</platform><license>GPL-3.0-or-later; includes MIT-licensed components</license>
+    <platform>android</platform><license>GPL-3.0-or-later; includes MIT-licensed components</license>
     <assets><icon>resources/art/crb-icon.png</icon><fanart>resources/art/crb-fanart.jpg</fanart></assets>
   </extension>
 </addon></addons>
