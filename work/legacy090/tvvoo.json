@@ -1,0 +1,565 @@
+{
+  "id": "org.stremio.vavoo.clean",
+  "version": "5.1.0",
+  "name": "TvVoo | ElfHosted",
+  "description": "Stremio addon that lists VAVOO TV channels and resolves clean HLS using the viewer's IP.",
+  "background": "https://raw.githubusercontent.com/qwertyuiop8899/StreamViX/refs/heads/main/public/backround.png",
+  "logo": "https://i.imgur.com/miRBJ2B.png",
+  "types": [
+    "tv"
+  ],
+  "idPrefixes": [
+    "vavoo",
+    "vavoo_"
+  ],
+  "catalogs": [
+    {
+      "id": "vavoo_tv_it",
+      "type": "tv",
+      "name": "TvVoo \u2022 Italia",
+      "extra": [
+        {
+          "name": "date",
+          "isRequired": false
+        },
+        {
+          "name": "skip",
+          "isRequired": false
+        },
+        {
+          "name": "genre",
+          "options": [
+            "Tutti",
+            "Altro",
+            "Bambini",
+            "Documentari",
+            "Film - Serie TV",
+            "Mediaset",
+            "Musica",
+            "News",
+            "Rai",
+            "Sport"
+          ],
+          "isRequired": false
+        }
+      ]
+    },
+    {
+      "id": "vavoo_tv_uk",
+      "type": "tv",
+      "name": "TvVoo \u2022 United Kingdom",
+      "extra": [
+        {
+          "name": "skip",
+          "isRequired": false
+        },
+        {
+          "name": "genre",
+          "options": [
+            "Tutti",
+            "Documentary",
+            "Kids",
+            "Movies",
+            "Music",
+            "News",
+            "Sport"
+          ],
+          "isRequired": false
+        }
+      ]
+    },
+    {
+      "id": "vavoo_tv_fr",
+      "type": "tv",
+      "name": "TvVoo \u2022 France",
+      "extra": [
+        {
+          "name": "skip",
+          "isRequired": false
+        },
+        {
+          "name": "genre",
+          "options": [
+            "Tutti",
+            "Documentary",
+            "Entertainment",
+            "General",
+            "Kids",
+            "Lifestyle",
+            "Movies",
+            "Music",
+            "News",
+            "Sport",
+            "VOD"
+          ],
+          "isRequired": false
+        }
+      ]
+    },
+    {
+      "id": "vavoo_tv_de",
+      "type": "tv",
+      "name": "TvVoo \u2022 Germany",
+      "extra": [
+        {
+          "name": "skip",
+          "isRequired": false
+        },
+        {
+          "name": "genre",
+          "options": [
+            "Tutti",
+            "Documentary",
+            "Kids",
+            "Movies",
+            "Music",
+            "News",
+            "Sport"
+          ],
+          "isRequired": false
+        }
+      ]
+    },
+    {
+      "id": "vavoo_tv_pt",
+      "type": "tv",
+      "name": "TvVoo \u2022 Portugal",
+      "extra": [
+        {
+          "name": "skip",
+          "isRequired": false
+        },
+        {
+          "name": "genre",
+          "options": [
+            "Tutti",
+            "Documentary",
+            "Kids",
+            "Movies",
+            "Music",
+            "News",
+            "Sport"
+          ],
+          "isRequired": false
+        }
+      ]
+    },
+    {
+      "id": "vavoo_tv_es",
+      "type": "tv",
+      "name": "TvVoo \u2022 Spain",
+      "extra": [
+        {
+          "name": "skip",
+          "isRequired": false
+        },
+        {
+          "name": "genre",
+          "options": [
+            "Tutti",
+            "Documentary",
+            "Kids",
+            "Movies",
+            "News",
+            "Sport",
+            "sport"
+          ],
+          "isRequired": false
+        }
+      ]
+    },
+    {
+      "id": "vavoo_tv_al",
+      "type": "tv",
+      "name": "TvVoo \u2022 Albania",
+      "extra": [
+        {
+          "name": "skip",
+          "isRequired": false
+        },
+        {
+          "name": "genre",
+          "options": [
+            "Tutti",
+            "Documentary",
+            "Kids",
+            "Movies",
+            "Music",
+            "News",
+            "Sport"
+          ],
+          "isRequired": false
+        }
+      ]
+    },
+    {
+      "id": "vavoo_tv_tr",
+      "type": "tv",
+      "name": "TvVoo \u2022 Turkey",
+      "extra": [
+        {
+          "name": "skip",
+          "isRequired": false
+        },
+        {
+          "name": "genre",
+          "options": [
+            "Tutti",
+            "Documentary",
+            "Kids",
+            "Movies",
+            "News",
+            "Sport"
+          ],
+          "isRequired": false
+        }
+      ]
+    },
+    {
+      "id": "vavoo_tv_nl",
+      "type": "tv",
+      "name": "TvVoo \u2022 Nederland",
+      "extra": [
+        {
+          "name": "skip",
+          "isRequired": false
+        },
+        {
+          "name": "genre",
+          "options": [
+            "Tutti",
+            "Documentary",
+            "Kids",
+            "Movies",
+            "Music",
+            "News",
+            "Sport"
+          ],
+          "isRequired": false
+        }
+      ]
+    },
+    {
+      "id": "vavoo_tv_ar",
+      "type": "tv",
+      "name": "TvVoo \u2022 Arabia",
+      "extra": [
+        {
+          "name": "skip",
+          "isRequired": false
+        },
+        {
+          "name": "genre",
+          "options": [
+            "Tutti",
+            "Documentary",
+            "Kids",
+            "Movies",
+            "Music",
+            "News",
+            "Sport"
+          ],
+          "isRequired": false
+        }
+      ]
+    },
+    {
+      "id": "vavoo_tv_bk",
+      "type": "tv",
+      "name": "TvVoo \u2022 Balkans",
+      "extra": [
+        {
+          "name": "skip",
+          "isRequired": false
+        },
+        {
+          "name": "genre",
+          "options": [
+            "Tutti",
+            "Documentary",
+            "Kids",
+            "Movies",
+            "Music",
+            "Sport"
+          ],
+          "isRequired": false
+        }
+      ]
+    },
+    {
+      "id": "vavoo_tv_ru",
+      "type": "tv",
+      "name": "TvVoo \u2022 Russia",
+      "extra": [
+        {
+          "name": "skip",
+          "isRequired": false
+        },
+        {
+          "name": "genre",
+          "options": [
+            "Tutti",
+            "Documentary",
+            "Kids",
+            "Movies",
+            "Music",
+            "News",
+            "Sport"
+          ],
+          "isRequired": false
+        }
+      ]
+    },
+    {
+      "id": "vavoo_tv_ro",
+      "type": "tv",
+      "name": "TvVoo \u2022 Romania",
+      "extra": [
+        {
+          "name": "skip",
+          "isRequired": false
+        },
+        {
+          "name": "genre",
+          "options": [
+            "Tutti",
+            "Documentary",
+            "Kids",
+            "Movies",
+            "Music",
+            "News",
+            "Sport"
+          ],
+          "isRequired": false
+        }
+      ]
+    },
+    {
+      "id": "vavoo_tv_pl",
+      "type": "tv",
+      "name": "TvVoo \u2022 Poland",
+      "extra": [
+        {
+          "name": "skip",
+          "isRequired": false
+        },
+        {
+          "name": "genre",
+          "options": [
+            "Tutti",
+            "Documentary",
+            "Kids",
+            "Movies",
+            "Music",
+            "News",
+            "Sport"
+          ],
+          "isRequired": false
+        }
+      ]
+    },
+    {
+      "id": "vavoo_tv_bg",
+      "type": "tv",
+      "name": "TvVoo \u2022 Bulgaria",
+      "extra": [
+        {
+          "name": "skip",
+          "isRequired": false
+        },
+        {
+          "name": "genre",
+          "options": [
+            "Tutti",
+            "Documentary",
+            "Kids",
+            "Movies",
+            "Music",
+            "News",
+            "Sport"
+          ],
+          "isRequired": false
+        }
+      ]
+    },
+    {
+      "id": "vavoo_search_it",
+      "type": "tv",
+      "name": "\ud83d\udd0e Italia",
+      "extra": [
+        {
+          "name": "search",
+          "isRequired": true
+        }
+      ]
+    },
+    {
+      "id": "vavoo_search_uk",
+      "type": "tv",
+      "name": "\ud83d\udd0e United Kingdom",
+      "extra": [
+        {
+          "name": "search",
+          "isRequired": true
+        }
+      ]
+    },
+    {
+      "id": "vavoo_search_fr",
+      "type": "tv",
+      "name": "\ud83d\udd0e France",
+      "extra": [
+        {
+          "name": "search",
+          "isRequired": true
+        }
+      ]
+    },
+    {
+      "id": "vavoo_search_de",
+      "type": "tv",
+      "name": "\ud83d\udd0e Germany",
+      "extra": [
+        {
+          "name": "search",
+          "isRequired": true
+        }
+      ]
+    },
+    {
+      "id": "vavoo_search_pt",
+      "type": "tv",
+      "name": "\ud83d\udd0e Portugal",
+      "extra": [
+        {
+          "name": "search",
+          "isRequired": true
+        }
+      ]
+    },
+    {
+      "id": "vavoo_search_es",
+      "type": "tv",
+      "name": "\ud83d\udd0e Spain",
+      "extra": [
+        {
+          "name": "search",
+          "isRequired": true
+        }
+      ]
+    },
+    {
+      "id": "vavoo_search_al",
+      "type": "tv",
+      "name": "\ud83d\udd0e Albania",
+      "extra": [
+        {
+          "name": "search",
+          "isRequired": true
+        }
+      ]
+    },
+    {
+      "id": "vavoo_search_tr",
+      "type": "tv",
+      "name": "\ud83d\udd0e Turkey",
+      "extra": [
+        {
+          "name": "search",
+          "isRequired": true
+        }
+      ]
+    },
+    {
+      "id": "vavoo_search_nl",
+      "type": "tv",
+      "name": "\ud83d\udd0e Nederland",
+      "extra": [
+        {
+          "name": "search",
+          "isRequired": true
+        }
+      ]
+    },
+    {
+      "id": "vavoo_search_ar",
+      "type": "tv",
+      "name": "\ud83d\udd0e Arabia",
+      "extra": [
+        {
+          "name": "search",
+          "isRequired": true
+        }
+      ]
+    },
+    {
+      "id": "vavoo_search_bk",
+      "type": "tv",
+      "name": "\ud83d\udd0e Balkans",
+      "extra": [
+        {
+          "name": "search",
+          "isRequired": true
+        }
+      ]
+    },
+    {
+      "id": "vavoo_search_ru",
+      "type": "tv",
+      "name": "\ud83d\udd0e Russia",
+      "extra": [
+        {
+          "name": "search",
+          "isRequired": true
+        }
+      ]
+    },
+    {
+      "id": "vavoo_search_ro",
+      "type": "tv",
+      "name": "\ud83d\udd0e Romania",
+      "extra": [
+        {
+          "name": "search",
+          "isRequired": true
+        }
+      ]
+    },
+    {
+      "id": "vavoo_search_pl",
+      "type": "tv",
+      "name": "\ud83d\udd0e Poland",
+      "extra": [
+        {
+          "name": "search",
+          "isRequired": true
+        }
+      ]
+    },
+    {
+      "id": "vavoo_search_bg",
+      "type": "tv",
+      "name": "\ud83d\udd0e Bulgaria",
+      "extra": [
+        {
+          "name": "search",
+          "isRequired": true
+        }
+      ]
+    }
+  ],
+  "resources": [
+    "catalog",
+    "meta",
+    "stream"
+  ],
+  "behaviorHints": {
+    "configurable": true,
+    "configurationRequired": false,
+    "epgProvider": true
+  },
+  "stremioAddonsConfig": {
+    "issuer": "https://stremio-addons.net",
+    "signature": "eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0..AEkVpgWVbgdJjE3cp31T4Q.CPmNnZ_2DJV3-gvqMSQf3p23an-90tk1gFl9nd0GEgw27DAn6gBnKPMQsSn0bJwOC4xuGpGpswN5FqTaae6rPs1WQGbvAMINuihb2WTvMpBw3rE1Plt8S_rRvsW1FBWO.QTNtrqn1tT7IiJcZ-kO6PA"
+  }
+}

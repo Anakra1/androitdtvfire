@@ -105,6 +105,7 @@ with ZipFile(PROJECT / 'windowsrepo.zip', 'w', ZIP_DEFLATED, compresslevel=7) as
             archive.write(path, (Path(repository.name) / path.relative_to(repository)).as_posix())
 
 names = ['repository.cbr.zip', 'windowsrepo.zip', alias, 'cbrwindows.zip']
+names += [name for name in ('a090repo.zip', 'w090repo.zip', 'a090.zip', 'w090.zip') if (PROJECT / name).is_file()]
 listing = ['<!doctype html>', '<html lang="en"><head><meta charset="utf-8"><title>CBR Kodi repository</title></head>',
            '<body><h1>Crimson Blood Requiem</h1>', '<table><tr><th>Name</th><th>Size</th></tr>']
 for name in names:

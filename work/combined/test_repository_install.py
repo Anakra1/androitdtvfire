@@ -17,7 +17,8 @@ class RepositoryInstallTests(unittest.TestCase):
         # no DOTALL flag, so each entry is also valid without multiline matching.
         pattern = re.compile(r'<a href="([^"]*)"[^>]*>\s*(.*?)\s*</a>(.+?)(?=<a|</tr|$)', re.I)
         entries = [link for link, name, _ in pattern.findall(html) if link.rstrip('/') == name.strip().rstrip('/')]
-        self.assertEqual(entries, ['repository.cbr.zip', 'windowsrepo.zip', 'cbr096.zip', 'cbrwindows.zip'])
+        self.assertEqual(entries, ['repository.cbr.zip', 'windowsrepo.zip', 'cbr096.zip', 'cbrwindows.zip',
+                                   'a090repo.zip', 'w090repo.zip', 'a090.zip', 'w090.zip'])
         for entry in entries:
             self.assertTrue((PROJECT / entry).is_file())
         self.assertEqual((PROJECT / 'cbr096.zip').read_bytes(),
