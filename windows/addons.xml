@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='utf8'?>
+<?xml version='1.0' encoding='utf-8'?>
 <addons><addon id="skin.crimsonbloodrequiem" version="0.1.1" name="Crimson Blood Requiem" provider-name="CBR Project">
   <requires>
     <import addon="xbmc.gui" version="5.17.0" />
@@ -42,14 +42,14 @@
       <fanart>resources/fanart.jpg</fanart>
     </assets>
   </extension>
-</addon><addon id="plugin.video.stremio.bridge" name="Crimson Blood Requiem" version="0.9.6" provider-name="Community">
+</addon><addon id="plugin.video.stremio.bridge" name="Crimson Blood Requiem" version="0.10.0" provider-name="Community">
   <requires><import addon="xbmc.python" version="3.0.1" /></requires>
   <extension point="xbmc.python.pluginsource" library="addon.py"><provides>video</provides></extension>
   <extension point="xbmc.service" library="service.py" start="startup" />
   <extension point="xbmc.addon.metadata">
     <summary lang="en_GB">CBR movies, series, live TV and built-in Windows/Android torrent player</summary>
-    <description lang="en_GB">Crimson Blood Requiem for Windows, Android TV and Fire TV: movies, TV episodes, torrent buffering, TV Channels, Internet TV and Live Sports. Kodi automatically installs CBR Playback Engine for integrated Android torrent buffering.</description>
+    <description lang="en_GB">CBR movies and TV episodes with Torrentio and integrated torrent buffering. Samsung TV Plus UK channels and guide, configured Sports Streams, and PC/phone source setup. Sports playback requires a working configured provider link. Android uses the automatically installed CBR Playback Engine dependency.</description>
     <platform>windows</platform><license>GPL-3.0-or-later; includes MIT-licensed components</license>
     <assets><icon>resources/art/crb-icon.png</icon><fanart>resources/art/crb-fanart.jpg</fanart></assets>
-  </extension>
+  <news>0.10.0: Accepted Samsung UK / Sports Streams baseline; matching Windows and Android packages; obsolete public TV presets retired. Restart Kodi after updating.</news></extension>
 </addon></addons>
