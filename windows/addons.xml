@@ -25,24 +25,7 @@
     <description lang="en_GB">Crimson Blood Requiem brings a dark space-fleet backdrop, deep red accents, and direct home-screen access to CBR movies, TV series, Live TV and search. Based on Kodi Estuary and designed to keep Kodi library, settings and other add-ons available.</description>
     <disclaimer lang="en_GB">An independent community skin. Kodi and Estuary are trademarks and software of their respective owners.</disclaimer>
   </extension>
-</addon><addon id="script.crb.wizard" name="CBR Setup Wizard" version="0.1.1" provider-name="CBR Project">
-  <requires>
-    <import addon="xbmc.python" version="3.0.1" />
-    <import addon="skin.crimsonbloodrequiem" version="0.1.1" />
-    <import addon="plugin.video.stremio.bridge" version="0.5.4" />
-  </requires>
-  <extension point="xbmc.python.script" library="default.py" />
-  <extension point="xbmc.addon.metadata">
-    <platform>all</platform>
-    <license>GPL-3.0-or-later</license>
-    <summary lang="en_GB">Install or restore the Crimson Blood Requiem Kodi interface</summary>
-    <description lang="en_GB">Applies the CBR space skin while preserving your Kodi library, profile and other add-ons. Stores the previous skin so you can restore it.</description>
-    <assets>
-      <icon>resources/icon.png</icon>
-      <fanart>resources/fanart.jpg</fanart>
-    </assets>
-  </extension>
-</addon><addon id="plugin.video.stremio.bridge" name="Crimson Blood Requiem" version="0.10.0" provider-name="Community">
+</addon><addon id="plugin.video.stremio.bridge" name="Crimson Blood Requiem" version="0.10.1" provider-name="Community">
   <requires><import addon="xbmc.python" version="3.0.1" /></requires>
   <extension point="xbmc.python.pluginsource" library="addon.py"><provides>video</provides></extension>
   <extension point="xbmc.service" library="service.py" start="startup" />
@@ -51,5 +34,22 @@
     <description lang="en_GB">CBR movies and TV episodes with Torrentio and integrated torrent buffering. Samsung TV Plus UK channels and guide, configured Sports Streams, and PC/phone source setup. Sports playback requires a working configured provider link. Android uses the automatically installed CBR Playback Engine dependency.</description>
     <platform>windows</platform><license>GPL-3.0-or-later; includes MIT-licensed components</license>
     <assets><icon>resources/art/crb-icon.png</icon><fanart>resources/art/crb-fanart.jpg</fanart></assets>
-  <news>0.10.0: Accepted Samsung UK / Sports Streams baseline; matching Windows and Android packages; obsolete public TV presets retired. Restart Kodi after updating.</news></extension>
+  <news>0.10.1: Accepted Samsung UK / Sports Streams baseline; matching Windows and Android packages; obsolete public TV presets retired. Restart Kodi after updating.</news></extension>
+</addon><addon id="script.crb.wizard" name="CBR Setup Wizard" version="0.2.0" provider-name="CBR Project">
+  <requires>
+    <import addon="xbmc.python" version="3.0.1" />
+    <import addon="skin.crimsonbloodrequiem" version="0.1.1" />
+    <import addon="plugin.video.stremio.bridge" version="0.10.1" />
+  <import addon="pvr.iptvsimple" version="21.0.0" /></requires>
+  <extension point="xbmc.python.script" library="default.py" />
+  <extension point="xbmc.addon.metadata">
+    <platform>all</platform>
+    <license>GPL-3.0-or-later</license>
+    <summary lang="en_GB">Full CBR install: movies, TV, channels, guide and crimson interface</summary>
+    <description lang="en_GB">Installs the required CBR video add-on, skin and official IPTV Simple client. Run Full install to configure sources, build the channels and programme guide, and apply the CBR interface. Existing personal settings are retained.</description>
+    <assets>
+      <icon>resources/icon.png</icon>
+      <fanart>resources/fanart.jpg</fanart>
+    </assets>
+  </extension>
 </addon></addons>

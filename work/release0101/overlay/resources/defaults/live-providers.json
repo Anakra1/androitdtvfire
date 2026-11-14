@@ -1,0 +1,33 @@
+[
+  {
+    "url": "https://dev.nebulawp.org/stremio/pluto-tv-addon/manifest.json",
+    "live_group": "internet",
+    "scope_types": [
+      "tv"
+    ],
+    "label": "Pluto TV",
+    "manifest_file": "pluto.json",
+    "public_fallback_url": "https://dev.nebulawp.org/stremio/pluto-tv-addon/manifest.json"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/BuddyChewChew/app-m3u-generator/main/playlists/samsungtvplus_gb.m3u",
+    "label": "Samsung TV Plus UK",
+    "manifest_file": "samsung.json",
+    "kind": "m3u",
+    "live_group": "internet",
+    "scope_types": [
+      "tv"
+    ],
+    "guide_country": "GB"
+  },
+  {
+    "url": "https://sports.highfly.dev/manifest.json",
+    "live_group": "sports",
+    "scope_types": [
+      "sport"
+    ],
+    "label": "Sports Streams",
+    "manifest_file": "sports.json",
+    "public_fallback_url": "https://sports.highfly.dev/manifest.json"
+  }
+]

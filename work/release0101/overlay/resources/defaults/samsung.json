@@ -1,0 +1,41 @@
+{
+  "id": "org.cbr.m3u.4b79acea3e313425",
+  "name": "M3U TV channels",
+  "version": "1.0.0",
+  "types": [
+    "tv"
+  ],
+  "resources": [
+    "catalog",
+    "meta",
+    "stream"
+  ],
+  "idPrefixes": [
+    "m3u."
+  ],
+  "catalogs": [
+    {
+      "id": "m3u_uk",
+      "type": "tv",
+      "name": "United Kingdom",
+      "country": "GB",
+      "extra": [
+        {
+          "name": "search",
+          "isRequired": false
+        }
+      ]
+    },
+    {
+      "id": "m3u_all",
+      "type": "tv",
+      "name": "All countries",
+      "extra": [
+        {
+          "name": "search",
+          "isRequired": false
+        }
+      ]
+    }
+  ]
+}
