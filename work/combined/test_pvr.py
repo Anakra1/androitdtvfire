@@ -264,6 +264,20 @@ class PVRRouteTests(unittest.TestCase):
         self.assertTrue(self.resolved[-1][1])
         self.assertIn('/fresh.m3u8',self.resolved[-1][2].path)
 
+    def test_recent_native_channel_link_skips_provider_loading_then_falls_back_when_dead(self):
+        variant = dict(provider=self.entry['key'], provider_id=self.entry['manifest']['id'], provider_label=self.entry['label'],
+                       resource_type='tv', live_country='GB', live_group='tv', meta=dict(id='bbc', type='tv', name='BBC News'))
+        rows = pvr.merge_channels([variant]); self.app.STORE.write(str(Path(self.temp.name)/'pvr-channels.json'),rows)
+        with patch.object(self.app,'probe_stream',return_value=True): self.app.pvr_play(rows[0]['id'])
+        with patch.object(self.app,'aggregate',side_effect=AssertionError('must not reload provider')), \
+             patch.object(self.app,'probe_stream',return_value=True): self.app.pvr_play(rows[0]['id'])
+        self.assertIn('/video.mp4',self.resolved[-1][2].path)
+        with patch.object(self.app,'aggregate',return_value=[(self.entry,{'streams':[{'url':'https://example.org/replacement.mp4'}]},None)]) as loader, \
+             patch.object(self.app,'probe_stream',side_effect=lambda s:not s['url'].endswith('/video.mp4')):
+            self.app.pvr_play(rows[0]['id'])
+            loader.assert_called_once()
+        self.assertIn('/replacement.mp4',self.resolved[-1][2].path)
+
     def test_daddylive_browsing_to_automatic_playback_without_source_picker(self):
         page = '<a class="card" href="watch.php?id=362" data-title="sky atlantic"></a>'
         daddylive._cache.clear()

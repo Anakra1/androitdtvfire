@@ -72,5 +72,20 @@ class DaddyTests(unittest.TestCase):
         with patch.object(daddy.decoders, 'fetch_page', return_value='<html>no catalogue</html>'):
             with self.assertRaises(ValueError): daddy.catalogue(daddy.DEFAULT_URL)
 
+    def test_preferred_player_avoids_slow_players_and_fails_over_if_blocked(self):
+        page = '<button data-url="/player/362" title="PLAYER 6"><button data-url="/cast/362" title="PLAYER 2">'
+        good = ('https://example.org/good.m3u8','https://example.org/')
+        with patch.object(daddy.decoders,'fetch_page',return_value=page), \
+             patch.object(daddy.decoders,'resolve_player',return_value=good), \
+             patch.object(daddy.decoders,'resolve_cast',return_value=('https://example.org/backup.m3u8','https://example.org/')) as backup, \
+             patch('resources.lib.live_player.probe_stream',return_value=True):
+            self.assertEqual(daddy.resolve(daddy.DEFAULT_URL,'daddy.362','DaddyLive / PLAYER 6')[0]['url'],good[0])
+            backup.assert_not_called()
+        with patch.object(daddy.decoders,'fetch_page',return_value=page), \
+             patch.object(daddy.decoders,'resolve_player',return_value=good), \
+             patch.object(daddy.decoders,'resolve_cast',return_value=('https://example.org/backup.m3u8','https://example.org/')), \
+             patch('resources.lib.live_player.probe_stream',return_value=False):
+            self.assertEqual(daddy.resolve(daddy.DEFAULT_URL,'daddy.362','DaddyLive / PLAYER 6')[0]['url'],'https://example.org/backup.m3u8')
+
 
 if __name__ == '__main__': unittest.main()

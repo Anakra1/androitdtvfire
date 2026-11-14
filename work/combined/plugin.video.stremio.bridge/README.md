@@ -1,4 +1,4 @@
-# Crimson Blood Requiem (CBR) 0.9.5 — Windows, Android TV and Fire TV
+# Crimson Blood Requiem (CBR) 0.9.6 — Windows, Android TV and Fire TV
 
 **One Kodi add-on includes movies, TV series, a torrent player and Live TV split into TV Channels, Internet TV and Live Sports.** No Elementum, separate Stream Bridge installation, or manual script copying is required.
 
@@ -8,7 +8,7 @@ These packages use public provider defaults and contain no personalized MediaFus
 
 ## Install
 
-1. On Windows, use **Add-ons → Install from zip file** and choose `plugin.video.stremio.bridge-0.9.5.zip`. On Android TV or Fire TV, install `CBR-Fire-TV-Android-Repository-0.1.7.zip`, then install Crimson Blood Requiem, the skin and the setup wizard from **Install from repository → CBR Android Add-on Repository**.
+1. On Windows, use **Add-ons → Install from zip file** and choose `plugin.video.stremio.bridge-0.9.6.zip`. On Android TV or Fire TV, install `CBR-Fire-TV-Android-Repository-0.1.7.zip`, then install Crimson Blood Requiem, the skin and the setup wizard from **Install from repository → CBR Android Add-on Repository**.
 2. Restart Kodi once to start the new background player service.
 3. Open **Video add-ons → Crimson Blood Requiem** (the crimson **CBR** thumbnail).
 4. Choose a movie or TV episode and a source, or open **Live TV** and select a category, catalogue, channel/event and source.
@@ -17,7 +17,7 @@ On Fire TV/Android, Kodi automatically installs **CBR Playback Engine** with the
 
 On a fresh profile, **Cinemeta** supplies movie/TV listings and posters, and **Torrentio** supplies stream results. They are enabled automatically on first launch; no account or default-URL entry is needed. Manifests describe sources and catalogues; the package does not contain movies or guarantee that every listed title has a working source. Playback depends on available peers, providers, network and Kodi codec support.
 
-## IPTV-org and M3U playlists (0.9.5)
+## IPTV-org and M3U playlists (0.9.6)
 
 Restart Kodi after updating, then open CBR once to add IPTV-org as an extra TV source. **CBR → Live TV → TV Channels → IPTV-org → United Kingdom** uses `https://iptv-org.github.io/iptv/countries/uk.m3u`. Other country catalogues are selectable; the worldwide master is `https://iptv-org.github.io/iptv/index.m3u`.
 
@@ -163,14 +163,20 @@ The integration is GPL-3.0-or-later and includes earlier MIT-licensed Movies com
 - [TorrServer release and source](https://github.com/YouROK/TorrServer/releases/tag/MatriX.150)
 - [Stremio add-on protocol](https://github.com/Stremio/stremio-addon-sdk/blob/master/docs/protocol.md)
 
-## MediaFusion channel fallbacks (0.9.5)
+## MediaFusion channel fallbacks (0.9.6)
 
 Enabled MediaFusion UK TV sources are added once to the native Kodi TV selection. Existing source selections, configured URLs, channel numbers and manual edits are retained. Known UK channel-name aliases share alternatives, including Sky Premiere / Sky Cinema Premiere. Playback checks alternatives across selected providers and uses a reachable link when earlier links fail. It cannot create streams for channels a provider does not return. Restart Kodi and open CBR once after updating; the background TV refresh rebuilds the lineup. Later source deselections are respected.
 
-## DaddyLive fresh stream resolution (0.9.5)
+## DaddyLive fresh stream resolution (0.9.6)
 
 Restart Kodi and open CBR once after updating. DaddyLive is added as an extra TV source and its UK catalogue joins an enabled native TV lineup. The generated M3U retains stable CBR channel routes; CBR requests fresh website player links at playback time rather than caching expiring playback URLs. Other countries are available in the DaddyLive All countries catalogue, with unknown countries kept separate. Native TV retains other selected sources and channel customisations. A failed upstream link can be skipped in favour of another available variant.
 
 Short PC checks returned video for Sky Atlantic, Sky Cinema Premiere and Sky Sports F1 through one player path. This is not a guarantee for every channel, location or extended playback. Player paths requiring continuous proxy token renewal are currently excluded. No separate DaddyLive addon, APK or external proxy is installed. The source origin can be edited in the paired source manager if the website changes domain; retain the `/cbr-daddylive/manifest.json` suffix, which identifies the local CBR adapter and is not a remote Stremio endpoint.
 
 Player page decoders are adapted from The Crew DaddyLive 5.2.7 under GPL-3.0-or-later; attribution and upstream location are in `resources/lib/daddy_resolvers.py`. Matching adapter and decoder source is included in the CBR source archive.
+
+## Faster native TV selection (0.9.6)
+
+Kodi TV remembers the last HTTP-responsive source for each channel. For 90 seconds it can reuse that link after a fresh availability check, without loading all providers. The original link expiry is never extended. For up to 24 hours the provider/player preference survives, letting CBR freshly resolve that player first; an explicit failure falls back to other links. DaddyLive can resolve its remembered player without waiting for all other players. These availability checks do not establish the spoken language or guarantee successful decoder startup.
+
+The short-lived links remain only in the local Kodi profile. M3U exports continue to use stable CBR routes. Cached links are not reused after the provider is disabled, removed or its configured URL changes. PVR retains ownership of channel switching. This update targets native Kodi TV channel selection; CBR catalogue caching remains as before. Restart Kodi after updating.

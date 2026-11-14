@@ -63,7 +63,7 @@ def catalogue(url, force=False):
     return rows
 
 
-def resolve(url, identity):
+def resolve(url, identity, preferred_player=''):
     if not re.fullmatch(r'daddy\.\d+', identity):
         return []
     base, cid = origin(url), identity.split('.')[1]
@@ -100,6 +100,14 @@ def resolve(url, identity):
         except Exception:
             return None
 
+    preferred = next((job for job in jobs if 'DaddyLive / ' + job[1] == preferred_player), None)
+    if preferred:
+        stream = attempt(preferred)
+        if stream:
+            from .live_player import probe_stream
+            if probe_stream(stream) is True:
+                return [stream]
+        jobs = [job for job in jobs if job != preferred]
     with ThreadPoolExecutor(max_workers=4) as pool:
         results = list(pool.map(attempt, jobs[:8]))
     unique = {}
@@ -113,7 +121,8 @@ def resource(entry, kind, media_type, identity, extras=None):
     if media_type != 'tv':
         return {}
     if kind == 'stream':
-        return {'streams': resolve(entry['url'], identity)}
+        preferred = (extras or {}).get('preferred_player', '')
+        return {'streams': resolve(entry['url'], identity, preferred) if preferred else resolve(entry['url'], identity)}
     extras = extras or {}
     rows = catalogue(entry['url'], force=bool(extras.get('_refresh')))
     if kind == 'catalog':

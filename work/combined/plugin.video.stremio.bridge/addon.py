@@ -14,6 +14,7 @@ from resources.lib.core import (DEFAULT_URL, PRESETS, Store, aggregate, fetch_js
                                 playback_url, resource_url, stream_kind, fetch_resource)
 from resources.lib.library import MovieLibrary
 from resources.lib.live_player import LiveAutoplay, probe_stream
+from resources.lib.live_hints import ChannelHints
 from resources.lib.programmes import (ProgrammeGuide, country_for, programme_text, request_refresh,
                                      provider_programmes, settings as programme_settings, save_settings as save_programme_settings)
 from resources.lib import pvr
@@ -758,21 +759,41 @@ def pvr_setup():
 
 def pvr_play(identity):
     row, variants = pvr.channel(STORE, identity)
+    LIVE_AUTOPLAY.clear()
+    hints = ChannelHints(STORE, row['id'])
+    cached = hints.cached(variants, probe_stream)
     path, fallback = None, None
-    for variant in variants:
+    if cached:
+        path, variant = cached
+    for variant in ([] if cached else hints.order(variants)):
         entry = STORE.provider(variant['provider'])
         streams = []
-        for _, data, _ in aggregate([entry], 'stream', variant['resource_type'], variant['meta']['id']):
+        preferred = hints.player(variant)
+        extras = {'preferred_player': preferred} if preferred else None
+        for _, data, _ in aggregate([entry], 'stream', variant['resource_type'], variant['meta']['id'], extras):
             streams.extend(s for s in data.get('streams', []) if isinstance(s, dict))
-        states = {}
+        # A remembered player gets one quick availability check before probing
+        # every other link; its URL has just been freshly resolved by the provider.
+        best = next((s for s in streams if preferred and s.get('name') == preferred), None)
+        if best and probe_stream(best) is True:
+            try:
+                path = playback_url(best)
+                hints.remember(variant, best)
+                break
+            except ValueError:
+                pass
+        states, checked_streams = {}, {}
         def checked(stream):
             state = probe_stream(stream)
             states[playback_url(stream)] = state
+            checked_streams[playback_url(stream)] = stream
             return state
         path = LIVE_AUTOPLAY.begin(variant['meta'], variant, streams, probe=checked)
         LIVE_AUTOPLAY.clear()
         if path:
             if states.get(path) is True:
+                best = checked_streams.get(path)
+                if best: hints.remember(variant, best)
                 break
             if fallback is None:
                 fallback = path, variant
