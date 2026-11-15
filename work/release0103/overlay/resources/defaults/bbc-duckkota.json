@@ -1,0 +1,2267 @@
+[
+  {
+    "url": "https://duckkota.github.io/iptv/playlists/best.m3u",
+    "label": "DuckKota TV",
+    "kind": "m3u",
+    "scope_types": [
+      "tv"
+    ],
+    "live_group": "tv",
+    "manifest": {
+      "id": "org.cbr.m3u.fd6e4444adff3080",
+      "name": "M3U TV channels",
+      "version": "1.0.0",
+      "types": [
+        "tv"
+      ],
+      "resources": [
+        "catalog",
+        "meta",
+        "stream"
+      ],
+      "idPrefixes": [
+        "m3u."
+      ],
+      "catalogs": [
+        {
+          "id": "m3u_uk",
+          "type": "tv",
+          "name": "United Kingdom",
+          "country": "GB",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_other",
+          "type": "tv",
+          "name": "Other / unspecified country",
+          "country": "",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_AF",
+          "type": "tv",
+          "name": "Afghanistan",
+          "country": "AF",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_AL",
+          "type": "tv",
+          "name": "Albania",
+          "country": "AL",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_DZ",
+          "type": "tv",
+          "name": "Algeria",
+          "country": "DZ",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_AD",
+          "type": "tv",
+          "name": "Andorra",
+          "country": "AD",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_AO",
+          "type": "tv",
+          "name": "Angola",
+          "country": "AO",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_AG",
+          "type": "tv",
+          "name": "Antigua and Barbuda",
+          "country": "AG",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_AR",
+          "type": "tv",
+          "name": "Argentina",
+          "country": "AR",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_AM",
+          "type": "tv",
+          "name": "Armenia",
+          "country": "AM",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_AW",
+          "type": "tv",
+          "name": "Aruba",
+          "country": "AW",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_AU",
+          "type": "tv",
+          "name": "Australia",
+          "country": "AU",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_AT",
+          "type": "tv",
+          "name": "Austria",
+          "country": "AT",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_AZ",
+          "type": "tv",
+          "name": "Azerbaijan",
+          "country": "AZ",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_BS",
+          "type": "tv",
+          "name": "Bahamas",
+          "country": "BS",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_BH",
+          "type": "tv",
+          "name": "Bahrain",
+          "country": "BH",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_BD",
+          "type": "tv",
+          "name": "Bangladesh",
+          "country": "BD",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_BB",
+          "type": "tv",
+          "name": "Barbados",
+          "country": "BB",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_BY",
+          "type": "tv",
+          "name": "Belarus",
+          "country": "BY",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_BE",
+          "type": "tv",
+          "name": "Belgium",
+          "country": "BE",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_BZ",
+          "type": "tv",
+          "name": "Belize",
+          "country": "BZ",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_BJ",
+          "type": "tv",
+          "name": "Benin",
+          "country": "BJ",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_BO",
+          "type": "tv",
+          "name": "Bolivia",
+          "country": "BO",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_BQ",
+          "type": "tv",
+          "name": "Bonaire",
+          "country": "BQ",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_BA",
+          "type": "tv",
+          "name": "Bosnia and Herzegovina",
+          "country": "BA",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_BR",
+          "type": "tv",
+          "name": "Brazil",
+          "country": "BR",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_VG",
+          "type": "tv",
+          "name": "British Virgin Islands",
+          "country": "VG",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_BN",
+          "type": "tv",
+          "name": "Brunei",
+          "country": "BN",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_BG",
+          "type": "tv",
+          "name": "Bulgaria",
+          "country": "BG",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_BF",
+          "type": "tv",
+          "name": "Burkina Faso",
+          "country": "BF",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_BI",
+          "type": "tv",
+          "name": "Burundi",
+          "country": "BI",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_KH",
+          "type": "tv",
+          "name": "Cambodia",
+          "country": "KH",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_CM",
+          "type": "tv",
+          "name": "Cameroon",
+          "country": "CM",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_CA",
+          "type": "tv",
+          "name": "Canada",
+          "country": "CA",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_CV",
+          "type": "tv",
+          "name": "Cape Verde",
+          "country": "CV",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_TD",
+          "type": "tv",
+          "name": "Chad",
+          "country": "TD",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_CL",
+          "type": "tv",
+          "name": "Chile",
+          "country": "CL",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_CN",
+          "type": "tv",
+          "name": "China",
+          "country": "CN",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_CO",
+          "type": "tv",
+          "name": "Colombia",
+          "country": "CO",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_CR",
+          "type": "tv",
+          "name": "Costa Rica",
+          "country": "CR",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_HR",
+          "type": "tv",
+          "name": "Croatia",
+          "country": "HR",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_CU",
+          "type": "tv",
+          "name": "Cuba",
+          "country": "CU",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_CW",
+          "type": "tv",
+          "name": "Curacao",
+          "country": "CW",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_CY",
+          "type": "tv",
+          "name": "Cyprus",
+          "country": "CY",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_CZ",
+          "type": "tv",
+          "name": "Czech Republic",
+          "country": "CZ",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_CD",
+          "type": "tv",
+          "name": "Democratic Republic of the Congo",
+          "country": "CD",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_DK",
+          "type": "tv",
+          "name": "Denmark",
+          "country": "DK",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_DO",
+          "type": "tv",
+          "name": "Dominican Republic",
+          "country": "DO",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_EC",
+          "type": "tv",
+          "name": "Ecuador",
+          "country": "EC",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_EG",
+          "type": "tv",
+          "name": "Egypt",
+          "country": "EG",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_SV",
+          "type": "tv",
+          "name": "El Salvador",
+          "country": "SV",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_GQ",
+          "type": "tv",
+          "name": "Equatorial Guinea",
+          "country": "GQ",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_ER",
+          "type": "tv",
+          "name": "Eritrea",
+          "country": "ER",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_EE",
+          "type": "tv",
+          "name": "Estonia",
+          "country": "EE",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_ET",
+          "type": "tv",
+          "name": "Ethiopia",
+          "country": "ET",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_FI",
+          "type": "tv",
+          "name": "Finland",
+          "country": "FI",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_FR",
+          "type": "tv",
+          "name": "France",
+          "country": "FR",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_GF",
+          "type": "tv",
+          "name": "French Guiana",
+          "country": "GF",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_PF",
+          "type": "tv",
+          "name": "French Polynesia",
+          "country": "PF",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_GM",
+          "type": "tv",
+          "name": "Gambia",
+          "country": "GM",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_GE",
+          "type": "tv",
+          "name": "Georgia",
+          "country": "GE",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_DE",
+          "type": "tv",
+          "name": "Germany",
+          "country": "DE",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_GH",
+          "type": "tv",
+          "name": "Ghana",
+          "country": "GH",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_GR",
+          "type": "tv",
+          "name": "Greece",
+          "country": "GR",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_GP",
+          "type": "tv",
+          "name": "Guadeloupe",
+          "country": "GP",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_GU",
+          "type": "tv",
+          "name": "Guam",
+          "country": "GU",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_GT",
+          "type": "tv",
+          "name": "Guatemala",
+          "country": "GT",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_GN",
+          "type": "tv",
+          "name": "Guinea",
+          "country": "GN",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_GY",
+          "type": "tv",
+          "name": "Guyana",
+          "country": "GY",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_HT",
+          "type": "tv",
+          "name": "Haiti",
+          "country": "HT",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_HN",
+          "type": "tv",
+          "name": "Honduras",
+          "country": "HN",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_HK",
+          "type": "tv",
+          "name": "Hong Kong",
+          "country": "HK",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_HU",
+          "type": "tv",
+          "name": "Hungary",
+          "country": "HU",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_IS",
+          "type": "tv",
+          "name": "Iceland",
+          "country": "IS",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_IN",
+          "type": "tv",
+          "name": "India",
+          "country": "IN",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_ID",
+          "type": "tv",
+          "name": "Indonesia",
+          "country": "ID",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_IR",
+          "type": "tv",
+          "name": "Iran",
+          "country": "IR",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_IQ",
+          "type": "tv",
+          "name": "Iraq",
+          "country": "IQ",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_IE",
+          "type": "tv",
+          "name": "Ireland",
+          "country": "IE",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_IL",
+          "type": "tv",
+          "name": "Israel",
+          "country": "IL",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_IT",
+          "type": "tv",
+          "name": "Italy",
+          "country": "IT",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_CI",
+          "type": "tv",
+          "name": "Ivory Coast",
+          "country": "CI",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_JM",
+          "type": "tv",
+          "name": "Jamaica",
+          "country": "JM",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_JP",
+          "type": "tv",
+          "name": "Japan",
+          "country": "JP",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_JO",
+          "type": "tv",
+          "name": "Jordan",
+          "country": "JO",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_KZ",
+          "type": "tv",
+          "name": "Kazakhstan",
+          "country": "KZ",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_KE",
+          "type": "tv",
+          "name": "Kenya",
+          "country": "KE",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_XK",
+          "type": "tv",
+          "name": "Kosovo",
+          "country": "XK",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_KW",
+          "type": "tv",
+          "name": "Kuwait",
+          "country": "KW",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_KG",
+          "type": "tv",
+          "name": "Kyrgyzstan",
+          "country": "KG",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_LA",
+          "type": "tv",
+          "name": "Laos",
+          "country": "LA",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_LV",
+          "type": "tv",
+          "name": "Latvia",
+          "country": "LV",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_LB",
+          "type": "tv",
+          "name": "Lebanon",
+          "country": "LB",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_LY",
+          "type": "tv",
+          "name": "Libya",
+          "country": "LY",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_LT",
+          "type": "tv",
+          "name": "Lithuania",
+          "country": "LT",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_LU",
+          "type": "tv",
+          "name": "Luxembourg",
+          "country": "LU",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_MO",
+          "type": "tv",
+          "name": "Macao",
+          "country": "MO",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_MY",
+          "type": "tv",
+          "name": "Malaysia",
+          "country": "MY",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_MV",
+          "type": "tv",
+          "name": "Maldives",
+          "country": "MV",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_ML",
+          "type": "tv",
+          "name": "Mali",
+          "country": "ML",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_MT",
+          "type": "tv",
+          "name": "Malta",
+          "country": "MT",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_MQ",
+          "type": "tv",
+          "name": "Martinique",
+          "country": "MQ",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_MR",
+          "type": "tv",
+          "name": "Mauritania",
+          "country": "MR",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_MX",
+          "type": "tv",
+          "name": "Mexico",
+          "country": "MX",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_MD",
+          "type": "tv",
+          "name": "Moldova",
+          "country": "MD",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_MC",
+          "type": "tv",
+          "name": "Monaco",
+          "country": "MC",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_MN",
+          "type": "tv",
+          "name": "Mongolia",
+          "country": "MN",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_ME",
+          "type": "tv",
+          "name": "Montenegro",
+          "country": "ME",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_MA",
+          "type": "tv",
+          "name": "Morocco",
+          "country": "MA",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_MZ",
+          "type": "tv",
+          "name": "Mozambique",
+          "country": "MZ",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_MM",
+          "type": "tv",
+          "name": "Myanmar",
+          "country": "MM",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_NA",
+          "type": "tv",
+          "name": "Namibia",
+          "country": "NA",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_NP",
+          "type": "tv",
+          "name": "Nepal",
+          "country": "NP",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_NL",
+          "type": "tv",
+          "name": "Netherlands",
+          "country": "NL",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_NC",
+          "type": "tv",
+          "name": "New Caledonia",
+          "country": "NC",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_NZ",
+          "type": "tv",
+          "name": "New Zealand",
+          "country": "NZ",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_NI",
+          "type": "tv",
+          "name": "Nicaragua",
+          "country": "NI",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_NE",
+          "type": "tv",
+          "name": "Niger",
+          "country": "NE",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_NG",
+          "type": "tv",
+          "name": "Nigeria",
+          "country": "NG",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_KP",
+          "type": "tv",
+          "name": "North Korea",
+          "country": "KP",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_MK",
+          "type": "tv",
+          "name": "North Macedonia",
+          "country": "MK",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_NO",
+          "type": "tv",
+          "name": "Norway",
+          "country": "NO",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_OM",
+          "type": "tv",
+          "name": "Oman",
+          "country": "OM",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_PK",
+          "type": "tv",
+          "name": "Pakistan",
+          "country": "PK",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_PS",
+          "type": "tv",
+          "name": "Palestine",
+          "country": "PS",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_PA",
+          "type": "tv",
+          "name": "Panama",
+          "country": "PA",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_PG",
+          "type": "tv",
+          "name": "Papua New Guinea",
+          "country": "PG",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_PY",
+          "type": "tv",
+          "name": "Paraguay",
+          "country": "PY",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_PE",
+          "type": "tv",
+          "name": "Peru",
+          "country": "PE",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_PH",
+          "type": "tv",
+          "name": "Philippines",
+          "country": "PH",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_PL",
+          "type": "tv",
+          "name": "Poland",
+          "country": "PL",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_PT",
+          "type": "tv",
+          "name": "Portugal",
+          "country": "PT",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_PR",
+          "type": "tv",
+          "name": "Puerto Rico",
+          "country": "PR",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_QA",
+          "type": "tv",
+          "name": "Qatar",
+          "country": "QA",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_CG",
+          "type": "tv",
+          "name": "Republic of the Congo",
+          "country": "CG",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_RO",
+          "type": "tv",
+          "name": "Romania",
+          "country": "RO",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_RU",
+          "type": "tv",
+          "name": "Russia",
+          "country": "RU",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_RW",
+          "type": "tv",
+          "name": "Rwanda",
+          "country": "RW",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_KN",
+          "type": "tv",
+          "name": "Saint Kitts and Nevis",
+          "country": "KN",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_LC",
+          "type": "tv",
+          "name": "Saint Lucia",
+          "country": "LC",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_VC",
+          "type": "tv",
+          "name": "Saint Vincent and the Grenadines",
+          "country": "VC",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_WS",
+          "type": "tv",
+          "name": "Samoa",
+          "country": "WS",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_SM",
+          "type": "tv",
+          "name": "San Marino",
+          "country": "SM",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_SA",
+          "type": "tv",
+          "name": "Saudi Arabia",
+          "country": "SA",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_SN",
+          "type": "tv",
+          "name": "Senegal",
+          "country": "SN",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_RS",
+          "type": "tv",
+          "name": "Serbia",
+          "country": "RS",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_SL",
+          "type": "tv",
+          "name": "Sierra Leone",
+          "country": "SL",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_SG",
+          "type": "tv",
+          "name": "Singapore",
+          "country": "SG",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_SX",
+          "type": "tv",
+          "name": "Sint Maarten",
+          "country": "SX",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_SK",
+          "type": "tv",
+          "name": "Slovakia",
+          "country": "SK",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_SI",
+          "type": "tv",
+          "name": "Slovenia",
+          "country": "SI",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_SO",
+          "type": "tv",
+          "name": "Somalia",
+          "country": "SO",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_ZA",
+          "type": "tv",
+          "name": "South Africa",
+          "country": "ZA",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_KR",
+          "type": "tv",
+          "name": "South Korea",
+          "country": "KR",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_ES",
+          "type": "tv",
+          "name": "Spain",
+          "country": "ES",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_LK",
+          "type": "tv",
+          "name": "Sri Lanka",
+          "country": "LK",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_SD",
+          "type": "tv",
+          "name": "Sudan",
+          "country": "SD",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_SR",
+          "type": "tv",
+          "name": "Suriname",
+          "country": "SR",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_SE",
+          "type": "tv",
+          "name": "Sweden",
+          "country": "SE",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_CH",
+          "type": "tv",
+          "name": "Switzerland",
+          "country": "CH",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_SY",
+          "type": "tv",
+          "name": "Syria",
+          "country": "SY",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_TW",
+          "type": "tv",
+          "name": "Taiwan",
+          "country": "TW",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_TJ",
+          "type": "tv",
+          "name": "Tajikistan",
+          "country": "TJ",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_TZ",
+          "type": "tv",
+          "name": "Tanzania",
+          "country": "TZ",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_TH",
+          "type": "tv",
+          "name": "Thailand",
+          "country": "TH",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_TG",
+          "type": "tv",
+          "name": "Togo",
+          "country": "TG",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_TT",
+          "type": "tv",
+          "name": "Trinidad and Tobago",
+          "country": "TT",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_TN",
+          "type": "tv",
+          "name": "Tunisia",
+          "country": "TN",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_TR",
+          "type": "tv",
+          "name": "Turkiye",
+          "country": "TR",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_TM",
+          "type": "tv",
+          "name": "Turkmenistan",
+          "country": "TM",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_UG",
+          "type": "tv",
+          "name": "Uganda",
+          "country": "UG",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_UA",
+          "type": "tv",
+          "name": "Ukraine",
+          "country": "UA",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_AE",
+          "type": "tv",
+          "name": "United Arab Emirates",
+          "country": "AE",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_US",
+          "type": "tv",
+          "name": "United States",
+          "country": "US",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_UY",
+          "type": "tv",
+          "name": "Uruguay",
+          "country": "UY",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_UZ",
+          "type": "tv",
+          "name": "Uzbekistan",
+          "country": "UZ",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_VE",
+          "type": "tv",
+          "name": "Venezuela",
+          "country": "VE",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_VN",
+          "type": "tv",
+          "name": "Vietnam",
+          "country": "VN",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_EH",
+          "type": "tv",
+          "name": "Western Sahara",
+          "country": "EH",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_YE",
+          "type": "tv",
+          "name": "Yemen",
+          "country": "YE",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_ZW",
+          "type": "tv",
+          "name": "Zimbabwe",
+          "country": "ZW",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        },
+        {
+          "id": "m3u_all",
+          "type": "tv",
+          "name": "All countries",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "url": "https://raw.githubusercontent.com/Free-TV/IPTV/master/playlists/playlist_uk.m3u8",
+    "label": "BBC UK (Free-TV)",
+    "kind": "m3u",
+    "scope_types": [
+      "tv"
+    ],
+    "live_group": "tv",
+    "priority": 10,
+    "include_tvg_ids": [
+      "BBCOne.uk",
+      "BBCTwo.uk",
+      "BBCThree.uk",
+      "BBCFour.uk",
+      "BBCAlba.uk",
+      "BBCScotland.uk",
+      "BBCNews.uk",
+      "BBCParliament.uk",
+      "CBBC.uk",
+      "CBeebies.uk"
+    ],
+    "epg_ids": {
+      "BBCOne.uk": "BBC.One.Yorks.HD.uk"
+    },
+    "manifest": {
+      "id": "org.cbr.m3u.af78bf8e93db0e1c",
+      "name": "M3U TV channels",
+      "version": "1.0.0",
+      "types": [
+        "tv"
+      ],
+      "resources": [
+        "catalog",
+        "meta",
+        "stream"
+      ],
+      "idPrefixes": [
+        "m3u."
+      ],
+      "catalogs": [
+        {
+          "id": "m3u_uk",
+          "type": "tv",
+          "name": "BBC UK",
+          "country": "GB",
+          "extra": [
+            {
+              "name": "search",
+              "isRequired": false
+            }
+          ]
+        }
+      ]
+    }
+  }
+]
