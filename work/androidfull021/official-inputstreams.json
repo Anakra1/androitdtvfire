@@ -1,0 +1,44 @@
+[
+  {
+    "id": "inputstream.ffmpegdirect",
+    "cpu": "android-armv7",
+    "source": "https://mirrors.kodi.tv/addons/omega/inputstream.ffmpegdirect+android-armv7/inputstream.ffmpegdirect-21.3.8.zip",
+    "cache": "verified-live-full021-android-armv7-inputstream.ffmpegdirect.zip",
+    "sha256": "54550ce557adca6747d5883c2c85c4a7cf1fe6d43e459bdcbeae13c7c7443389"
+  },
+  {
+    "id": "inputstream.ffmpegdirect",
+    "cpu": "android-aarch64",
+    "source": "https://mirrors.kodi.tv/addons/omega/inputstream.ffmpegdirect+android-aarch64/inputstream.ffmpegdirect-21.3.8.zip",
+    "cache": "verified-live-full021-android-aarch64-inputstream.ffmpegdirect.zip",
+    "sha256": "26b0f54cfd1964ab78c802a218c2bd6053d959cdee1f65ddc8d6145807efdc80"
+  },
+  {
+    "id": "inputstream.adaptive",
+    "cpu": "android-armv7",
+    "source": "https://mirrors.kodi.tv/addons/omega/inputstream.adaptive+android-armv7/inputstream.adaptive-21.5.25.zip",
+    "cache": "verified-live-full021-android-armv7-inputstream.adaptive.zip",
+    "sha256": "973bb1fd9ddb549df260dd0321dd8fea37a2e949885bee5c4da9a23e3ba9090e"
+  },
+  {
+    "id": "inputstream.adaptive",
+    "cpu": "android-aarch64",
+    "source": "https://mirrors.kodi.tv/addons/omega/inputstream.adaptive+android-aarch64/inputstream.adaptive-21.5.25.zip",
+    "cache": "verified-live-full021-android-aarch64-inputstream.adaptive.zip",
+    "sha256": "5bec8b8ca1f1ca8264e32455cb34b2939e523f9bdb18cd65d7383d18afdf04cb"
+  },
+  {
+    "id": "inputstream.rtmp",
+    "cpu": "android-armv7",
+    "source": "https://mirrors.kodi.tv/addons/omega/inputstream.rtmp+android-armv7/inputstream.rtmp-21.1.2.zip",
+    "cache": "verified-live-full021-android-armv7-inputstream.rtmp.zip",
+    "sha256": "300fa80956dba4f7ad30a479f2dabb5f28bd156e232c0cbbbcc16334d148ec29"
+  },
+  {
+    "id": "inputstream.rtmp",
+    "cpu": "android-aarch64",
+    "source": "https://mirrors.kodi.tv/addons/omega/inputstream.rtmp+android-aarch64/inputstream.rtmp-21.1.2.zip",
+    "cache": "verified-live-full021-android-aarch64-inputstream.rtmp.zip",
+    "sha256": "e1705675af645be49880db81289c3457fa75e346510998f10d777026a4832dcc"
+  }
+]

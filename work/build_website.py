@@ -102,7 +102,19 @@ def install_page(platform):
     <aside class="guide-aside" aria-label="{label} installation downloads"><div class="device-icon">{icon('tv' if android else 'windows')}</div><p class="eyebrow" style="margin-top:22px">{label} downloads</p><h3>Use the right repository.</h3><p>For a first install, choose <strong>{filename}</strong> in Kodi’s CBR source.</p><a class="button primary" href="../{filename}" download>{icon('download')} Download repository ZIP</a><a class="button" href="../{update}"{update_attr} download>Latest video add-on ZIP {icon('arrow')}</a><div class="aside-note"><p><strong>Installing with a TV remote?</strong><br>Add the short source address in Kodi. You can select the ZIP there without typing a download filename.</p></div><div class="aside-note"><p>Using {'a Windows PC' if android else 'Android or Fire TV'} instead?</p><a class="text-link" href="{'windows' if android else 'android'}.html">Open that install guide {icon('arrow')}</a></div></aside></section>'''
 
 
-render('android.html', 'Android & Fire TV install, update and uninstall guide', 'Install, update or uninstall Crimson Blood Requiem on Firestick, Fire TV and Android TV, including safe removal of the skin and playback dependency.', install_page('android'))
+def android_install_page():
+    content = install_page('android')
+    start = content.index('<li><h3>Install the Android / Fire TV repository</h3>')
+    stop = content.index('<li><h3>Run Full install, then restart Kodi</h3>', start)
+    content = content[:start] + '<li><h3>Install the Android full package</h3><span class="path">Add-ons → Install from zip file → CBR → <strong>fulla.zip</strong></span><p>This package includes the CBR skin, video add-on, torrent engine, update repository and Kodi 21 ARM TV client. No CBR repository install is required first. It is a larger download: wait for Kodi to confirm installation.</p><p>If Kodi asks, enable Unknown sources under Settings → System → Add-ons, then return here.</p></li>' + content[stop:]
+    content = content.replace('through Kodi’s repository system.', 'from the full Android installer.')
+    start = content.index('<h3>Use the right repository.</h3>')
+    stop = content.index('<div class="aside-note">', start)
+    content = content[:start] + '<h3>The skin is included.</h3><p>Choose <strong>fulla.zip</strong> in Kodi’s CBR source, then open the wizard and run Full install / repair.</p><a class="button primary" href="../fulla.zip" download>Download Android full installer</a>' + content[stop:]
+    return content
+
+
+render('android.html', 'Android & Fire TV install, update and uninstall guide', 'Install, update or uninstall Crimson Blood Requiem on Firestick, Fire TV and Android TV, including safe removal of the skin and playback dependency.', android_install_page())
 render('windows.html', 'Windows install, update and uninstall guide', 'Install, update or uninstall Crimson Blood Requiem on Windows, including the correct order to remove its wizard, skin and video add-on.', install_page('windows'))
 
 help_content = page_hero('Help & updates', 'A smoother setup.<br><span class="accent">A better evening.</span>', 'Set up your sources, organise the TV guide and make CBR feel at home on your screen.') + f'''
