@@ -1,32 +1,5 @@
-<?xml version='1.0' encoding='utf8'?>
-<addons><addon id="plugin.video.stremio.bridge" name="Crimson Blood Requiem" version="0.10.5" provider-name="Community">
-  <requires><import addon="xbmc.python" version="3.0.1" /></requires>
-  <extension point="xbmc.python.pluginsource" library="addon.py"><provides>video</provides></extension>
-  <extension point="xbmc.service" library="service.py" start="startup" />
-  <extension point="xbmc.addon.metadata">
-    <summary lang="en_GB">CBR movies, series, live TV and built-in Windows/Android torrent player</summary>
-    <description lang="en_GB">CBR movies and TV episodes with Torrentio and integrated torrent buffering. Samsung TV Plus UK channels and guide, configured Sports Streams, and PC/phone source setup. Sports playback requires a working configured provider link. Android uses the automatically installed CBR Playback Engine dependency.</description>
-    <platform>windows</platform><license>GPL-3.0-or-later; includes MIT-licensed components</license>
-    <assets><icon>resources/art/crb-icon.png</icon><fanart>resources/art/crb-fanart.jpg</fanart></assets>
-  <news>0.10.5: Check Kodi repositories after an idle startup. Kodi handles automatic installation for repository-linked add-ons according to your update settings. Manual ZIP installs need a one-time repository selection.</news></extension>
-</addon><addon id="script.crb.wizard" name="CBR Setup Wizard" version="0.2.1" provider-name="CBR Project">
-  <requires>
-    <import addon="xbmc.python" version="3.0.1" />
-    <import addon="skin.crimsonbloodrequiem" version="0.1.2" />
-    <import addon="plugin.video.stremio.bridge" version="0.10.5" />
-  <import addon="pvr.iptvsimple" version="21.0.0" /></requires>
-  <extension point="xbmc.python.script" library="default.py" />
-  <extension point="xbmc.addon.metadata">
-    <platform>windows</platform>
-    <license>GPL-3.0-or-later</license>
-    <summary lang="en_GB">Full CBR install: movies, TV, channels, guide and crimson interface</summary>
-    <description lang="en_GB">Installs the required CBR video add-on, skin and official IPTV Simple client. Run Full install to configure sources, build the channels and programme guide, and apply the CBR interface. Existing personal settings are retained.</description>
-    <assets>
-      <icon>resources/icon.png</icon>
-      <fanart>resources/fanart.jpg</fanart>
-    </assets>
-  </extension>
-</addon><addon id="skin.crimsonbloodrequiem" version="0.1.2" name="Crimson Blood Requiem" provider-name="CBR Project">
+<?xml version='1.0' encoding='utf-8'?>
+<addons><addon id="skin.crimsonbloodrequiem" version="0.1.2" name="Crimson Blood Requiem" provider-name="CBR Project">
   <requires>
     <import addon="xbmc.gui" version="5.17.0" />
     <import addon="plugin.video.stremio.bridge" version="0.10.3" />
@@ -52,4 +25,31 @@
     <description lang="en_GB">Crimson Blood Requiem brings a dark space-fleet backdrop, deep red accents, and direct home-screen access to CBR movies, TV series, Live TV and search. Based on Kodi Estuary and designed to keep Kodi library, settings and other add-ons available.</description>
     <disclaimer lang="en_GB">An independent community skin. Kodi and Estuary are trademarks and software of their respective owners.</disclaimer>
   </extension>
+</addon><addon id="plugin.video.stremio.bridge" name="Crimson Blood Requiem" version="0.11.0" provider-name="Community">
+  <requires><import addon="xbmc.python" version="3.0.1" /></requires>
+  <extension point="xbmc.python.pluginsource" library="addon.py"><provides>video</provides></extension>
+  <extension point="xbmc.service" library="service.py" start="startup" />
+  <extension point="xbmc.addon.metadata">
+    <summary lang="en_GB">CBR movies, series, live TV and built-in Windows/Android torrent player</summary>
+    <description lang="en_GB">CBR movies and TV episodes with Torrentio and integrated torrent buffering. Samsung TV Plus UK channels and guide, configured Sports Streams, and PC/phone source setup. Sports playback requires a working configured provider link. Android uses the automatically installed CBR Playback Engine dependency.</description>
+    <platform>windows</platform><license>GPL-3.0-or-later; includes MIT-licensed components</license>
+    <assets><icon>resources/art/crb-icon.png</icon><fanart>resources/art/crb-fanart.jpg</fanart></assets>
+  <news>0.11.0: Check/repair and redacted diagnostics, bounded source samples, Pluto UK M3U and guide, favourites and channel groups, private settings backup/restore, and guided CBR-only removal. Keep Kodi auto-updates enabled and select the repository version once for manual installs.</news></extension>
+</addon><addon id="script.crb.wizard" name="CBR Setup Wizard" version="0.3.0" provider-name="CBR Project">
+  <requires>
+    <import addon="xbmc.python" version="3.0.1" />
+    <import addon="skin.crimsonbloodrequiem" version="0.1.2" />
+    <import addon="plugin.video.stremio.bridge" version="0.11.0" />
+  <import addon="pvr.iptvsimple" version="21.0.0" /></requires>
+  <extension point="xbmc.python.script" library="default.py" />
+  <extension point="xbmc.addon.metadata">
+    <platform>windows</platform>
+    <license>GPL-3.0-or-later</license>
+    <summary lang="en_GB">Full CBR install: movies, TV, channels, guide and crimson interface</summary>
+    <description lang="en_GB">Installs the required CBR video add-on, skin and official IPTV Simple client. Run Full install to configure sources, build the channels and programme guide, and apply the CBR interface. Existing personal settings are retained.</description>
+    <assets>
+      <icon>resources/icon.png</icon>
+      <fanart>resources/fanart.jpg</fanart>
+    </assets>
+  <news>0.3.0: Includes check/repair access and CBR-only removal with settings kept by default. Run Full install / repair for initial setup.</news></extension>
 </addon></addons>
