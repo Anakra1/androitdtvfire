@@ -35,7 +35,7 @@
     <description lang="en_GB">Crimson Blood Requiem brings a dark space-fleet backdrop, deep red accents, and direct home-screen access to CBR movies, TV series, Live TV and search. Based on Kodi Estuary and designed to keep Kodi library, settings and other add-ons available.</description>
     <disclaimer lang="en_GB">An independent community skin. Kodi and Estuary are trademarks and software of their respective owners.</disclaimer>
   </extension>
-</addon><addon id="plugin.video.stremio.bridge" name="Crimson Blood Requiem" version="0.10.4" provider-name="Community">
+</addon><addon id="plugin.video.stremio.bridge" name="Crimson Blood Requiem" version="0.10.5" provider-name="Community">
   <requires><import addon="xbmc.python" version="3.0.1" /><import addon="script.module.cbr.engine" version="0.1.0" /></requires>
   <extension point="xbmc.python.pluginsource" library="addon.py"><provides>video</provides></extension>
   <extension point="xbmc.service" library="service.py" start="startup" />
@@ -44,8 +44,8 @@
     <description lang="en_GB">CBR movies and TV episodes with Torrentio and integrated torrent buffering. Samsung TV Plus UK channels and guide, configured Sports Streams, and PC/phone source setup. Sports playback requires a working configured provider link. Android uses the automatically installed CBR Playback Engine dependency.</description>
     <platform>android</platform><license>GPL-3.0-or-later; includes MIT-licensed components</license>
     <assets><icon>resources/art/crb-icon.png</icon><fanart>resources/art/crb-fanart.jpg</fanart></assets>
-  <news>0.10.4: Sport-first event/channel menus, merged compatible source alternatives and optional links to installed Crew sports menus. DaddyLive remains disabled after failed playback tests. Restart Kodi after updating.</news></extension>
-</addon><addon id="script.crb.wizard" name="CBR Setup Wizard" version="0.2.3" provider-name="CBR Project">
+  <news>0.10.5: Check Kodi repositories after an idle startup. Kodi handles automatic installation for repository-linked add-ons according to your update settings. Manual ZIP installs need a one-time repository selection.</news></extension>
+</addon><addon id="script.crb.wizard" name="CBR Setup Wizard" version="0.2.4" provider-name="CBR Project">
   <requires>
     <import addon="xbmc.python" version="3.0.1" />
     </requires>
