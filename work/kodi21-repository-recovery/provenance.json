@@ -1,0 +1,12 @@
+{
+  "tag": "21.3-Omega",
+  "source": "https://raw.githubusercontent.com/xbmc/xbmc/21.3-Omega/",
+  "files": {
+    "addon.xml": "1453e050fb6c9c49bf23af2ab60c3a18c886021364670b5960fa06cf862ba055",
+    "icon.png": "c70ad7d3f0967045e4efb9f39c33d1b6090325906025e0ff322a3a3da77aead6",
+    "LICENSE.md": "9d2396ef3e091d3b82bc84143e070700412984e8589513570f54e0675d1e8851",
+    "LICENSE.GPL-2.0-or-later": "8c0e6fe8979268b2509827f052ef1a87d5e203a8ddc12abd7362abac0820cddd",
+    "RECOVERY.txt": "bffc2de447ee4ba685079e47e158d6a4ea53e30c0735d53f12491006d8e68da2"
+  },
+  "zip_sha256": "8d345b8e6a545b27fa7e582026bd58c11ea0b316263999a77cee8b759f9388cd"
+}
