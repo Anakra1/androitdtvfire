@@ -7,7 +7,7 @@ for (const button of document.querySelectorAll('[data-copy]')) {
     let copied = false;
     try { await navigator.clipboard.writeText(input.value); copied = true; }
     catch (_) { input.focus(); input.select(); copied = document.execCommand('copy'); }
-    status.textContent = copied ? 'Source URL copied. Name it CBR in Kodi.' : 'Select the address above and copy it using your browser.';
+    status.textContent = copied ? (button.dataset.copyMessage || 'Source URL copied. Name it CBR in Kodi.') : 'Select the address above and copy it using your browser.';
     button.textContent = copied ? 'Copied ✓' : 'Select address';
   });
 }
