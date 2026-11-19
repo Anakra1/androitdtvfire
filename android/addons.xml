@@ -1,40 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<addons><addon id="script.module.cbr.engine" name="CBR Playback Engine" version="0.1.1" provider-name="CBR Project">
-  <requires><import addon="xbmc.python" version="3.0.1" /></requires>
-  <extension point="xbmc.python.module" library="lib" />
-  <extension point="xbmc.addon.metadata">
-    <summary lang="en_GB">Integrated torrent buffering for Crimson Blood Requiem</summary>
-    <description lang="en_GB">Loads the bundled TorrServer shared engine inside Kodi on Android. Installed and updated automatically as a CBR dependency.</description>
-    <platform>all</platform>
-    <license>GPL-3.0-or-later</license>
-    <source>https://github.com/Anakra1/androitdtvfire</source>
-  <news>Recognise armv8l and select native library by Kodi process pointer size.</news></extension>
-</addon><addon id="plugin.video.stremio.bridge" name="Crimson Blood Requiem" version="0.12.2" provider-name="Community">
-  <requires><import addon="xbmc.python" version="3.0.1" /><import addon="script.module.cbr.engine" version="0.1.1" /></requires>
-  <extension point="xbmc.python.pluginsource" library="addon.py"><provides>video</provides></extension>
-  <extension point="xbmc.service" library="service.py" start="startup" />
-  <extension point="xbmc.addon.metadata">
-    <summary lang="en_GB">CBR movies, series, live TV and built-in Windows/Android torrent player</summary>
-    <description lang="en_GB">CBR movies and TV episodes with Torrentio and integrated torrent buffering. Samsung TV Plus UK channels and guide, configured Sports Streams, and PC/phone source setup. Sports playback requires a working configured provider link. Android uses the automatically installed CBR Playback Engine dependency.</description>
-    <platform>android</platform><license>GPL-3.0-or-later; includes MIT-licensed components</license>
-    <assets><icon>resources/art/crb-icon.png</icon><fanart>resources/art/crb-fanart.jpg</fanart></assets>
-  <news>0.12.2: Exit CBR returns to Kodi Add-ons; Quit Kodi asks before closing the application. Home, shared sidebar and default-skin menus supported.</news></extension>
-</addon><addon id="script.crb.wizard" name="CBR Setup Wizard" version="0.4.2" provider-name="CBR Project">
-  <requires>
-    <import addon="xbmc.python" version="3.0.1" />
-    </requires>
-  <extension point="xbmc.python.script" library="default.py" />
-  <extension point="xbmc.addon.metadata">
-    <platform>android</platform>
-    <license>GPL-3.0-or-later</license>
-    <summary lang="en_GB">Android / Fire TV full install with the CBR skin included</summary>
-    <description lang="en_GB">Self-contained Android setup. Includes the CBR skin, video add-on, torrent engine, repository and Kodi 21 ARM IPTV clients. Install this ZIP, open CBR Setup Wizard and run Full install. No CBR repository installation is required first.</description>
-    <assets>
-      <icon>resources/icon.png</icon>
-      <fanart>resources/fanart.jpg</fanart>
-    </assets>
-  <news>Includes CBR 0.12.2 and Command skin 0.2.1 with Continue Watching, sports artwork and setup tools.</news></extension>
-</addon><addon id="skin.crimsonbloodrequiem" version="0.2.1" name="Crimson Blood Requiem" provider-name="CBR Project">
+<addons><addon id="skin.crimsonbloodrequiem" version="0.2.1" name="Crimson Blood Requiem" provider-name="CBR Project">
   <requires>
     <import addon="xbmc.gui" version="5.17.0" />
     <import addon="plugin.video.stremio.bridge" version="0.12.2" />
@@ -60,4 +25,39 @@
     <description lang="en_GB">Crimson Blood Requiem brings a dark space-fleet backdrop, deep red accents, and direct home-screen access to CBR movies, TV series, Live TV and search. Based on Kodi Estuary and designed to keep Kodi library, settings and other add-ons available.</description>
     <disclaimer lang="en_GB">An independent community skin. Kodi and Estuary are trademarks and software of their respective owners.</disclaimer>
   <news>Adds Exit CBR and confirmed Quit Kodi controls to Home and CBR browsing menus.</news></extension>
+</addon><addon id="plugin.video.stremio.bridge" name="Crimson Blood Requiem" version="0.12.3" provider-name="Community">
+  <requires><import addon="xbmc.python" version="3.0.1" /><import addon="script.module.cbr.engine" version="0.1.2" /></requires>
+  <extension point="xbmc.python.pluginsource" library="addon.py"><provides>video</provides></extension>
+  <extension point="xbmc.service" library="service.py" start="startup" />
+  <extension point="xbmc.addon.metadata">
+    <summary lang="en_GB">CBR movies, series, live TV and built-in Windows/Android torrent player</summary>
+    <description lang="en_GB">CBR movies and TV episodes with Torrentio and integrated torrent buffering. Samsung TV Plus UK channels and guide, configured Sports Streams, and PC/phone source setup. Sports playback requires a working configured provider link. Android uses the automatically installed CBR Playback Engine dependency.</description>
+    <platform>android</platform><license>GPL-3.0-or-later; includes MIT-licensed components</license>
+    <assets><icon>resources/art/crb-icon.png</icon><fanart>resources/art/crb-fanart.jpg</fanart></assets>
+  <news>Requires CBR Playback Engine 0.1.2: fixes missing DT_HASH loader errors on older Fire TV/Android devices.</news></extension>
+</addon><addon id="script.crb.wizard" name="CBR Setup Wizard" version="0.4.3" provider-name="CBR Project">
+  <requires>
+    <import addon="xbmc.python" version="3.0.1" />
+    </requires>
+  <extension point="xbmc.python.script" library="default.py" />
+  <extension point="xbmc.addon.metadata">
+    <platform>android</platform>
+    <license>GPL-3.0-or-later</license>
+    <summary lang="en_GB">Android / Fire TV full install with the CBR skin included</summary>
+    <description lang="en_GB">Self-contained Android setup. Includes the CBR skin, video add-on, torrent engine, repository and Kodi 21 ARM IPTV clients. Install this ZIP, open CBR Setup Wizard and run Full install. No CBR repository installation is required first.</description>
+    <assets>
+      <icon>resources/icon.png</icon>
+      <fanart>resources/fanart.jpg</fanart>
+    </assets>
+  <news>Android full installer includes Playback Engine 0.1.2 legacy-loader fix and CBR 0.12.3.</news></extension>
+</addon><addon id="script.module.cbr.engine" name="CBR Playback Engine" version="0.1.2" provider-name="CBR Project">
+  <requires><import addon="xbmc.python" version="3.0.1" /></requires>
+  <extension point="xbmc.python.module" library="lib" />
+  <extension point="xbmc.addon.metadata">
+    <summary lang="en_GB">Integrated torrent buffering for Crimson Blood Requiem</summary>
+    <description lang="en_GB">Loads the bundled TorrServer shared engine inside Kodi on Android. Installed and updated automatically as a CBR dependency.</description>
+    <platform>all</platform>
+    <license>GPL-3.0-or-later</license>
+    <source>https://github.com/Anakra1/androitdtvfire</source>
+  <news>Compatibility fix: include legacy Android DT_HASH plus GNU hashes. Built against API 21 for older Fire TV/Android loaders.</news></extension>
 </addon></addons>

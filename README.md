@@ -1,4 +1,4 @@
-# Crimson Blood Requiem 0.12.2
+# Crimson Blood Requiem
 
 Kodi 21+ for Windows, Android TV and Fire TV. Uses the accepted Samsung UK / Sports Streams baseline, with Cinemeta listings and Torrentio movie and episode sources. The crimson space skin and wizard remain optional.
 
@@ -25,3 +25,5 @@ Video 0.12.0, skin 0.2.0 and wizard 0.4.0 add title pages, watchlist, confirmed 
 Movie and episode quality filtering (0.12.1): default 4K + 1080p, remembered per device; change from the link list or Configure → Movies and series links. Link counts and hidden CAM notices stay visible. Quality comes from provider labels, not a playback test. Source and checks: work/release0121/.
 
 Exit controls (video 0.12.2 / skin 0.2.1): Exit CBR opens Kodi Add-ons; Quit Kodi confirms before closing the application. Update both video and skin for the Home/sidebar buttons. Current wizard/full installer is 0.4.2. Release source: work/release0122/.
+
+Android compatibility update: video 0.12.3, Playback Engine 0.1.2, wizard 0.4.3. Fixes the empty/missing DT_HASH native-loader error. Install engine.zip from the existing source and restart Kodi, or update the Android video addon. Windows remains 0.12.2; skin remains 0.2.1. Source/checks: work/release0123/.

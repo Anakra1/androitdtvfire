@@ -1,0 +1,11 @@
+{
+  "engine": "0.1.2",
+  "runtime": "isolated Android x86_64 emulator",
+  "android_api": "37",
+  "native_load": true,
+  "hash_match": true,
+  "echo": "MatriX.150",
+  "healthy_samples": 40,
+  "sustained_seconds": 21,
+  "physical_fire_tv_tested": false
+}
