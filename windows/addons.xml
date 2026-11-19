@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<addons><addon id="plugin.video.stremio.bridge" name="Crimson Blood Requiem" version="0.11.4" provider-name="Community">
+<addons><addon id="plugin.video.stremio.bridge" name="Crimson Blood Requiem" version="0.12.0" provider-name="Community">
   <requires><import addon="xbmc.python" version="3.0.1" /></requires>
   <extension point="xbmc.python.pluginsource" library="addon.py"><provides>video</provides></extension>
   <extension point="xbmc.service" library="service.py" start="startup" />
@@ -8,12 +8,12 @@
     <description lang="en_GB">CBR movies and TV episodes with Torrentio and integrated torrent buffering. Samsung TV Plus UK channels and guide, configured Sports Streams, and PC/phone source setup. Sports playback requires a working configured provider link. Android uses the automatically installed CBR Playback Engine dependency.</description>
     <platform>windows</platform><license>GPL-3.0-or-later; includes MIT-licensed components</license>
     <assets><icon>resources/art/crb-icon.png</icon><fanart>resources/art/crb-fanart.jpg</fanart></assets>
-  <news>0.11.4: Progress-aware TV repair, channel status checks, confirmed fresh-link caching and bounded PVR retry, component update summaries and easier recovery access.</news></extension>
-</addon><addon id="script.crb.wizard" name="CBR Setup Wizard" version="0.3.4" provider-name="CBR Project">
+  <news>0.12.0: CBR Command interface, title pages, watchlist, confirmed Continue Watching/resume/next episode, sports favourites and team pins, cancellable loading and source/TV setup dashboard.</news></extension>
+</addon><addon id="script.crb.wizard" name="CBR Setup Wizard" version="0.4.0" provider-name="CBR Project">
   <requires>
     <import addon="xbmc.python" version="3.0.1" />
-    <import addon="skin.crimsonbloodrequiem" version="0.1.3" />
-    <import addon="plugin.video.stremio.bridge" version="0.11.4" />
+    <import addon="skin.crimsonbloodrequiem" version="0.2.0" />
+    <import addon="plugin.video.stremio.bridge" version="0.12.0" />
   <import addon="pvr.iptvsimple" version="21.0.0" /></requires>
   <extension point="xbmc.python.script" library="default.py" />
   <extension point="xbmc.addon.metadata">
@@ -25,11 +25,11 @@
       <icon>resources/icon.png</icon>
       <fanart>resources/fanart.jpg</fanart>
     </assets>
-  <news>Includes CBR 0.11.4 with detailed installer progress and TV repair/status/recovery tools.</news></extension>
-</addon><addon id="skin.crimsonbloodrequiem" version="0.1.3" name="Crimson Blood Requiem" provider-name="CBR Project">
+  <news>Includes CBR 0.12.0 and Command skin 0.2.0 with Continue Watching, sports artwork and setup tools.</news></extension>
+</addon><addon id="skin.crimsonbloodrequiem" version="0.2.0" name="Crimson Blood Requiem" provider-name="CBR Project">
   <requires>
     <import addon="xbmc.gui" version="5.17.0" />
-    <import addon="plugin.video.stremio.bridge" version="0.10.3" />
+    <import addon="plugin.video.stremio.bridge" version="0.12.0" />
   </requires>
   <extension point="xbmc.gui.skin" debugging="false">
     <res width="1920" height="1440" aspect="4:3" default="false" folder="xml" />
@@ -51,5 +51,5 @@
     <summary lang="en_GB">A crimson space-command skin for Kodi, built for CBR.</summary>
     <description lang="en_GB">Crimson Blood Requiem brings a dark space-fleet backdrop, deep red accents, and direct home-screen access to CBR movies, TV series, Live TV and search. Based on Kodi Estuary and designed to keep Kodi library, settings and other add-ons available.</description>
     <disclaimer lang="en_GB">An independent community skin. Kodi and Estuary are trademarks and software of their respective owners.</disclaimer>
-  <news>Native channel-group tabs on TV channels and guide. TV opens the CBR guide. Clear missing-programme information.</news></extension>
+  <news>CBR Command: unified navigation, title cards, Continue Watching and Sports Streams artwork.</news></extension>
 </addon></addons>

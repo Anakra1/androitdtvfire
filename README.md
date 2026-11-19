@@ -1,4 +1,4 @@
-# Crimson Blood Requiem 0.10.1
+# Crimson Blood Requiem 0.12.0
 
 Kodi 21+ for Windows, Android TV and Fire TV. Uses the accepted Samsung UK / Sports Streams baseline, with Cinemeta listings and Torrentio movie and episode sources. The crimson space skin and wizard remain optional.
 
@@ -16,4 +16,8 @@ This release does not overwrite the original 0.9.0 rollback packages.
 
 Install the matching repository, then install CBR Setup Wizard from Program add-ons. Kodi resolves the video add-on, skin, IPTV Simple Client and Android engine dependency automatically. Alternatively install full.zip after the matching repository is installed. Open the wizard and choose Full install / repair, wait for the channel/guide build, then restart Kodi once. Sports Streams still needs a configured provider link.
 
-Release source and checks: work/release0101/.
+Release source and checks: work/release0120/.
+
+## Command interface update
+
+Video 0.12.0, skin 0.2.0 and wizard 0.4.0 add title pages, watchlist, confirmed Continue Watching/resume/next episode, sports artwork/favourites/team pins, cancellable loading and a shared Setup dashboard. Both platforms retain their existing playback engines and private settings. Use the matching full installer to update all components together; a video-only ZIP does not update the skin. See the website guide for usage. Android installer/ABI checks pass; physical Fire TV playback validation remains outstanding.
