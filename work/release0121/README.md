@@ -1,0 +1,11 @@
+# CBR 0.12.1 — Movie and episode source-quality filters
+
+Video 0.12.1, wizard 0.4.1, existing skin 0.2.0. Windows and Android / Fire TV share filtering code; their existing native payloads remain unchanged.
+
+Movies and episodes default to 4K + 1080p. The link list starts with Quality → Change and a persistent shown/total/hidden summary. Choose 4K, 1080p, 720p, 1440p/2K, SD, CAM/TS/TC, unknown or all. The selection is remembered in the Kodi addon setting `vod_quality`, also available under Configure → Movies and series links. Cancelling the choice preserves it. Changing quality reuses that source-list result, avoiding repeated provider calls.
+
+CAM markers take precedence over advertised resolution. For two 1080p links and eight CAM links, show only the two HD entries and display “2 of 10 links shown · 8 hidden (8 CAM/TS/TC)”. Details gives the full quality breakdown and explains that classification comes from provider labels/filenames, not media verification. Unknown quality is not assumed to be HD. No matching quality leaves filter controls and a clear notification; it never silently plays CAM. Provider setup/error notices remain accessible and are not counted as playable links. Live TV and sports, including automatic fallback, bypass VOD filtering.
+
+Build starts from immutable video 0.12.0 / wizard 0.4.0 archives. Android full installer includes the updated video and existing skin/engines. `verify_quality.py` exercises both actual packaged archives with 26 quality examples, filename metadata, transport-stream extension handling, CAM precedence, missing metadata, counts, no-match, cancel, remembered choices, provider notices and live-TV isolation. Package validation, 41 Command checks per platform, source isolation and fresh Android ARM32/ARM64 installer checks pass. The native Windows UI showed exactly two links and eight hidden CAM entries, and all nine filter options. No commercial media played during this UI test; physical Fire TV playback is not claimed.
+
+Install Android video-only `cbr0121.zip`, Windows video-only `cbrwindows.zip`, or matching full installers Android `fulla041.zip` / Windows `full.zip`. Existing source settings and progress are retained. No personal configurations or UI-test source records are included.

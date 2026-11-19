@@ -9,7 +9,7 @@
     <license>GPL-3.0-or-later</license>
     <source>https://github.com/Anakra1/androitdtvfire</source>
   <news>Recognise armv8l and select native library by Kodi process pointer size.</news></extension>
-</addon><addon id="plugin.video.stremio.bridge" name="Crimson Blood Requiem" version="0.12.0" provider-name="Community">
+</addon><addon id="plugin.video.stremio.bridge" name="Crimson Blood Requiem" version="0.12.1" provider-name="Community">
   <requires><import addon="xbmc.python" version="3.0.1" /><import addon="script.module.cbr.engine" version="0.1.1" /></requires>
   <extension point="xbmc.python.pluginsource" library="addon.py"><provides>video</provides></extension>
   <extension point="xbmc.service" library="service.py" start="startup" />
@@ -18,8 +18,8 @@
     <description lang="en_GB">CBR movies and TV episodes with Torrentio and integrated torrent buffering. Samsung TV Plus UK channels and guide, configured Sports Streams, and PC/phone source setup. Sports playback requires a working configured provider link. Android uses the automatically installed CBR Playback Engine dependency.</description>
     <platform>android</platform><license>GPL-3.0-or-later; includes MIT-licensed components</license>
     <assets><icon>resources/art/crb-icon.png</icon><fanart>resources/art/crb-fanart.jpg</fanart></assets>
-  <news>0.12.0: CBR Command interface, title pages, watchlist, confirmed Continue Watching/resume/next episode, sports favourites and team pins, cancellable loading and source/TV setup dashboard.</news></extension>
-</addon><addon id="script.crb.wizard" name="CBR Setup Wizard" version="0.4.0" provider-name="CBR Project">
+  <news>0.12.1: Remembered movie/episode quality filters, 4K/1080p/720p/SD/CAM/unknown choices, matching-link counts and hidden-CAM notices. Live TV is unchanged.</news></extension>
+</addon><addon id="script.crb.wizard" name="CBR Setup Wizard" version="0.4.1" provider-name="CBR Project">
   <requires>
     <import addon="xbmc.python" version="3.0.1" />
     </requires>
@@ -33,7 +33,7 @@
       <icon>resources/icon.png</icon>
       <fanart>resources/fanart.jpg</fanart>
     </assets>
-  <news>Includes CBR 0.12.0 and Command skin 0.2.0 with Continue Watching, sports artwork and setup tools.</news></extension>
+  <news>Includes CBR 0.12.1 and Command skin 0.2.0 with Continue Watching, sports artwork and setup tools.</news></extension>
 </addon><addon id="skin.crimsonbloodrequiem" version="0.2.0" name="Crimson Blood Requiem" provider-name="CBR Project">
   <requires>
     <import addon="xbmc.gui" version="5.17.0" />

@@ -1,0 +1,90 @@
+"""CBR maintenance release: matching Windows and Android packages."""
+from pathlib import Path
+from zipfile import ZipFile, ZIP_DEFLATED, ZIP_STORED
+import ast, hashlib, json, re, shutil
+import xml.etree.ElementTree as ET
+
+HERE=Path(__file__).resolve().parent
+ROOT=HERE.parents[1]
+VIDEO,WIZARD,SKIN='plugin.video.stremio.bridge','script.crb.wizard','skin.crimsonbloodrequiem'
+
+def read(path):
+    with ZipFile(path)as z:return {n:z.read(n)for n in z.namelist()if not n.endswith('/')and'__pycache__'not in n}
+
+def package(platform,identity,version,files):
+    path=ROOT/platform/'packages'/identity/(identity+'-'+version+'.zip');path.parent.mkdir(parents=True,exist_ok=True)
+    with ZipFile(path,'w',ZIP_DEFLATED,compresslevel=7)as z:
+        for name,raw in sorted(files.items()):
+            if name.endswith('.py'):ast.parse(raw.decode('utf-8-sig'),feature_version=(3,8))
+            if name.endswith('.xml'):ET.fromstring(raw)
+            if name.endswith('.json'):json.loads(raw)
+            z.writestr(name,raw,compress_type=ZIP_STORED if name.endswith('.zip')else ZIP_DEFLATED)
+    assert path.stat().st_size<100*1024*1024
+    return path
+
+def set_meta(files,identity,version,news):
+    a=ET.fromstring(files[identity+'/addon.xml']);a.set('version',version)
+    extension=a.find("extension[@point='xbmc.addon.metadata']")
+    node=extension.find('news')
+    if node is None:node=ET.SubElement(extension,'news')
+    node.text=news
+    files[identity+'/addon.xml']=ET.tostring(a,encoding='utf-8',xml_declaration=True)
+    return a
+
+news='0.12.1: Remembered movie/episode quality filters, 4K/1080p/720p/SD/CAM/unknown choices, matching-link counts and hidden-CAM notices. Live TV is unchanged.'
+videos={};manifests={};skins={};skin_meta={}
+for platform in ['android','windows']:
+    files=read(ROOT/platform/'packages'/VIDEO/(VIDEO+'-0.12.0.zip'))
+    for source in (HERE/'overlay').rglob('*'):
+        if source.is_file():files[VIDEO+'/'+source.relative_to(HERE/'overlay').as_posix()]=source.read_bytes()
+    versions={VIDEO:'0.12.1',WIZARD:'0.4.1',SKIN:'0.2.0'}
+    if platform=='android':versions['script.module.cbr.engine']='0.1.1'
+    files[VIDEO+'/resources/defaults/release-components.json']=json.dumps(versions).encode()
+    manifests[platform]=set_meta(files,VIDEO,'0.12.1',news)
+    videos[platform]=package(platform,VIDEO,'0.12.1',files)
+    skins[platform]=ROOT/platform/'packages'/SKIN/(SKIN+'-0.2.0.zip')
+    with ZipFile(skins[platform])as z:skin_meta[platform]=ET.fromstring(z.read(SKIN+'/addon.xml'))
+
+wizards={};wizard_meta={}
+for platform in ['android','windows']:
+    files=read(ROOT/platform/'packages'/WIZARD/(WIZARD+'-0.4.0.zip'))
+    for source in (HERE/(platform+'-wizard')).rglob('*'):
+        if source.is_file():files[WIZARD+'/'+source.relative_to(HERE/(platform+'-wizard')).as_posix()]=source.read_bytes()
+    meta=set_meta(files,WIZARD,'0.4.1','Includes CBR 0.12.1 and Command skin 0.2.0 with Continue Watching, sports artwork and setup tools.')
+    if platform=='android':
+        prefix=WIZARD+'/resources/bundle/';bundle=json.loads(files[prefix+'packages.json'])
+        for identity,version,path in [(VIDEO,'0.12.1',videos[platform]),(SKIN,'0.2.0',skins[platform])]:
+            item=next(i for i in bundle['packages']if i['id']==identity);raw=path.read_bytes()
+            item.update(version=version,sha256=hashlib.sha256(raw).hexdigest());files[prefix+item['file']]=raw
+        files[prefix+'packages.json']=json.dumps(bundle,indent=2).encode()
+    else:
+        for dep in meta.find('requires'):
+            if dep.get('addon')==VIDEO:dep.set('version','0.12.1')
+            if dep.get('addon')==SKIN:dep.set('version','0.2.0')
+        files[WIZARD+'/addon.xml']=ET.tostring(meta,encoding='utf-8',xml_declaration=True)
+    wizard_meta[platform]=meta
+    wizards[platform]=package(platform,WIZARD,'0.4.1',files)
+for platform in ['android','windows']:
+    path=ROOT/platform/'addons.xml';feed=ET.parse(path).getroot()
+    for meta in [manifests[platform],wizard_meta[platform],skin_meta[platform]]:
+        for old in list(feed):
+            if old.get('id')==meta.get('id'):feed.remove(old)
+        feed.append(meta)
+    raw=ET.tostring(feed,encoding='utf-8',xml_declaration=True);path.write_bytes(raw)
+    path.with_suffix('.xml.md5').write_text(hashlib.md5(raw).hexdigest(),encoding='ascii')
+for alias,source in [('cbr0121.zip',videos['android']),('video.zip',videos['android']),('cbrwindows.zip',videos['windows']),
+                     ('fulla041.zip',wizards['android']),('fulla.zip',wizards['android']),('full.zip',wizards['windows'])]:
+    shutil.copy2(source,ROOT/alias)
+for platform,folder in [('android','Fire-TV-Android'),('windows','Windows')]:
+    shutil.copy2(videos[platform],ROOT/'downloads'/folder/videos[platform].name)
+    shutil.copy2(wizards[platform],ROOT/'downloads'/folder/'CBR-Full-Install-0.4.1.zip')
+index=(ROOT/'index.html').read_text(encoding='utf8')
+for name in ['cbr0121.zip','video.zip','cbrwindows.zip','fulla041.zip','fulla.zip','full.zip']:
+    size=(ROOT/name).stat().st_size;pattern=r'(<a href="'+re.escape(name)+r'">'+re.escape(name)+r'</a></td><td>)\d+ B'
+    if re.search(pattern,index):index=re.sub(pattern,lambda m:m[1]+str(size)+' B',index)
+    else:index=index.replace('</table>',f'<tr><td><a href="{name}">{name}</a></td><td>{size} B</td></tr>\n</table>')
+(ROOT/'index.html').write_text(index,encoding='utf8')
+for path in (ROOT/'website').glob('*.html'):
+    text=path.read_text(encoding='utf8').replace('0.12.0','0.12.1').replace('0.4.0','0.4.1').replace('cbr0120','cbr0121').replace('fulla040','fulla041')
+    path.write_text(text,encoding='utf8')
+print('Built CBR 0.12.1, skin 0.2.0 and wizard 0.4.1 for Windows and Android.')

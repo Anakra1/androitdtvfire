@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='utf-8'?>
+<settings>
+  <category label="Built-in player">
+    <setting id="cache_mb" type="select" label="Torrent memory cache (MB; restart Kodi to apply)" values="64|128|256|512" default="128" />
+  </category>
+  <category label="Updates">
+    <setting id="startup_update_check" type="bool" label="Check repositories after Kodi starts" default="true" />
+  </category>
+<category label="Movies and series links"><setting id="vod_quality" type="select" label="Link quality filter (provider labels)" values="4K + 1080p|4K only|1080p only|720p only|1440p / 2K only|SD (480p / 576p)|CAM / TS / TC only|Other / unknown quality|Show all qualities" default="4K + 1080p" /></category></settings>
