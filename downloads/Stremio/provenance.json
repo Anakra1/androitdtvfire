@@ -1,0 +1,19 @@
+{
+  "upstream_url": "https://dl.strem.io/android/v1.6.12-com.stremio.one/com.stremio.one-1.6.12-11049190-armeabi-v7a.apk",
+  "version": "1.6.12",
+  "architecture": "armeabi-v7a",
+  "sha256": "5383af8072d22a3f4178c904372055037190a902e894079ecaa8a622aee94f7d",
+  "bytes": 87502583,
+  "package": "com.stremio.one",
+  "minimum_android": "5.1",
+  "min_sdk": 22,
+  "target_sdk": 34,
+  "tv_launcher": true,
+  "publisher_certificate_sha256": "7e6a979c968f771e3fbcf2c2e8718ce61e708d87caf91fc13e2d4c19a8022c6b",
+  "signature_v1": true,
+  "signature_v2": true,
+  "native_libraries": 29,
+  "legacy_hash_tables": true,
+  "modified": false,
+  "mirror": "https://anakra1.github.io/androitdtvfire/s.apk"
+}
