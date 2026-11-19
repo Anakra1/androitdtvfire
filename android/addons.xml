@@ -9,7 +9,7 @@
     <license>GPL-3.0-or-later</license>
     <source>https://github.com/Anakra1/androitdtvfire</source>
   <news>Recognise armv8l and select native library by Kodi process pointer size.</news></extension>
-</addon><addon id="plugin.video.stremio.bridge" name="Crimson Blood Requiem" version="0.12.1" provider-name="Community">
+</addon><addon id="plugin.video.stremio.bridge" name="Crimson Blood Requiem" version="0.12.2" provider-name="Community">
   <requires><import addon="xbmc.python" version="3.0.1" /><import addon="script.module.cbr.engine" version="0.1.1" /></requires>
   <extension point="xbmc.python.pluginsource" library="addon.py"><provides>video</provides></extension>
   <extension point="xbmc.service" library="service.py" start="startup" />
@@ -18,8 +18,8 @@
     <description lang="en_GB">CBR movies and TV episodes with Torrentio and integrated torrent buffering. Samsung TV Plus UK channels and guide, configured Sports Streams, and PC/phone source setup. Sports playback requires a working configured provider link. Android uses the automatically installed CBR Playback Engine dependency.</description>
     <platform>android</platform><license>GPL-3.0-or-later; includes MIT-licensed components</license>
     <assets><icon>resources/art/crb-icon.png</icon><fanart>resources/art/crb-fanart.jpg</fanart></assets>
-  <news>0.12.1: Remembered movie/episode quality filters, 4K/1080p/720p/SD/CAM/unknown choices, matching-link counts and hidden-CAM notices. Live TV is unchanged.</news></extension>
-</addon><addon id="script.crb.wizard" name="CBR Setup Wizard" version="0.4.1" provider-name="CBR Project">
+  <news>0.12.2: Exit CBR returns to Kodi Add-ons; Quit Kodi asks before closing the application. Home, shared sidebar and default-skin menus supported.</news></extension>
+</addon><addon id="script.crb.wizard" name="CBR Setup Wizard" version="0.4.2" provider-name="CBR Project">
   <requires>
     <import addon="xbmc.python" version="3.0.1" />
     </requires>
@@ -33,11 +33,11 @@
       <icon>resources/icon.png</icon>
       <fanart>resources/fanart.jpg</fanart>
     </assets>
-  <news>Includes CBR 0.12.1 and Command skin 0.2.0 with Continue Watching, sports artwork and setup tools.</news></extension>
-</addon><addon id="skin.crimsonbloodrequiem" version="0.2.0" name="Crimson Blood Requiem" provider-name="CBR Project">
+  <news>Includes CBR 0.12.2 and Command skin 0.2.1 with Continue Watching, sports artwork and setup tools.</news></extension>
+</addon><addon id="skin.crimsonbloodrequiem" version="0.2.1" name="Crimson Blood Requiem" provider-name="CBR Project">
   <requires>
     <import addon="xbmc.gui" version="5.17.0" />
-    <import addon="plugin.video.stremio.bridge" version="0.12.0" />
+    <import addon="plugin.video.stremio.bridge" version="0.12.2" />
   </requires>
   <extension point="xbmc.gui.skin" debugging="false">
     <res width="1920" height="1440" aspect="4:3" default="false" folder="xml" />
@@ -59,5 +59,5 @@
     <summary lang="en_GB">A crimson space-command skin for Kodi, built for CBR.</summary>
     <description lang="en_GB">Crimson Blood Requiem brings a dark space-fleet backdrop, deep red accents, and direct home-screen access to CBR movies, TV series, Live TV and search. Based on Kodi Estuary and designed to keep Kodi library, settings and other add-ons available.</description>
     <disclaimer lang="en_GB">An independent community skin. Kodi and Estuary are trademarks and software of their respective owners.</disclaimer>
-  <news>CBR Command: unified navigation, title cards, Continue Watching and Sports Streams artwork.</news></extension>
+  <news>Adds Exit CBR and confirmed Quit Kodi controls to Home and CBR browsing menus.</news></extension>
 </addon></addons>
