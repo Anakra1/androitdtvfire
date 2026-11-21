@@ -18,3 +18,9 @@
 .user-guide .release-row{padding-block:22px}.user-guide .release-row p{overflow-wrap:anywhere}
 .main-nav{flex-wrap:wrap;row-gap:0}.main-nav a{white-space:nowrap}
 @media(max-width:760px){.updates-banner{display:block;padding:22px}.updates-banner .button{margin-top:16px}.featured-playlist{padding:20px}.main-nav{justify-content:flex-start;column-gap:18px}.user-guide .release-number{font-size:18px}}
+
+/* Pluto UK channel directory */
+.channel-filters{display:grid;grid-template-columns:1fr 1fr auto;align-items:end;gap:18px;margin:28px 0}
+.channel-filters label{display:block;font-weight:650;margin-bottom:8px}.channel-filters input,.channel-filters select{font:inherit;color:inherit;background:#171017;border:1px solid #805166;border-radius:8px;padding:12px;width:100%;min-height:48px}
+.channel-table-wrap{overflow:auto;border:1px solid #4b2b38;border-radius:12px}.channel-list-table{width:100%;border-collapse:collapse;text-align:left}.channel-list-table caption{text-align:left;padding:16px;font-weight:650;background:#24141d}.channel-list-table th,.channel-list-table td{padding:13px 18px;border-top:1px solid #4b2b38}.channel-list-table th{color:#edb3c4;background:#201219}.channel-list-table tbody tr:nth-child(even){background:#1a1118}.channel-list-table tr[hidden]{display:none}.channel-filters input:focus,.channel-filters select:focus{outline:2px solid #ed6b8d;outline-offset:3px}
+@media(max-width:760px){.channel-filters{grid-template-columns:1fr}.channel-list-table th,.channel-list-table td{padding:12px;font-size:14px}}
