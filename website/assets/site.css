@@ -9,3 +9,12 @@
 /* TV sources user guide */
 .user-guide .guide-body{min-width:0}.user-guide .guide-body a:not(.button){color:#ff9bae;text-decoration:underline;text-underline-offset:3px}.user-guide section[id]{scroll-margin-top:120px}.user-guide code{font-family:Consolas,monospace;font-size:.9em;overflow-wrap:anywhere;color:#ffd1db}.user-guide .guide-steps>li{margin-bottom:18px}.user-guide .source-card{border:1px solid var(--line);background:linear-gradient(120deg,#23111b,#130e13);padding:25px;margin-block:22px;border-radius:4px}.user-guide .source-card h3{font-size:25px}.user-guide .source-category{display:block;color:#ff9bae;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px}.user-guide .source-card .copy-row input{min-width:0;font-size:12px}.user-guide .source-card .copy-row .button{white-space:nowrap}.user-guide .source-card .copy-status{min-height:1.7em;margin-bottom:0}.user-guide .source-panel hr{border:0;border-top:1px solid var(--line);margin-block:24px}.user-guide .guide-note{font-size:13px;margin-top:28px}
 @media(max-width:760px){.main-nav{flex-wrap:wrap;column-gap:14px;row-gap:0}.main-nav a{white-space:nowrap}.user-guide section[id]{scroll-margin-top:160px}.user-guide .source-card{padding:20px}.user-guide .source-card .copy-row input{font-size:11px}.user-guide .guide-aside{display:none}}
+
+/* Updates and playlist hub */
+.updates-banner{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:24px 28px;margin-top:24px;border:1px solid #8e3855;border-radius:14px;background:linear-gradient(110deg,#321320,#161019)}
+.updates-banner h2{margin:4px 0 8px;font-size:26px}.updates-banner p{margin:5px 0}.updates-banner .button{flex-shrink:0}
+.featured-playlist{padding:26px;border:1px solid #8e3855;border-radius:14px;background:#20111a}
+.release-archive{margin:24px 0;padding:18px;border:1px solid #4b2b38;border-radius:10px}.release-archive>summary{cursor:pointer;font-size:17px;font-weight:650;color:#f3c4d1}.release-archive[open]>summary{margin-bottom:24px}
+.user-guide .release-row{padding-block:22px}.user-guide .release-row p{overflow-wrap:anywhere}
+.main-nav{flex-wrap:wrap;row-gap:0}.main-nav a{white-space:nowrap}
+@media(max-width:760px){.updates-banner{display:block;padding:22px}.updates-banner .button{margin-top:16px}.featured-playlist{padding:20px}.main-nav{justify-content:flex-start;column-gap:18px}.user-guide .release-number{font-size:18px}}
